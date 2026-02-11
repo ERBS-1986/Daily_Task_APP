@@ -11,7 +11,7 @@ interface GymManagerProps {
 const GymManager: React.FC<GymManagerProps> = ({ workouts, setWorkouts }) => {
   const [selectedDay, setSelectedDay] = useState(0);
   const [activeExerciseId, setActiveExerciseId] = useState<string | null>(null);
-  
+
   // Rest Timer State
   const [restTime, setRestTime] = useState(60);
   const [isResting, setIsResting] = useState(false);
@@ -92,8 +92,8 @@ const GymManager: React.FC<GymManagerProps> = ({ workouts, setWorkouts }) => {
               }}
               className={`
                 flex flex-col items-center gap-1 min-w-[100px] p-4 rounded-2xl border transition-all
-                ${selectedDay === idx 
-                  ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-600/20' 
+                ${selectedDay === idx
+                  ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-600/20'
                   : 'bg-slate-900 border-slate-800 text-slate-500 hover:border-slate-700'}
               `}
             >
@@ -130,35 +130,43 @@ const GymManager: React.FC<GymManagerProps> = ({ workouts, setWorkouts }) => {
             </div>
 
             <div className="space-y-4 relative z-10">
-              {currentWorkout.exercises.map(ex => (
-                <div 
-                  key={ex.id}
-                  onClick={() => handleExerciseClick(ex.id)}
-                  className={`
-                    flex items-center justify-between p-5 rounded-2xl border cursor-pointer transition-all
-                    ${activeExerciseId === ex.id 
-                      ? 'bg-indigo-600/20 border-indigo-500 shadow-lg shadow-indigo-500/10' 
-                      : ex.completed ? 'bg-indigo-600/5 border-indigo-500/30' : 'bg-slate-950/50 border-slate-800 hover:border-slate-700'}
-                  `}
-                >
-                  <div className="flex items-center gap-4">
-                    <div 
-                      onClick={(e) => toggleExercise(ex.id, e)}
-                      className={`w-6 h-6 rounded-full flex items-center justify-center border transition-all ${ex.completed ? 'bg-indigo-500 border-indigo-400 text-white' : 'border-slate-700 text-transparent hover:border-indigo-500'}`}
-                    >
-                      <CheckCircle2 className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <h5 className={`font-bold transition-colors ${ex.completed ? 'text-slate-500 line-through' : 'text-slate-100'}`}>{ex.name}</h5>
-                      <p className="text-xs text-slate-500 font-medium">{ex.sets} séries • {ex.reps} reps {ex.weight && `• ${ex.weight}kg`}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    {ex.gifUrl && <Play className={`w-4 h-4 transition-colors ${activeExerciseId === ex.id ? 'text-indigo-400 animate-pulse' : 'text-slate-600'}`} />}
-                    <ChevronRight className={`w-5 h-5 ${activeExerciseId === ex.id ? 'text-indigo-400 rotate-90 transition-transform' : 'text-slate-700 transition-transform'}`} />
-                  </div>
+              {currentWorkout.exercises.length === 0 ? (
+                <div className="text-center py-12 bg-slate-950/50 rounded-2xl border border-dashed border-slate-800">
+                  <Dumbbell className="w-12 h-12 text-slate-700 mx-auto mb-4" />
+                  <p className="text-slate-400 font-medium">Nenhum exercício para {currentWorkout.day}.</p>
+                  <p className="text-slate-600 text-sm mt-2">Adicione exercícios para este dia de treino.</p>
                 </div>
-              ))}
+              ) : (
+                currentWorkout.exercises.map(ex => (
+                  <div
+                    key={ex.id}
+                    onClick={() => handleExerciseClick(ex.id)}
+                    className={`
+                      flex items-center justify-between p-5 rounded-2xl border cursor-pointer transition-all
+                      ${activeExerciseId === ex.id
+                        ? 'bg-indigo-600/20 border-indigo-500 shadow-lg shadow-indigo-500/10'
+                        : ex.completed ? 'bg-indigo-600/5 border-indigo-500/30' : 'bg-slate-950/50 border-slate-800 hover:border-slate-700'}
+                    `}
+                  >
+                    <div className="flex items-center gap-4">
+                      <div
+                        onClick={(e) => toggleExercise(ex.id, e)}
+                        className={`w-6 h-6 rounded-full flex items-center justify-center border transition-all ${ex.completed ? 'bg-indigo-500 border-indigo-400 text-white' : 'border-slate-700 text-transparent hover:border-indigo-500'}`}
+                      >
+                        <CheckCircle2 className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <h5 className={`font-bold transition-colors ${ex.completed ? 'text-slate-500 line-through' : 'text-slate-100'}`}>{ex.name}</h5>
+                        <p className="text-xs text-slate-500 font-medium">{ex.sets} séries • {ex.reps} reps {ex.weight && `• ${ex.weight}kg`}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      {ex.gifUrl && <Play className={`w-4 h-4 transition-colors ${activeExerciseId === ex.id ? 'text-indigo-400 animate-pulse' : 'text-slate-600'}`} />}
+                      <ChevronRight className={`w-5 h-5 ${activeExerciseId === ex.id ? 'text-indigo-400 rotate-90 transition-transform' : 'text-slate-700 transition-transform'}`} />
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
 
             <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
@@ -174,8 +182,8 @@ const GymManager: React.FC<GymManagerProps> = ({ workouts, setWorkouts }) => {
                 <p className="text-sm font-bold text-white">Tempo de Descanso</p>
                 <div className="flex gap-2 mt-1">
                   {[30, 60, 90].map(s => (
-                    <button 
-                      key={s} 
+                    <button
+                      key={s}
                       onClick={() => resetRest(s)}
                       className="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-400 px-2 py-0.5 rounded-md font-bold uppercase transition-colors"
                     >
@@ -193,15 +201,15 @@ const GymManager: React.FC<GymManagerProps> = ({ workouts, setWorkouts }) => {
                 </span>
                 <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Restante</p>
               </div>
-              
+
               <div className="flex gap-2">
-                <button 
+                <button
                   onClick={() => resetRest(60)}
                   className="p-3 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-2xl transition-all active:scale-90"
                 >
                   <RotateCcw className="w-5 h-5" />
                 </button>
-                <button 
+                <button
                   onClick={toggleRest}
                   className={`p-4 rounded-2xl transition-all active:scale-95 shadow-lg ${isResting ? 'bg-rose-500 text-white shadow-rose-500/20' : 'bg-amber-500 text-slate-900 shadow-amber-500/20'}`}
                 >
@@ -215,9 +223,9 @@ const GymManager: React.FC<GymManagerProps> = ({ workouts, setWorkouts }) => {
         {/* Workout Image / GIF (Lado Direito) */}
         <div className="lg:col-span-4 space-y-6 sticky top-8 h-fit">
           <div className="relative group overflow-hidden rounded-[2.5rem] border-4 border-slate-900 shadow-2xl h-[450px] bg-slate-900">
-            <img 
+            <img
               key={activeExercise?.gifUrl || currentWorkout.image}
-              src={activeExercise?.gifUrl || currentWorkout.image} 
+              src={activeExercise?.gifUrl || currentWorkout.image}
               alt={activeExercise?.name || currentWorkout.focus}
               className="w-full h-full object-cover transition-all duration-700 animate-in fade-in"
             />
@@ -237,7 +245,7 @@ const GymManager: React.FC<GymManagerProps> = ({ workouts, setWorkouts }) => {
               <Save className="w-5 h-5" /> Dica de Execução
             </h4>
             <p className="text-sm text-indigo-100 leading-relaxed font-medium">
-              {activeExercise 
+              {activeExercise
                 ? `Ao realizar ${activeExercise.name.toLowerCase()}, concentre-se na amplitude total do movimento. Não sacrifique a técnica pelo peso.`
                 : `"Para este treino de ${currentWorkout.focus.toLowerCase()}, foque na contração máxima no topo de cada repetição. O tempo sob tensão é seu melhor aliado hoje."`
               }

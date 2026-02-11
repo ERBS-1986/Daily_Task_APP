@@ -162,6 +162,7 @@ const Auth: React.FC = () => {
               )}
             </button>
 
+            {/* Temporariamente removido - Login Social
             <div className="relative py-4">
               <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-800"></div></div>
               <div className="relative flex justify-center text-[10px] font-bold uppercase tracking-widest"><span className="bg-slate-900/0 px-2 text-slate-500">ou continuar com</span></div>
@@ -182,6 +183,7 @@ const Auth: React.FC = () => {
                 <Github className="w-4 h-4" /> Github
               </button>
             </div>
+            */}
           </form>
         </div>
 

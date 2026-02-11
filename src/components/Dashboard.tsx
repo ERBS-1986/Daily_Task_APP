@@ -1,11 +1,11 @@
 
 import React, { useState } from 'react';
-import { 
-  CheckCircle2, 
-  Circle, 
-  Flame, 
-  Trophy, 
-  TrendingUp, 
+import {
+  CheckCircle2,
+  Circle,
+  Flame,
+  Trophy,
+  TrendingUp,
   Plus,
   ArrowUpRight,
   Droplet,
@@ -35,12 +35,7 @@ const Dashboard: React.FC<DashboardProps> = ({ tasks, habits, goals, water, work
   const todayName = days[new Date().getDay()];
   const todayWorkout = workouts.find(w => w.day === todayName);
 
-  // Mock Calendar Events for Dashboard View
-  const todayEvents = [
-    { id: '1', title: 'Reunião Trimestral', time: '14:00', type: 'Work' },
-    { id: '2', title: 'Check-up Médico', time: '16:30', type: 'Health' },
-    { id: '3', title: 'Jantar de Networking', time: '20:00', type: 'Social' }
-  ];
+
 
   const weeklyData = [
     { day: 'Seg', tasks: 12 },
@@ -66,7 +61,7 @@ const Dashboard: React.FC<DashboardProps> = ({ tasks, habits, goals, water, work
                 <h3 className="text-xl font-bold text-white">Sua Agenda de Hoje</h3>
                 <p className="text-xs text-slate-500">Sincronizado com Google Calendar</p>
               </div>
-              <button 
+              <button
                 onClick={() => onNavigate('calendar')}
                 className="ml-auto md:ml-4 p-2 bg-slate-800 hover:bg-slate-700 text-slate-400 rounded-lg transition-colors"
               >
@@ -75,21 +70,18 @@ const Dashboard: React.FC<DashboardProps> = ({ tasks, habits, goals, water, work
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {todayEvents.map(event => (
-                <div key={event.id} className="bg-slate-950/50 border border-slate-800 p-4 rounded-2xl flex items-center gap-4 hover:border-indigo-500/30 transition-all cursor-pointer group/card">
-                  <div className="flex flex-col items-center justify-center w-12 h-12 bg-white/5 rounded-xl border border-white/5 group-hover/card:bg-indigo-600/10 transition-colors">
-                    <Clock className="w-4 h-4 text-indigo-400" />
-                    <span className="text-[10px] font-bold text-slate-400 mt-1">{event.time}</span>
-                  </div>
-                  <div>
-                    <p className="text-sm font-bold text-slate-100 line-clamp-1">{event.title}</p>
-                    <span className="text-[10px] px-2 py-0.5 bg-indigo-600/10 text-indigo-400 rounded-full font-bold uppercase">{event.type}</span>
-                  </div>
+              {/* Empty State for Calendar Events */}
+              <div className="col-span-1 md:col-span-3 bg-slate-950/50 border border-slate-800 p-6 rounded-2xl flex flex-col items-center justify-center text-center group/card">
+                <div className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center mb-3">
+                  <CalIcon className="w-5 h-5 text-slate-500" />
                 </div>
-              ))}
-              <button 
+                <p className="text-sm font-bold text-slate-300">Nenhum evento agendado</p>
+                <p className="text-xs text-slate-500 mt-1">Conecte seu Google Calendar para ver sua agenda.</p>
+              </div>
+
+              <button
                 onClick={() => onNavigate('tasks')}
-                className="bg-indigo-600/5 border border-dashed border-indigo-600/30 p-4 rounded-2xl flex items-center justify-center gap-2 text-indigo-400 hover:bg-indigo-600/10 transition-all font-bold text-sm"
+                className="col-span-1 md:col-span-3 bg-indigo-600/5 border border-dashed border-indigo-600/30 p-4 rounded-2xl flex items-center justify-center gap-2 text-indigo-400 hover:bg-indigo-600/10 transition-all font-bold text-sm"
               >
                 <Plus className="w-4 h-4" /> Nova Atividade
               </button>
@@ -149,7 +141,7 @@ const Dashboard: React.FC<DashboardProps> = ({ tasks, habits, goals, water, work
           </div>
           <p className="text-slate-400 text-sm mb-1">Metas Semanais</p>
           <p className="text-2xl font-bold text-slate-100">{goals.length} ativas</p>
-          <button 
+          <button
             onClick={() => onNavigate('goals')}
             className="mt-4 text-xs text-indigo-400 font-semibold flex items-center gap-1 hover:text-indigo-300 transition-colors"
           >
@@ -168,9 +160,9 @@ const Dashboard: React.FC<DashboardProps> = ({ tasks, habits, goals, water, work
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={weeklyData}>
-                <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} dy={10} />
-                <Tooltip 
-                  cursor={{fill: '#1e293b'}} 
+                <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 12 }} dy={10} />
+                <Tooltip
+                  cursor={{ fill: '#1e293b' }}
                   contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '12px', color: '#f8fafc' }}
                 />
                 <Bar dataKey="tasks" fill="#6366f1" radius={[6, 6, 0, 0]} barSize={40} />

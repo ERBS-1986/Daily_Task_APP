@@ -1,19 +1,23 @@
 
 import React, { useState } from 'react';
-import { 
-  Plus, 
-  Search, 
-  Filter, 
-  MoreVertical, 
-  Calendar as CalIcon, 
-  Tag, 
-  Trash2, 
-  CheckCircle2, 
+import {
+  Plus,
+  Search,
+  Filter,
+  MoreVertical,
+  Calendar as CalIcon,
+  Tag,
+  Trash2,
+  CheckCircle2,
   Circle,
-  AlertTriangle
+  AlertTriangle,
+  Loader2
 } from 'lucide-react';
 import { Task, Category, TaskPriority } from '../types';
 import { CATEGORY_ICONS, PRIORITY_COLORS } from '../constants';
+import { supabase } from '../lib/supabase';
+import { useAuth } from '../contexts/AuthContext';
+import { useToast } from '../contexts/ToastContext';
 
 interface TaskManagerProps {
   tasks: Task[];
@@ -21,36 +25,102 @@ interface TaskManagerProps {
 }
 
 const TaskManager: React.FC<TaskManagerProps> = ({ tasks, setTasks }) => {
+  const { user } = useAuth();
+  const { showToast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCategory, setFilterCategory] = useState<Category | 'ALL'>('ALL');
   const [showAddModal, setShowAddModal] = useState(false);
-  
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   // New task form state
   const [newTitle, setNewTitle] = useState('');
   const [newCategory, setNewCategory] = useState<Category>(Category.WORK);
   const [newPriority, setNewPriority] = useState<TaskPriority>(TaskPriority.MEDIUM);
 
-  const handleAddTask = () => {
-    if (!newTitle.trim()) return;
-    const newTask: Task = {
-      id: Date.now().toString(),
-      title: newTitle,
-      category: newCategory,
-      priority: newPriority,
-      completed: false,
-      subTasks: []
-    };
-    setTasks([newTask, ...tasks]);
-    setNewTitle('');
-    setShowAddModal(false);
+  const handleAddTask = async () => {
+    if (!newTitle.trim() || !user) return;
+    setIsSubmitting(true);
+
+    try {
+      const newTaskPayload = {
+        user_id: user.id,
+        title: newTitle,
+        category: newCategory,
+        priority: newPriority,
+        completed: false,
+        subtasks: []
+      };
+
+      const { data, error } = await supabase
+        .from('tasks')
+        .insert(newTaskPayload)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      if (data) {
+        // Map back to App Task type
+        const newTask: Task = {
+          id: data.id,
+          title: data.title,
+          category: data.category as Category,
+          priority: data.priority as TaskPriority,
+          completed: data.completed,
+          subTasks: data.subtasks || [],
+          dueDate: data.due_date,
+          reminder: data.reminder
+        };
+        setTasks([newTask, ...tasks]);
+        setNewTitle('');
+        setShowAddModal(false);
+      }
+    } catch (error) {
+      console.error('Error adding task:', error);
+      showToast('Erro ao criar tarefa. Tente novamente.', 'error');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const toggleTask = (id: string) => {
-    setTasks(tasks.map(t => t.id === id ? { ...t, completed: !t.completed } : t));
+  const toggleTask = async (id: string, currentStatus: boolean) => {
+    // Optimistic Update
+    setTasks(tasks.map(t => t.id === id ? { ...t, completed: !currentStatus } : t));
+
+    try {
+      const { error } = await supabase
+        .from('tasks')
+        .update({ completed: !currentStatus })
+        .eq('id', id);
+
+      if (error) throw error;
+    } catch (error) {
+      console.error('Error updating task:', error);
+      // Revert on error
+      setTasks(tasks.map(t => t.id === id ? { ...t, completed: currentStatus } : t));
+    }
   };
 
-  const deleteTask = (id: string) => {
+  const deleteTask = async (id: string) => {
+    if (!confirm('Tem certeza que deseja excluir esta tarefa?')) return;
+
+    // Optimistic Update
+    const previousTasks = [...tasks];
     setTasks(tasks.filter(t => t.id !== id));
+
+    try {
+      const { error } = await supabase
+        .from('tasks')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+    } catch (error) {
+      console.error('Error deleting task:', error);
+      // Revert on error
+      setTasks(previousTasks);
+      alert('Erro ao excluir tarefa.');
+    }
   };
 
   const filteredTasks = tasks.filter(task => {
@@ -65,17 +135,17 @@ const TaskManager: React.FC<TaskManagerProps> = ({ tasks, setTasks }) => {
       <div className="flex flex-col md:flex-row gap-4 items-center">
         <div className="relative flex-1 w-full">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
-          <input 
-            type="text" 
-            placeholder="Pesquisar tarefas..." 
+          <input
+            type="text"
+            placeholder="Pesquisar tarefas..."
             className="w-full pl-12 pr-4 py-3 bg-slate-900 border border-slate-800 rounded-2xl text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        
+
         <div className="flex items-center gap-3 w-full md:w-auto">
-          <select 
+          <select
             className="bg-slate-900 border border-slate-800 text-slate-300 py-3 px-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
             value={filterCategory}
             onChange={(e) => setFilterCategory(e.target.value as Category | 'ALL')}
@@ -85,7 +155,7 @@ const TaskManager: React.FC<TaskManagerProps> = ({ tasks, setTasks }) => {
               <option key={cat} value={cat}>{cat}</option>
             ))}
           </select>
-          <button 
+          <button
             onClick={() => setShowAddModal(true)}
             className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-6 rounded-2xl transition-colors shadow-lg shadow-indigo-500/20"
           >
@@ -98,16 +168,16 @@ const TaskManager: React.FC<TaskManagerProps> = ({ tasks, setTasks }) => {
       {/* Task List */}
       <div className="space-y-3">
         {filteredTasks.map(task => (
-          <div 
-            key={task.id} 
+          <div
+            key={task.id}
             className={`
               group flex items-center justify-between p-4 rounded-2xl border transition-all duration-300
               ${task.completed ? 'bg-slate-900/40 border-slate-800/50 opacity-60' : 'bg-slate-900 border-slate-800 hover:border-slate-700 shadow-sm'}
             `}
           >
             <div className="flex items-center gap-4 flex-1">
-              <button 
-                onClick={() => toggleTask(task.id)}
+              <button
+                onClick={() => toggleTask(task.id, task.completed)}
                 className="transition-transform active:scale-90"
               >
                 {task.completed ? (
@@ -116,7 +186,7 @@ const TaskManager: React.FC<TaskManagerProps> = ({ tasks, setTasks }) => {
                   <Circle className="w-6 h-6 text-slate-600 group-hover:text-indigo-400" />
                 )}
               </button>
-              
+
               <div className="flex flex-col">
                 <span className={`text-slate-100 font-medium ${task.completed ? 'line-through text-slate-500' : ''}`}>
                   {task.title}
@@ -134,7 +204,7 @@ const TaskManager: React.FC<TaskManagerProps> = ({ tasks, setTasks }) => {
             </div>
 
             <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-              <button 
+              <button
                 onClick={() => deleteTask(task.id)}
                 className="p-2 text-slate-500 hover:text-rose-400 transition-colors"
               >
@@ -160,19 +230,19 @@ const TaskManager: React.FC<TaskManagerProps> = ({ tasks, setTasks }) => {
         )}
       </div>
 
-      {/* Add Task Modal (Simplified for the demo) */}
+      {/* Add Task Modal */}
       {showAddModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm" onClick={() => setShowAddModal(false)}></div>
           <div className="relative w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl p-8 animate-in zoom-in-95 duration-200">
             <h3 className="text-xl font-bold text-white mb-6">Nova Tarefa</h3>
-            
+
             <div className="space-y-4">
               <div>
                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Título</label>
-                <input 
+                <input
                   autoFocus
-                  type="text" 
+                  type="text"
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
                   placeholder="O que precisa ser feito?"
@@ -183,7 +253,7 @@ const TaskManager: React.FC<TaskManagerProps> = ({ tasks, setTasks }) => {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Categoria</label>
-                  <select 
+                  <select
                     value={newCategory}
                     onChange={(e) => setNewCategory(e.target.value as Category)}
                     className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white focus:outline-none"
@@ -195,7 +265,7 @@ const TaskManager: React.FC<TaskManagerProps> = ({ tasks, setTasks }) => {
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Prioridade</label>
-                  <select 
+                  <select
                     value={newPriority}
                     onChange={(e) => setNewPriority(e.target.value as TaskPriority)}
                     className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white focus:outline-none"
@@ -208,17 +278,18 @@ const TaskManager: React.FC<TaskManagerProps> = ({ tasks, setTasks }) => {
               </div>
 
               <div className="pt-4 flex gap-3">
-                <button 
+                <button
                   onClick={() => setShowAddModal(false)}
                   className="flex-1 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl transition-colors"
                 >
                   Cancelar
                 </button>
-                <button 
+                <button
                   onClick={handleAddTask}
-                  className="flex-1 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl transition-colors"
+                  disabled={isSubmitting}
+                  className="flex-1 py-3 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-bold rounded-xl transition-colors flex items-center justify-center gap-2"
                 >
-                  Salvar
+                  {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Salvar'}
                 </button>
               </div>
             </div>
