@@ -24,6 +24,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [user, setUser] = useState<AppUser | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
+    const mapSupabaseUserToAppUser = (sbUser: SupabaseUser) => {
+        const newUser: AppUser = {
+            id: sbUser.id,
+            name: sbUser.user_metadata?.full_name || sbUser.email?.split('@')[0] || 'Usuário',
+            email: sbUser.email || '',
+            avatar: sbUser.user_metadata?.avatar_url || `https://ui-avatars.com/api/?name=${sbUser.email?.charAt(0)}&background=random`,
+            plan: 'Free', // Default plan
+        };
+        setUser(newUser);
+        setIsLoading(false);
+    };
+
     useEffect(() => {
         // Check active session
         supabase.auth.getSession().then(({ data: { session } }) => {
@@ -50,18 +62,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         return () => subscription.unsubscribe();
     }, []);
-
-    const mapSupabaseUserToAppUser = (sbUser: SupabaseUser) => {
-        const newUser: AppUser = {
-            id: sbUser.id,
-            name: sbUser.user_metadata?.full_name || sbUser.email?.split('@')[0] || 'Usuário',
-            email: sbUser.email || '',
-            avatar: sbUser.user_metadata?.avatar_url || `https://ui-avatars.com/api/?name=${sbUser.email?.charAt(0)}&background=random`,
-            plan: 'Free', // Default plan
-        };
-        setUser(newUser);
-        setIsLoading(false);
-    };
 
     const signOut = async () => {
         await supabase.auth.signOut();
