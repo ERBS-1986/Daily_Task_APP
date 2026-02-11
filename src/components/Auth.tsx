@@ -1,48 +1,60 @@
 
 import React, { useState } from 'react';
 import { Mail, Lock, LogIn, UserPlus, Github, Chrome, ArrowRight, Loader2, Calendar } from 'lucide-react';
-import { User } from '../types';
+import { supabase } from '../lib/supabase';
 
-interface AuthProps {
-  onLogin: (user: User) => void;
-}
-
-const Auth: React.FC<AuthProps> = ({ onLogin }) => {
+const Auth: React.FC = () => {
   const [mode, setMode] = useState<'login' | 'signup'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    
-    // Simulação de login
-    setTimeout(() => {
-      onLogin({
-        id: '1',
-        name: name || 'Alex Silva',
-        email: email || 'alex@exemplo.com',
-        avatar: 'https://picsum.photos/seed/user/100/100',
-        plan: 'Premium'
-      });
+    setError(null);
+
+    try {
+      if (mode === 'signup') {
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: {
+              full_name: name,
+            },
+          },
+        });
+        if (error) throw error;
+        alert('Conta criada! Verifique seu email para confirmar o cadastro (se necessário) ou faça login.');
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+        if (error) throw error;
+      }
+    } catch (err: any) {
+      setError(err.message || 'Ocorreu um erro ao tentar autenticar.');
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   };
 
-  const handleGoogleLogin = () => {
+  const handleGoogleLogin = async () => {
     setIsLoading(true);
-    setTimeout(() => {
-      onLogin({
-        id: 'google-1',
-        name: 'Alex Silva (Google)',
-        email: 'alex.silva@gmail.com',
-        avatar: 'https://lh3.googleusercontent.com/a/ACg8ocL-...', // Exemplo de URL de avatar do Google
-        plan: 'Premium'
+    setError(null);
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
       });
+      if (error) throw error;
+    } catch (err: any) {
+      setError(err.message || 'Erro ao conectar com Google.');
       setIsLoading(false);
-    }, 1200);
+    }
   };
 
   return (
@@ -65,14 +77,14 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
         <div className="bg-slate-900/40 backdrop-blur-2xl border border-white/5 rounded-[2.5rem] shadow-2xl overflow-hidden">
           {/* Tabs */}
           <div className="flex p-2 bg-white/5 border-b border-white/5">
-            <button 
-              onClick={() => setMode('login')}
+            <button
+              onClick={() => { setMode('login'); setError(null); }}
               className={`flex-1 py-3 px-4 rounded-2xl text-sm font-bold transition-all flex items-center justify-center gap-2 ${mode === 'login' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-500 hover:text-white'}`}
             >
               <LogIn className="w-4 h-4" /> Entrar
             </button>
-            <button 
-              onClick={() => setMode('signup')}
+            <button
+              onClick={() => { setMode('signup'); setError(null); }}
               className={`flex-1 py-3 px-4 rounded-2xl text-sm font-bold transition-all flex items-center justify-center gap-2 ${mode === 'signup' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-500 hover:text-white'}`}
             >
               <UserPlus className="w-4 h-4" /> Criar Conta
@@ -80,12 +92,18 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
           </div>
 
           <form onSubmit={handleSubmit} className="p-8 space-y-5">
+            {error && (
+              <div className="p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl text-rose-400 text-xs font-bold text-center">
+                {error}
+              </div>
+            )}
+
             {mode === 'signup' && (
               <div className="space-y-2">
                 <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Nome Completo</label>
                 <div className="relative">
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
@@ -100,8 +118,8 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
               <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">E-mail</label>
               <div className="relative group">
                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-600 group-focus-within:text-indigo-400 transition-colors" />
-                <input 
-                  type="email" 
+                <input
+                  type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -118,8 +136,8 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
               </div>
               <div className="relative group">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-600 group-focus-within:text-indigo-400 transition-colors" />
-                <input 
-                  type="password" 
+                <input
+                  type="password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -129,8 +147,8 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
               </div>
             </div>
 
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               disabled={isLoading}
               className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-bold py-4 rounded-2xl shadow-xl shadow-indigo-600/20 transition-all flex items-center justify-center gap-2 mt-4"
             >
@@ -150,14 +168,14 @@ const Auth: React.FC<AuthProps> = ({ onLogin }) => {
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              <button 
+              <button
                 type="button"
                 onClick={handleGoogleLogin}
                 className="flex items-center justify-center gap-3 py-3 bg-white hover:bg-slate-100 text-slate-900 rounded-2xl font-bold text-xs transition-all shadow-lg"
               >
                 <Chrome className="w-4 h-4 text-rose-500" /> Google
               </button>
-              <button 
+              <button
                 type="button"
                 className="flex items-center justify-center gap-3 py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-2xl font-bold text-xs transition-all border border-slate-700 shadow-lg"
               >

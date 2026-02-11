@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
+import { useAuth } from './contexts/AuthContext';
 import {
   Bell,
   Menu,
@@ -47,10 +48,7 @@ const THEMES: { id: AppTheme, name: string, bgClass: string, sidebarClass: strin
 ];
 
 const App: React.FC = () => {
-  const [user, setUser] = useState<User | null>(() => {
-    const saved = localStorage.getItem('ff_user');
-    return saved ? JSON.parse(saved) : null;
-  });
+  const { user, signOut, isLoading: isAuthLoading } = useAuth();
 
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -77,14 +75,6 @@ const App: React.FC = () => {
     localStorage.setItem('ff_theme', currentTheme);
     document.documentElement.classList.add('dark');
   }, [currentTheme]);
-
-  useEffect(() => {
-    if (user) {
-      localStorage.setItem('ff_user', JSON.stringify(user));
-    } else {
-      localStorage.removeItem('ff_user');
-    }
-  }, [user]);
 
   // Click outside to close profile menu
   useEffect(() => {
@@ -175,8 +165,8 @@ const App: React.FC = () => {
     }
   }, [isCoachOpen]);
 
-  const handleLogout = () => {
-    setUser(null);
+  const handleLogout = async () => {
+    await signOut();
     setIsProfileMenuOpen(false);
     setActiveTab('dashboard');
   };
@@ -185,8 +175,16 @@ const App: React.FC = () => {
     setNotifications(prev => prev.map(n => ({ ...n, read: true })));
   };
 
+  if (isAuthLoading) {
+    return (
+      <div className="min-h-screen bg-[#020617] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+      </div>
+    );
+  }
+
   if (!user) {
-    return <Auth onLogin={setUser} />;
+    return <Auth />;
   }
 
   const currentThemeData = THEMES.find(t => t.id === currentTheme) || THEMES[0];
