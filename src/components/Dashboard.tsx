@@ -1,0 +1,210 @@
+
+import React, { useState } from 'react';
+import { 
+  CheckCircle2, 
+  Circle, 
+  Flame, 
+  Trophy, 
+  TrendingUp, 
+  Plus,
+  ArrowUpRight,
+  Droplet,
+  Dumbbell,
+  Calendar as CalIcon,
+  Clock,
+  ExternalLink
+} from 'lucide-react';
+import { Task, Habit, WeeklyGoal, WaterIntake, DailyWorkout } from '../types';
+import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip } from 'recharts';
+
+interface DashboardProps {
+  tasks: Task[];
+  habits: Habit[];
+  goals: WeeklyGoal[];
+  water: WaterIntake;
+  workouts: DailyWorkout[];
+  onNavigate: (tab: string) => void;
+}
+
+const Dashboard: React.FC<DashboardProps> = ({ tasks, habits, goals, water, workouts, onNavigate }) => {
+  const completedTasks = tasks.filter(t => t.completed).length;
+  const taskProgress = tasks.length > 0 ? (completedTasks / tasks.length) * 100 : 0;
+  const waterProgress = (water.current / water.target) * 100;
+
+  const days = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+  const todayName = days[new Date().getDay()];
+  const todayWorkout = workouts.find(w => w.day === todayName);
+
+  // Mock Calendar Events for Dashboard View
+  const todayEvents = [
+    { id: '1', title: 'Reunião Trimestral', time: '14:00', type: 'Work' },
+    { id: '2', title: 'Check-up Médico', time: '16:30', type: 'Health' },
+    { id: '3', title: 'Jantar de Networking', time: '20:00', type: 'Social' }
+  ];
+
+  const weeklyData = [
+    { day: 'Seg', tasks: 12 },
+    { day: 'Ter', tasks: 19 },
+    { day: 'Qua', tasks: 15 },
+    { day: 'Qui', tasks: 22 },
+    { day: 'Sex', tasks: tasks.length },
+    { day: 'Sáb', tasks: 0 },
+    { day: 'Dom', tasks: 0 },
+  ];
+
+  return (
+    <div className="space-y-8 animate-in fade-in duration-500">
+      {/* Google Calendar Section - Top Highlight */}
+      <section className="bg-slate-900 border border-slate-800 rounded-3xl p-8 relative overflow-hidden group">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 relative z-10">
+          <div className="flex-1 w-full">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2 bg-indigo-500/10 rounded-xl">
+                <CalIcon className="w-6 h-6 text-indigo-500" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white">Sua Agenda de Hoje</h3>
+                <p className="text-xs text-slate-500">Sincronizado com Google Calendar</p>
+              </div>
+              <button 
+                onClick={() => onNavigate('calendar')}
+                className="ml-auto md:ml-4 p-2 bg-slate-800 hover:bg-slate-700 text-slate-400 rounded-lg transition-colors"
+              >
+                <ExternalLink className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {todayEvents.map(event => (
+                <div key={event.id} className="bg-slate-950/50 border border-slate-800 p-4 rounded-2xl flex items-center gap-4 hover:border-indigo-500/30 transition-all cursor-pointer group/card">
+                  <div className="flex flex-col items-center justify-center w-12 h-12 bg-white/5 rounded-xl border border-white/5 group-hover/card:bg-indigo-600/10 transition-colors">
+                    <Clock className="w-4 h-4 text-indigo-400" />
+                    <span className="text-[10px] font-bold text-slate-400 mt-1">{event.time}</span>
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-slate-100 line-clamp-1">{event.title}</p>
+                    <span className="text-[10px] px-2 py-0.5 bg-indigo-600/10 text-indigo-400 rounded-full font-bold uppercase">{event.type}</span>
+                  </div>
+                </div>
+              ))}
+              <button 
+                onClick={() => onNavigate('tasks')}
+                className="bg-indigo-600/5 border border-dashed border-indigo-600/30 p-4 rounded-2xl flex items-center justify-center gap-2 text-indigo-400 hover:bg-indigo-600/10 transition-all font-bold text-sm"
+              >
+                <Plus className="w-4 h-4" /> Nova Atividade
+              </button>
+            </div>
+          </div>
+        </div>
+        <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-600/5 rounded-full blur-3xl group-hover:bg-indigo-600/10 transition-colors"></div>
+      </section>
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="bg-slate-900 border border-slate-800 p-6 rounded-3xl hover:border-slate-700 transition-colors">
+          <div className="flex items-center justify-between mb-4">
+            <div className="p-3 bg-emerald-500/10 rounded-2xl">
+              <CheckCircle2 className="w-6 h-6 text-emerald-500" />
+            </div>
+            <span className="text-xs font-bold text-emerald-500 bg-emerald-500/10 px-2 py-1 rounded-md">+4 hoje</span>
+          </div>
+          <p className="text-slate-400 text-sm mb-1">Tarefas de Hoje</p>
+          <p className="text-2xl font-bold text-slate-100">{completedTasks}/{tasks.length}</p>
+          <div className="mt-4 w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+            <div className="bg-emerald-500 h-full transition-all duration-1000" style={{ width: `${taskProgress}%` }}></div>
+          </div>
+        </div>
+
+        <div className="bg-slate-900 border border-slate-800 p-6 rounded-3xl hover:border-slate-700 transition-colors">
+          <div className="flex items-center justify-between mb-4">
+            <div className="p-3 bg-indigo-500/10 rounded-2xl">
+              <Dumbbell className="w-6 h-6 text-indigo-500" />
+            </div>
+          </div>
+          <p className="text-slate-400 text-sm mb-1">Treino de Hoje</p>
+          <p className="text-xl font-bold text-slate-100 line-clamp-1">{todayWorkout?.focus || 'Descanso'}</p>
+          <button onClick={() => onNavigate('gym')} className="mt-4 text-xs text-indigo-400 font-semibold flex items-center gap-1 hover:text-indigo-300 transition-colors">
+            Ver treino <ArrowUpRight className="w-3 h-3" />
+          </button>
+        </div>
+
+        <div className="bg-slate-900 border border-slate-800 p-6 rounded-3xl hover:border-slate-700 transition-colors">
+          <div className="flex items-center justify-between mb-4">
+            <div className="p-3 bg-sky-500/10 rounded-2xl">
+              <Droplet className="w-6 h-6 text-sky-500" />
+            </div>
+          </div>
+          <p className="text-slate-400 text-sm mb-1">Hidratação</p>
+          <p className="text-2xl font-bold text-slate-100">{water.current}ml / {water.target}ml</p>
+          <div className="mt-4 w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+            <div className="bg-sky-500 h-full transition-all duration-1000" style={{ width: `${Math.min(waterProgress, 100)}%` }}></div>
+          </div>
+        </div>
+
+        <div className="bg-slate-900 border border-slate-800 p-6 rounded-3xl hover:border-slate-700 transition-colors">
+          <div className="flex items-center justify-between mb-4">
+            <div className="p-3 bg-amber-500/10 rounded-2xl">
+              <Trophy className="w-6 h-6 text-amber-500" />
+            </div>
+          </div>
+          <p className="text-slate-400 text-sm mb-1">Metas Semanais</p>
+          <p className="text-2xl font-bold text-slate-100">{goals.length} ativas</p>
+          <button 
+            onClick={() => onNavigate('goals')}
+            className="mt-4 text-xs text-indigo-400 font-semibold flex items-center gap-1 hover:text-indigo-300 transition-colors"
+          >
+            Ver detalhes <ArrowUpRight className="w-3 h-3" />
+          </button>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Weekly Chart */}
+        <div className="lg:col-span-2 bg-slate-900 border border-slate-800 p-8 rounded-3xl shadow-sm">
+          <h3 className="text-lg font-bold text-slate-100 mb-6 flex items-center gap-2">
+            <TrendingUp className="w-5 h-5 text-indigo-400" />
+            Desempenho Semanal
+          </h3>
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={weeklyData}>
+                <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} dy={10} />
+                <Tooltip 
+                  cursor={{fill: '#1e293b'}} 
+                  contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '12px', color: '#f8fafc' }}
+                />
+                <Bar dataKey="tasks" fill="#6366f1" radius={[6, 6, 0, 0]} barSize={40} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Quick Task List */}
+        <div className="bg-slate-900 border border-slate-800 p-8 rounded-3xl flex flex-col shadow-sm">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-lg font-bold text-slate-100">Próximas Tarefas</h3>
+            <button onClick={() => onNavigate('tasks')} className="text-xs text-indigo-400 font-bold hover:underline">Ver tudo</button>
+          </div>
+          <div className="space-y-4 flex-1">
+            {tasks.filter(t => !t.completed).slice(0, 4).map(task => (
+              <div key={task.id} className="flex items-center gap-3 group">
+                <Circle className="w-5 h-5 text-slate-600 group-hover:text-indigo-500 transition-colors cursor-pointer" />
+                <span className="text-slate-300 text-sm font-medium line-clamp-1">{task.title}</span>
+              </div>
+            ))}
+            {tasks.filter(t => !t.completed).length === 0 && (
+              <div className="text-center py-8">
+                <div className="w-12 h-12 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <CheckCircle2 className="w-6 h-6 text-slate-600" />
+                </div>
+                <p className="text-slate-500 text-sm">Nada por aqui!</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Dashboard;

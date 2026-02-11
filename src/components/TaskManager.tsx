@@ -1,0 +1,232 @@
+
+import React, { useState } from 'react';
+import { 
+  Plus, 
+  Search, 
+  Filter, 
+  MoreVertical, 
+  Calendar as CalIcon, 
+  Tag, 
+  Trash2, 
+  CheckCircle2, 
+  Circle,
+  AlertTriangle
+} from 'lucide-react';
+import { Task, Category, TaskPriority } from '../types';
+import { CATEGORY_ICONS, PRIORITY_COLORS } from '../constants';
+
+interface TaskManagerProps {
+  tasks: Task[];
+  setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
+}
+
+const TaskManager: React.FC<TaskManagerProps> = ({ tasks, setTasks }) => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterCategory, setFilterCategory] = useState<Category | 'ALL'>('ALL');
+  const [showAddModal, setShowAddModal] = useState(false);
+  
+  // New task form state
+  const [newTitle, setNewTitle] = useState('');
+  const [newCategory, setNewCategory] = useState<Category>(Category.WORK);
+  const [newPriority, setNewPriority] = useState<TaskPriority>(TaskPriority.MEDIUM);
+
+  const handleAddTask = () => {
+    if (!newTitle.trim()) return;
+    const newTask: Task = {
+      id: Date.now().toString(),
+      title: newTitle,
+      category: newCategory,
+      priority: newPriority,
+      completed: false,
+      subTasks: []
+    };
+    setTasks([newTask, ...tasks]);
+    setNewTitle('');
+    setShowAddModal(false);
+  };
+
+  const toggleTask = (id: string) => {
+    setTasks(tasks.map(t => t.id === id ? { ...t, completed: !t.completed } : t));
+  };
+
+  const deleteTask = (id: string) => {
+    setTasks(tasks.filter(t => t.id !== id));
+  };
+
+  const filteredTasks = tasks.filter(task => {
+    const matchesSearch = task.title.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = filterCategory === 'ALL' || task.category === filterCategory;
+    return matchesSearch && matchesCategory;
+  });
+
+  return (
+    <div className="space-y-6 animate-in slide-in-from-bottom-4 duration-500">
+      {/* Search and Filters */}
+      <div className="flex flex-col md:flex-row gap-4 items-center">
+        <div className="relative flex-1 w-full">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
+          <input 
+            type="text" 
+            placeholder="Pesquisar tarefas..." 
+            className="w-full pl-12 pr-4 py-3 bg-slate-900 border border-slate-800 rounded-2xl text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+        
+        <div className="flex items-center gap-3 w-full md:w-auto">
+          <select 
+            className="bg-slate-900 border border-slate-800 text-slate-300 py-3 px-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+            value={filterCategory}
+            onChange={(e) => setFilterCategory(e.target.value as Category | 'ALL')}
+          >
+            <option value="ALL">Todas Categorias</option>
+            {Object.values(Category).map(cat => (
+              <option key={cat} value={cat}>{cat}</option>
+            ))}
+          </select>
+          <button 
+            onClick={() => setShowAddModal(true)}
+            className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-6 rounded-2xl transition-colors shadow-lg shadow-indigo-500/20"
+          >
+            <Plus className="w-5 h-5" />
+            Adicionar
+          </button>
+        </div>
+      </div>
+
+      {/* Task List */}
+      <div className="space-y-3">
+        {filteredTasks.map(task => (
+          <div 
+            key={task.id} 
+            className={`
+              group flex items-center justify-between p-4 rounded-2xl border transition-all duration-300
+              ${task.completed ? 'bg-slate-900/40 border-slate-800/50 opacity-60' : 'bg-slate-900 border-slate-800 hover:border-slate-700 shadow-sm'}
+            `}
+          >
+            <div className="flex items-center gap-4 flex-1">
+              <button 
+                onClick={() => toggleTask(task.id)}
+                className="transition-transform active:scale-90"
+              >
+                {task.completed ? (
+                  <CheckCircle2 className="w-6 h-6 text-indigo-500" />
+                ) : (
+                  <Circle className="w-6 h-6 text-slate-600 group-hover:text-indigo-400" />
+                )}
+              </button>
+              
+              <div className="flex flex-col">
+                <span className={`text-slate-100 font-medium ${task.completed ? 'line-through text-slate-500' : ''}`}>
+                  {task.title}
+                </span>
+                <div className="flex items-center gap-3 mt-1">
+                  <span className="flex items-center gap-1 text-xs text-slate-500">
+                    {CATEGORY_ICONS[task.category]}
+                    {task.category}
+                  </span>
+                  <span className={`text-[10px] px-2 py-0.5 rounded-full border ${PRIORITY_COLORS[task.priority]}`}>
+                    {task.priority}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+              <button 
+                onClick={() => deleteTask(task.id)}
+                className="p-2 text-slate-500 hover:text-rose-400 transition-colors"
+              >
+                <Trash2 className="w-5 h-5" />
+              </button>
+              <button className="p-2 text-slate-500 hover:text-indigo-400 transition-colors">
+                <MoreVertical className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+        ))}
+
+        {filteredTasks.length === 0 && (
+          <div className="text-center py-20 bg-slate-900/50 rounded-3xl border border-dashed border-slate-800">
+            <div className="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Search className="w-8 h-8 text-slate-600" />
+            </div>
+            <h4 className="text-slate-300 font-bold">Nenhuma tarefa encontrada</h4>
+            <p className="text-slate-500 text-sm max-w-xs mx-auto mt-2">
+              Não encontramos tarefas para os filtros aplicados. Tente buscar por outros termos ou crie uma nova.
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Add Task Modal (Simplified for the demo) */}
+      {showAddModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm" onClick={() => setShowAddModal(false)}></div>
+          <div className="relative w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl p-8 animate-in zoom-in-95 duration-200">
+            <h3 className="text-xl font-bold text-white mb-6">Nova Tarefa</h3>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Título</label>
+                <input 
+                  autoFocus
+                  type="text" 
+                  value={newTitle}
+                  onChange={(e) => setNewTitle(e.target.value)}
+                  placeholder="O que precisa ser feito?"
+                  className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Categoria</label>
+                  <select 
+                    value={newCategory}
+                    onChange={(e) => setNewCategory(e.target.value as Category)}
+                    className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white focus:outline-none"
+                  >
+                    {Object.values(Category).map(cat => (
+                      <option key={cat} value={cat}>{cat}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Prioridade</label>
+                  <select 
+                    value={newPriority}
+                    onChange={(e) => setNewPriority(e.target.value as TaskPriority)}
+                    className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white focus:outline-none"
+                  >
+                    {Object.values(TaskPriority).map(prio => (
+                      <option key={prio} value={prio}>{prio}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="pt-4 flex gap-3">
+                <button 
+                  onClick={() => setShowAddModal(false)}
+                  className="flex-1 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button 
+                  onClick={handleAddTask}
+                  className="flex-1 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl transition-colors"
+                >
+                  Salvar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default TaskManager;
