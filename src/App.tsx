@@ -1,11 +1,11 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { 
-  Bell, 
-  Menu, 
-  X, 
-  Plus, 
-  ChevronRight, 
+import {
+  Bell,
+  Menu,
+  X,
+  Plus,
+  ChevronRight,
   Settings,
   LogOut,
   Calendar as CalIcon,
@@ -62,9 +62,9 @@ const App: React.FC = () => {
   const [coachAdvice, setCoachAdvice] = useState<string>("");
   const [isUpdatingAdvice, setIsUpdatingAdvice] = useState(false);
   const [currentTheme, setCurrentTheme] = useState<AppTheme>(() => (localStorage.getItem('ff_theme') as AppTheme) || 'default');
-  
+
   const profileMenuRef = useRef<HTMLDivElement>(null);
-  
+
   const [notifications, setNotifications] = useState<NotificationItem[]>([
     { id: '1', title: 'Meta Alcançada!', message: 'Você atingiu 100% da sua meta de água ontem. Continue assim!', time: '10 min atrás', type: 'success', read: false },
     { id: '2', title: 'Hora do Treino', message: 'Seu treino de "Peito e Tríceps" está programado para agora.', time: '1 h atrás', type: 'info', read: false },
@@ -101,7 +101,7 @@ const App: React.FC = () => {
   const [workouts, setWorkouts] = useState<DailyWorkout[]>(() => {
     const saved = localStorage.getItem('focusflow_workouts');
     return saved ? JSON.parse(saved) : [
-      { 
+      {
         day: 'Segunda', focus: 'Peito e Tríceps', image: 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=800',
         exercises: [
           { id: '1', name: 'Supino Reto', sets: 4, reps: '12', completed: false, gifUrl: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHpobTRoOHJidTVoNmZlM3JtdHozZzZzNmZlbHh2eXFmZzRzNmZlbCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3o7TKv6eCiL6ZpXfoc/giphy.gif' },
@@ -143,9 +143,9 @@ const App: React.FC = () => {
 
   const [water, setWater] = useState<WaterIntake>(() => {
     const saved = localStorage.getItem('focusflow_water');
-    return saved ? JSON.parse(saved) : { 
-      target: 2500, 
-      current: 1200, 
+    return saved ? JSON.parse(saved) : {
+      target: 2500,
+      current: 1200,
       unit: 'ml',
       remindersEnabled: true,
       reminderType: 'interval',
@@ -234,7 +234,7 @@ const App: React.FC = () => {
             ))}
           </nav>
           <div className="p-4 border-t border-white/5">
-            <button 
+            <button
               onClick={handleLogout}
               className="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-rose-400 w-full rounded-xl hover:bg-rose-500/10 transition-colors"
             >
@@ -254,11 +254,11 @@ const App: React.FC = () => {
             <div className="flex-1 lg:flex-none">
               <h2 className="text-lg font-semibold text-slate-100 hidden md:block">{NAVIGATION.find(n => n.id === activeTab)?.name || 'Daily Task'}</h2>
             </div>
-            
+
             <div className="flex items-center gap-2">
               {/* Color Theme Selector */}
               <div className="relative">
-                <button 
+                <button
                   onClick={() => { setIsThemeOpen(!isThemeOpen); setIsNotificationsOpen(false); setIsCoachOpen(false); setIsProfileMenuOpen(false); }}
                   className={`p-2 rounded-xl transition-all ${isThemeOpen ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-400 hover:text-indigo-400 hover:bg-white/5'}`}
                 >
@@ -286,7 +286,7 @@ const App: React.FC = () => {
 
               {/* Coach IA Button */}
               <div className="relative">
-                <button 
+                <button
                   onClick={() => { setIsCoachOpen(!isCoachOpen); setIsNotificationsOpen(false); setIsThemeOpen(false); setIsProfileMenuOpen(false); }}
                   className={`p-2 rounded-xl transition-all ${isCoachOpen ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-400 hover:text-indigo-400 hover:bg-white/5'}`}
                 >
@@ -300,7 +300,7 @@ const App: React.FC = () => {
                           <Sparkles className="w-5 h-5" />
                           <h4 className="font-bold text-sm">Coach de Bolso IA</h4>
                         </div>
-                        <button 
+                        <button
                           onClick={updateCoachAdvice}
                           className="p-1.5 hover:bg-white/20 rounded-lg transition-colors"
                         >
@@ -320,7 +320,7 @@ const App: React.FC = () => {
                             <p className="text-xs text-slate-200 font-bold">Saúde e Bem-estar</p>
                           </div>
                         </div>
-                        <button 
+                        <button
                           onClick={() => { setActiveTab('ai'); setIsCoachOpen(false); }}
                           className="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-xs font-bold text-white rounded-xl transition-colors border border-slate-700"
                         >
@@ -334,7 +334,7 @@ const App: React.FC = () => {
 
               {/* Notifications Bell */}
               <div className="relative">
-                <button 
+                <button
                   onClick={() => { setIsNotificationsOpen(!isNotificationsOpen); setIsThemeOpen(false); setIsCoachOpen(false); setIsProfileMenuOpen(false); markNotificationsAsRead(); }}
                   className={`relative p-2 rounded-xl transition-all ${isNotificationsOpen ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-indigo-400 hover:bg-white/5'}`}
                 >
@@ -374,10 +374,10 @@ const App: React.FC = () => {
               </div>
 
               <div className="h-8 w-[1px] bg-white/10 mx-2 hidden md:block"></div>
-              
+
               {/* Profile Interactive Button */}
               <div className="relative" ref={profileMenuRef}>
-                <button 
+                <button
                   onClick={() => { setIsProfileMenuOpen(!isProfileMenuOpen); setIsNotificationsOpen(false); setIsThemeOpen(false); setIsCoachOpen(false); }}
                   className={`flex items-center gap-3 p-1.5 pl-3 rounded-2xl transition-all border ${isProfileMenuOpen ? 'bg-indigo-600/20 border-indigo-500/50' : 'hover:bg-white/5 border-transparent'}`}
                 >
@@ -422,7 +422,7 @@ const App: React.FC = () => {
                     </div>
 
                     <div className="p-2 border-t border-slate-800">
-                      <button 
+                      <button
                         onClick={handleLogout}
                         className="w-full flex items-center gap-3 px-3 py-2.5 text-xs font-bold text-rose-400 hover:bg-rose-500/10 rounded-xl transition-all"
                       >
