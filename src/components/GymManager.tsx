@@ -1,7 +1,9 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { DailyWorkout, Exercise } from '../types';
-import { Dumbbell, Plus, CheckCircle2, Circle, Calendar, Flame, Activity, ChevronRight, Save, Play, RotateCcw, Pause, Timer } from 'lucide-react';
+import { Dumbbell, Plus, CheckCircle2, Circle, Calendar, Flame, Activity, ChevronRight, Save, Play, RotateCcw, Pause, Timer, X, Pencil, Trash2, Sparkles } from 'lucide-react';
+import { WORKOUT_TEMPLATES, DAYS_OF_WEEK } from '../constants/workoutTemplates';
+import { useToast } from '../contexts/ToastContext';
 
 interface GymManagerProps {
   workouts: DailyWorkout[];
@@ -9,8 +11,24 @@ interface GymManagerProps {
 }
 
 const GymManager: React.FC<GymManagerProps> = ({ workouts, setWorkouts }) => {
+  const { showToast } = useToast();
   const [selectedDay, setSelectedDay] = useState(0);
   const [activeExerciseId, setActiveExerciseId] = useState<string | null>(null);
+
+  // Modals state
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [showDaySelector, setShowDaySelector] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [currentSuggestion, setCurrentSuggestion] = useState<Omit<DailyWorkout, 'day'> | null>(null);
+  const [suggestionIndex, setSuggestionIndex] = useState(0);
+  const [editingExercise, setEditingExercise] = useState<Exercise | null>(null);
+  const [editingExerciseWorkoutDay, setEditingExerciseWorkoutDay] = useState<string | null>(null);
+
+  // Edit form state
+  const [editName, setEditName] = useState('');
+  const [editSets, setEditSets] = useState(3);
+  const [editReps, setEditReps] = useState('');
+  const [editWeight, setEditWeight] = useState('');
 
   // Rest Timer State
   const [restTime, setRestTime] = useState(60);
@@ -66,9 +84,166 @@ const GymManager: React.FC<GymManagerProps> = ({ workouts, setWorkouts }) => {
     setActiveExerciseId(id === activeExerciseId ? null : id);
   };
 
+  // Show suggestions modal when no workouts exist
+  useEffect(() => {
+    if (workouts.length === 0) {
+      setShowSuggestions(true);
+      setSuggestionIndex(0);
+    }
+  }, [workouts.length]);
+
+  // Suggestion Management
+  const acceptSuggestion = () => {
+    if (!currentSuggestion) {
+      setCurrentSuggestion(WORKOUT_TEMPLATES[suggestionIndex]);
+    }
+    setShowDaySelector(true);
+  };
+
+  const skipSuggestion = () => {
+    if (suggestionIndex < WORKOUT_TEMPLATES.length - 1) {
+      setSuggestionIndex(prev => prev + 1);
+    } else {
+      setShowSuggestions(false);
+      showToast('Você pode adicionar treinos depois clicando no botão +', 'info');
+    }
+  };
+
+  const selectDayForWorkout = (day: string) => {
+    if (!currentSuggestion) return;
+
+    // Check if day already has workout
+    const existingWorkout = workouts.find(w => w.day === day);
+    if (existingWorkout) {
+      showToast('Já existe um treino para este dia', 'error');
+      return;
+    }
+
+    const newWorkout: DailyWorkout = {
+      ...currentSuggestion,
+      day
+    };
+
+    setWorkouts(prev => [...prev, newWorkout]);
+    showToast(`Treino de ${currentSuggestion.focus} adicionado para ${day}!`, 'success');
+    setShowDaySelector(false);
+    setCurrentSuggestion(null);
+
+    // Save to localStorage
+    localStorage.setItem('workouts', JSON.stringify([...workouts, newWorkout]));
+  };
+
+  // Exercise Editing
+  const openEditExercise = (exercise: Exercise, workoutDay: string) => {
+    setEditingExercise(exercise);
+    setEditingExerciseWorkoutDay(workoutDay);
+    setEditName(exercise.name);
+    setEditSets(exercise.sets);
+    setEditReps(exercise.reps);
+    setEditWeight(exercise.weight || '');
+    setShowEditModal(true);
+  };
+
+  const saveEditedExercise = () => {
+    if (!editingExercise || !editingExerciseWorkoutDay) return;
+    if (!editName.trim() || editSets < 1) {
+      showToast('Preencha todos os campos obrigatórios', 'error');
+      return;
+    }
+
+    setWorkouts(prev => prev.map(w => {
+      if (w.day === editingExerciseWorkoutDay) {
+        return {
+          ...w,
+          exercises: w.exercises.map(ex =>
+            ex.id === editingExercise.id
+              ? { ...ex, name: editName, sets: editSets, reps: editReps, weight: editWeight || undefined }
+              : ex
+          )
+        };
+      }
+      return w;
+    }));
+
+    showToast('Exercício atualizado!', 'success');
+    setShowEditModal(false);
+    setEditingExercise(null);
+
+    // Save to localStorage
+    const updated = workouts.map(w => {
+      if (w.day === editingExerciseWorkoutDay) {
+        return {
+          ...w,
+          exercises: w.exercises.map(ex =>
+            ex.id === editingExercise.id
+              ? { ...ex, name: editName, sets: editSets, reps: editReps, weight: editWeight || undefined }
+              : ex
+          )
+        };
+      }
+      return w;
+    });
+    localStorage.setItem('workouts', JSON.stringify(updated));
+  };
+
+  const deleteExercise = () => {
+    if (!editingExercise || !editingExerciseWorkoutDay) return;
+
+    setWorkouts(prev => prev.map(w => {
+      if (w.day === editingExerciseWorkoutDay) {
+        return {
+          ...w,
+          exercises: w.exercises.filter(ex => ex.id !== editingExercise.id)
+        };
+      }
+      return w;
+    }));
+
+    showToast('Exercício excluído', 'success');
+    setShowEditModal(false);
+    setEditingExercise(null);
+
+    // Save to localStorage
+    const updated = workouts.map(w => {
+      if (w.day === editingExerciseWorkoutDay) {
+        return {
+          ...w,
+          exercises: w.exercises.filter(ex => ex.id !== editingExercise.id)
+        };
+      }
+      return w;
+    });
+    localStorage.setItem('workouts', JSON.stringify(updated));
+  };
+
+  // Load workouts from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem('workouts');
+    if (saved) {
+      try {
+        setWorkouts(JSON.parse(saved));
+      } catch (e) {
+        console.error('Failed to load workouts', e);
+      }
+    }
+  }, []);
+
+  if (workouts.length === 0) {
+    return <div className="text-slate-400">Carregando...</div>;
+  }
+
+  const currentWorkout = workouts[selectedDay];
+  if (!currentWorkout) {
+    return <div className="text-slate-400">Nenhum treino encontrado</div>;
+  }
+
+  const activeExercise = currentWorkout.exercises.find(ex => ex.id === activeExerciseId);
+
   const completedCount = currentWorkout.exercises.filter(ex => ex.completed).length;
   const totalCount = currentWorkout.exercises.length;
   const progress = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
+
+
 
   return (
     <div className="space-y-8 animate-in slide-in-from-right-4 duration-500">

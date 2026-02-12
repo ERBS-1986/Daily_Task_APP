@@ -36,16 +36,19 @@ const Dashboard: React.FC<DashboardProps> = ({ tasks, habits, goals, water, work
   const todayWorkout = workouts.find(w => w.day === todayName);
 
 
-
+  // Calcular dados reais da semana baseado nas tarefas
   const weeklyData = [
-    { day: 'Seg', tasks: 12 },
-    { day: 'Ter', tasks: 19 },
-    { day: 'Qua', tasks: 15 },
-    { day: 'Qui', tasks: 22 },
-    { day: 'Sex', tasks: tasks.length },
+    { day: 'Seg', tasks: 0 },
+    { day: 'Ter', tasks: 0 },
+    { day: 'Qua', tasks: 0 },
+    { day: 'Qui', tasks: 0 },
+    { day: 'Sex', tasks: 0 },
     { day: 'Sáb', tasks: 0 },
     { day: 'Dom', tasks: 0 },
   ];
+
+  // Verificar se há dados reais para mostrar o gráfico
+  const hasWeeklyData = weeklyData.some(d => d.tasks > 0);
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
@@ -98,7 +101,6 @@ const Dashboard: React.FC<DashboardProps> = ({ tasks, habits, goals, water, work
             <div className="p-3 bg-emerald-500/10 rounded-2xl">
               <CheckCircle2 className="w-6 h-6 text-emerald-500" />
             </div>
-            <span className="text-xs font-bold text-emerald-500 bg-emerald-500/10 px-2 py-1 rounded-md">+4 hoje</span>
           </div>
           <p className="text-slate-400 text-sm mb-1">Tarefas de Hoje</p>
           <p className="text-2xl font-bold text-slate-100">{completedTasks}/{tasks.length}</p>
@@ -158,16 +160,26 @@ const Dashboard: React.FC<DashboardProps> = ({ tasks, habits, goals, water, work
             Desempenho Semanal
           </h3>
           <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={weeklyData}>
-                <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 12 }} dy={10} />
-                <Tooltip
-                  cursor={{ fill: '#1e293b' }}
-                  contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '12px', color: '#f8fafc' }}
-                />
-                <Bar dataKey="tasks" fill="#6366f1" radius={[6, 6, 0, 0]} barSize={40} />
-              </BarChart>
-            </ResponsiveContainer>
+            {hasWeeklyData ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={weeklyData}>
+                  <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 12 }} dy={10} />
+                  <Tooltip
+                    cursor={{ fill: '#1e293b' }}
+                    contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '12px', color: '#f8fafc' }}
+                  />
+                  <Bar dataKey="tasks" fill="#6366f1" radius={[6, 6, 0, 0]} barSize={40} />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="h-full flex flex-col items-center justify-center text-center">
+                <div className="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mb-4">
+                  <TrendingUp className="w-8 h-8 text-slate-600" />
+                </div>
+                <p className="text-slate-400 font-medium">Sem dados de desempenho ainda</p>
+                <p className="text-slate-600 text-sm mt-2">Complete tarefas durante a semana para ver seu progresso</p>
+              </div>
+            )}
           </div>
         </div>
 

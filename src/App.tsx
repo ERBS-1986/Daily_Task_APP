@@ -82,7 +82,7 @@ const App: React.FC = () => {
   // Click outside to close profile menu
   // ... (keep existing click outside logic) ...
 
-  // Workout state (Keeping local for now as requested, or empty)
+  // Workout state - will be populated by user through suggestions
   const [workouts, setWorkouts] = useState<DailyWorkout[]>([]);
 
   const [tasks, setTasks] = useState<Task[]>([]);
