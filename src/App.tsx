@@ -15,10 +15,6 @@ import {
   Check,
   Clock,
   Trash2,
-  Brain,
-  Sparkles,
-  RefreshCcw,
-  Zap,
   User as UserIcon,
   Lock,
   ChevronDown,
@@ -32,7 +28,6 @@ import HabitTracker from './components/HabitTracker';
 import GoalsManager from './components/GoalsManager';
 import WaterManager from './components/WaterManager';
 import CalendarSync from './components/CalendarSync';
-import AIAssistant from './components/AIAssistant';
 import FocusMode from './components/FocusMode';
 import GymManager from './components/GymManager';
 import Auth from './components/Auth';
@@ -207,7 +202,6 @@ const App: React.FC = () => {
       case 'water': return <WaterManager water={water} setWater={setWater} />;
       case 'gym': return <GymManager workouts={workouts} setWorkouts={setWorkouts} />;
       case 'calendar': return <CalendarSync />;
-      case 'ai': return <AIAssistant tasks={tasks} habits={habits} goals={goals} />;
       case 'focus': return <FocusMode tasks={tasks} isGlobalFocusActive={isFocusActive} setIsGlobalFocusActive={setIsFocusActive} />;
       default: return <Dashboard tasks={tasks} habits={habits} goals={goals} water={water} workouts={workouts} onNavigate={setActiveTab} />;
     }
@@ -291,53 +285,6 @@ const App: React.FC = () => {
                 )}
               </div>
 
-              {/* Coach IA Button */}
-              <div className="relative">
-                <button
-                  onClick={() => { setIsCoachOpen(!isCoachOpen); setIsNotificationsOpen(false); setIsThemeOpen(false); setIsProfileMenuOpen(false); }}
-                  className={`p-2 rounded-xl transition-all ${isCoachOpen ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-400 hover:text-indigo-400 hover:bg-white/5'}`}
-                >
-                  <Brain className="w-6 h-6" />
-                </button>
-                {isCoachOpen && (
-                  <div className="absolute top-12 right-0 w-80 bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 z-50">
-                    <div className="p-5 bg-gradient-to-br from-indigo-600 to-violet-700 text-white">
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-2">
-                          <Sparkles className="w-5 h-5" />
-                          <h4 className="font-bold text-sm">Coach de Bolso IA</h4>
-                        </div>
-                        <button
-                          onClick={updateCoachAdvice}
-                          className="p-1.5 hover:bg-white/20 rounded-lg transition-colors"
-                        >
-                          <RefreshCcw className={`w-4 h-4 ${isUpdatingAdvice ? 'animate-spin' : ''}`} />
-                        </button>
-                      </div>
-                      <p className="text-xs text-indigo-100 font-medium leading-relaxed italic">
-                        {isUpdatingAdvice ? "Analisando sua rotina..." : `"${coachAdvice}"`}
-                      </p>
-                    </div>
-                    <div className="p-4 bg-slate-900">
-                      <div className="space-y-3">
-                        <div className="flex items-center gap-3 p-3 bg-white/5 rounded-2xl">
-                          <Zap className="w-4 h-4 text-amber-400" />
-                          <div>
-                            <p className="text-[10px] text-slate-500 font-bold uppercase">Sugestão de Foco</p>
-                            <p className="text-xs text-slate-200 font-bold">Saúde e Bem-estar</p>
-                          </div>
-                        </div>
-                        <button
-                          onClick={() => { setActiveTab('ai'); setIsCoachOpen(false); }}
-                          className="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-xs font-bold text-white rounded-xl transition-colors border border-slate-700"
-                        >
-                          Conversar com IA
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
 
               {/* Notifications Bell */}
               <div className="relative">

@@ -1,10 +1,10 @@
 
 import React from 'react';
-import { 
-  Briefcase, 
-  User, 
-  Heart, 
-  Book, 
+import {
+  Briefcase,
+  User,
+  Heart,
+  Book,
   DollarSign,
   LayoutDashboard,
   CheckSquare,
@@ -35,7 +35,6 @@ export const NAVIGATION = [
   { id: 'goals', name: 'Metas', icon: <Target className="w-5 h-5" /> },
   { id: 'water', name: 'Hidratação', icon: <Droplets className="w-5 h-5" /> },
   { id: 'calendar', name: 'Calendário', icon: <CalendarIcon className="w-5 h-5" /> },
-  { id: 'ai', name: 'IA Assistente', icon: <Sparkles className="w-5 h-5" /> }
 ];
 
 export const PRIORITY_COLORS = {

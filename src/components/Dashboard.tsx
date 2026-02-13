@@ -152,37 +152,7 @@ const Dashboard: React.FC<DashboardProps> = ({ tasks, habits, goals, water, work
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Weekly Chart */}
-        <div className="lg:col-span-2 bg-slate-900 border border-slate-800 p-8 rounded-3xl shadow-sm">
-          <h3 className="text-lg font-bold text-slate-100 mb-6 flex items-center gap-2">
-            <TrendingUp className="w-5 h-5 text-indigo-400" />
-            Desempenho Semanal
-          </h3>
-          <div className="h-64">
-            {hasWeeklyData ? (
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={weeklyData}>
-                  <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 12 }} dy={10} />
-                  <Tooltip
-                    cursor={{ fill: '#1e293b' }}
-                    contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '12px', color: '#f8fafc' }}
-                  />
-                  <Bar dataKey="tasks" fill="#6366f1" radius={[6, 6, 0, 0]} barSize={40} />
-                </BarChart>
-              </ResponsiveContainer>
-            ) : (
-              <div className="h-full flex flex-col items-center justify-center text-center">
-                <div className="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mb-4">
-                  <TrendingUp className="w-8 h-8 text-slate-600" />
-                </div>
-                <p className="text-slate-400 font-medium">Sem dados de desempenho ainda</p>
-                <p className="text-slate-600 text-sm mt-2">Complete tarefas durante a semana para ver seu progresso</p>
-              </div>
-            )}
-          </div>
-        </div>
-
+      <div className="grid grid-cols-1 gap-6">
         {/* Quick Task List */}
         <div className="bg-slate-900 border border-slate-800 p-8 rounded-3xl flex flex-col shadow-sm">
           <div className="flex items-center justify-between mb-6">
