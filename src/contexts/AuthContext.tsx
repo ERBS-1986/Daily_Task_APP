@@ -45,6 +45,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             } else {
                 setIsLoading(false);
             }
+        }).catch(err => {
+            console.error('[AuthContext] Erro ao buscar sessão:', err);
+            setIsLoading(false);
         });
 
         // Listen for changes
@@ -60,7 +63,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             }
         });
 
-        return () => subscription.unsubscribe();
+        return () => {
+            if (subscription) subscription.unsubscribe();
+        };
     }, []);
 
     const signOut = async () => {
