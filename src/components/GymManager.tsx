@@ -232,12 +232,9 @@ const GymManager: React.FC<GymManagerProps> = ({ workouts, setWorkouts }) => {
     return <div className="text-slate-400">Carregando...</div>;
   }
 
-  const currentWorkout = workouts[selectedDay];
   if (!currentWorkout) {
     return <div className="text-slate-400">Nenhum treino encontrado</div>;
   }
-
-  const activeExercise = currentWorkout.exercises.find(ex => ex.id === activeExerciseId);
 
   const completedCount = currentWorkout.exercises.filter(ex => ex.completed).length;
   const totalCount = currentWorkout.exercises.length;
