@@ -46,12 +46,12 @@ const WaterManager: React.FC<WaterManagerProps> = ({ water, setWater }) => {
   const addWater = (amount: number) => {
     const newCurrent = water.current + amount;
     setWater(prev => ({ ...prev, current: newCurrent }));
-    updateWaterInDb({ current: newCurrent });
+    updateWaterInDb({ current: newCurrent, updated_at: new Date().toISOString() });
   };
 
   const resetWater = () => {
     setWater(prev => ({ ...prev, current: 0 }));
-    updateWaterInDb({ current: 0 });
+    updateWaterInDb({ current: 0, updated_at: new Date().toISOString() });
   };
 
   const handleSaveAll = () => {

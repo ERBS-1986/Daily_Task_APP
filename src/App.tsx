@@ -37,13 +37,13 @@ import { useToast } from './contexts/ToastContext';
 
 
 
-const THEMES: { id: AppTheme, name: string, bgClass: string, sidebarClass: string, color: string }[] = [
-  { id: 'default', name: 'Padrão', bgClass: 'bg-slate-50 dark:bg-slate-950', sidebarClass: 'bg-slate-100/80 dark:bg-slate-900/80', color: '#64748b' },
-  { id: 'red', name: 'Vermelho', bgClass: 'bg-red-950', sidebarClass: 'bg-black/40', color: '#b91c1c' },
-  { id: 'green', name: 'Verde', bgClass: 'bg-emerald-950', sidebarClass: 'bg-black/40', color: '#065f46' },
-  { id: 'blue', name: 'Azul', bgClass: 'bg-blue-950', sidebarClass: 'bg-black/40', color: '#1e40af' },
-  { id: 'pink', name: 'Rosa', bgClass: 'bg-pink-950', sidebarClass: 'bg-black/40', color: '#be185d' },
-  { id: 'purple', name: 'Roxo', bgClass: 'bg-violet-950', sidebarClass: 'bg-black/40', color: '#6d28d9' },
+const THEMES: { id: AppTheme, name: string, bgClass: string, sidebarClass: string, cardClass: string, color: string }[] = [
+  { id: 'default', name: 'Padrão', bgClass: 'bg-slate-50 dark:bg-slate-950', sidebarClass: 'bg-slate-100/80 dark:bg-slate-900/80', cardClass: 'bg-white dark:bg-[#434B96]', color: '#6366f1' },
+  { id: 'red', name: 'Vermelho', bgClass: 'bg-red-900', sidebarClass: 'bg-black/40', cardClass: 'bg-red-950/50', color: '#ef4444' },
+  { id: 'green', name: 'Verde', bgClass: 'bg-emerald-900', sidebarClass: 'bg-black/40', cardClass: 'bg-emerald-950/50', color: '#10b981' },
+  { id: 'blue', name: 'Azul', bgClass: 'bg-blue-900', sidebarClass: 'bg-black/40', cardClass: 'bg-blue-950/50', color: '#3b82f6' },
+  { id: 'pink', name: 'Rosa', bgClass: 'bg-pink-900', sidebarClass: 'bg-black/40', cardClass: 'bg-pink-950/50', color: '#ec4899' },
+  { id: 'purple', name: 'Roxo', bgClass: 'bg-violet-900', sidebarClass: 'bg-black/40', cardClass: 'bg-violet-950/50', color: '#8b5cf6' },
 ];
 
 import { supabase } from './lib/supabase';
@@ -70,9 +70,7 @@ const App: React.FC = () => {
 
   const profileMenuRef = useRef<HTMLDivElement>(null);
 
-  const [notifications, setNotifications] = useState<NotificationItem[]>([
-    { id: '1', title: 'Bem-vindo!', message: 'Comece adicionando suas primeiras tarefas.', time: 'Agora', type: 'info', read: false },
-  ]);
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
 
   const unreadCount = notifications.filter(n => !n.read).length;
 
@@ -100,10 +98,16 @@ const App: React.FC = () => {
     scheduledTimes: ["09:00", "12:00", "15:00", "18:00", "21:00"]
   });
 
-  // Fetch Data from Supabase
   useEffect(() => {
     if (user) {
       fetchData();
+
+      // Mostrar boas-vindas apenas na primeira vez nesta sessão
+      const hasWelcomed = sessionStorage.getItem('daily_task_welcomed');
+      if (!hasWelcomed) {
+        setNotifications([{ id: 'welcome', title: 'Bem-vindo de volta!', message: 'Sua jornada de alta performance continua.', time: 'Agora', type: 'info', read: false }]);
+        sessionStorage.setItem('daily_task_welcomed', 'true');
+      }
     } else {
       // Clear data on logout
       setTasks([]);
@@ -128,16 +132,30 @@ const App: React.FC = () => {
       if (tasksResult.data) setTasks(tasksResult.data);
       if (habitsResult.data) setHabits(habitsResult.data);
       if (goalsResult.data) setGoals(goalsResult.data);
-      if (waterResult.data) setWater(waterResult.data);
+      if (waterResult.data) {
+        const waterData = waterResult.data;
+        const lastUpdate = new Date(waterData.updated_at);
+        const today = new Date();
+
+        // Reset if date changed
+        if (lastUpdate.toDateString() !== today.toDateString()) {
+          console.log('[App] Dia mudou, resetando hidratação...');
+          const resetWater = { ...waterData, current: 0, updated_at: today.toISOString() };
+          await supabase.from('water_intake').update({ current: 0, updated_at: today.toISOString() }).eq('user_id', user.id);
+          setWater(resetWater);
+        } else {
+          setWater(waterData);
+        }
+      }
 
       // If water data is missing (new user), create it
-      if (!waterResult.data && !waterResult.error) { // basic check
-        // Insert default water settings
+      if (!waterResult.data && !waterResult.error) {
         const defaultWater = {
           user_id: user.id,
           target: 2500,
           current: 0,
-          unit: 'ml'
+          unit: 'ml',
+          updated_at: new Date().toISOString()
         };
         const { error } = await supabase.from('water_intake').insert(defaultWater);
         if (!error) setWater(prev => ({ ...prev, ...defaultWater }));
@@ -191,7 +209,7 @@ const App: React.FC = () => {
 
   const renderContent = () => {
     switch (activeTab) {
-      case 'dashboard': return <Dashboard tasks={tasks} habits={habits} goals={goals} water={water} workouts={workouts} onNavigate={setActiveTab} />;
+      case 'dashboard': return <Dashboard tasks={tasks} habits={habits} goals={goals} water={water} workouts={workouts} onNavigate={setActiveTab} cardClass={currentThemeData.cardClass} />;
       case 'tasks': return <TaskManager tasks={tasks} setTasks={setTasks} />;
       case 'habits': return <HabitTracker habits={habits} setHabits={setHabits} />;
       case 'goals': return <GoalsManager goals={goals} setGoals={setGoals} />;
@@ -206,10 +224,10 @@ const App: React.FC = () => {
   return (
     <div className={`flex h-screen overflow-hidden transition-colors duration-1000 ${currentThemeData.bgClass}`}>
       {isSidebarOpen && !isFocusActive && (
-        <div className="fixed inset-0 bg-black/50 z-20 lg:hidden" onClick={() => setIsSidebarOpen(false)} />
+        <div className="fixed inset-0 bg-black/60 z-40 lg:hidden backdrop-blur-sm" onClick={() => setIsSidebarOpen(false)} />
       )}
 
-      <aside className={`fixed inset-y-0 left-0 z-30 w-64 ${currentThemeData.sidebarClass} backdrop-blur-xl border-r border-white/5 transform transition-all duration-500 ease-in-out lg:relative lg:translate-x-0 ${isSidebarOpen && !isFocusActive ? 'translate-x-0' : '-translate-x-full'} ${isFocusActive ? 'lg:-translate-x-full lg:hidden' : ''}`}>
+      <aside className={`fixed inset-y-0 left-0 z-50 w-64 ${currentThemeData.sidebarClass} backdrop-blur-xl border-r border-white/5 transform transition-all duration-500 ease-in-out lg:relative lg:translate-x-0 ${isSidebarOpen && !isFocusActive ? 'translate-x-0' : '-translate-x-full'} ${isFocusActive ? 'lg:-translate-x-full lg:hidden' : ''}`}>
         <div className="flex flex-col h-full">
           <div className="p-6">
             <div className="flex items-center gap-3">
@@ -242,9 +260,9 @@ const App: React.FC = () => {
         </div>
       </aside>
 
-      <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
+      <main className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
         {!isFocusActive && (
-          <header className="h-16 bg-white/5 backdrop-blur-md border-b border-white/5 flex items-center justify-between px-4 lg:px-8 z-40 animate-in slide-in-from-top-4 duration-500">
+          <header className="h-16 bg-white/5 backdrop-blur-md border-b border-white/5 flex items-center justify-between px-4 lg:px-8 z-30 animate-in slide-in-from-top-4 duration-500">
             <button className="lg:hidden p-2 text-slate-400 hover:text-white" onClick={() => setIsSidebarOpen(true)}>
               <Menu className="w-6 h-6" />
             </button>

@@ -58,7 +58,7 @@ const Auth: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen w-full bg-[#020617] flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen w-full bg-[#3580BB] flex items-center justify-center p-4 relative overflow-hidden">
       {/* Background Decorativo */}
       <div className="absolute top-0 left-0 w-full h-full">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-600/20 rounded-full blur-[120px]"></div>

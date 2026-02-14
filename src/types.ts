@@ -64,6 +64,7 @@ export interface WaterIntake {
   reminderType: 'interval' | 'scheduled';
   reminderInterval?: number; // em minutos
   scheduledTimes?: string[]; // ["08:00", "10:00", ...]
+  updated_at?: string;
 }
 
 export interface Exercise {

@@ -24,9 +24,18 @@ interface DashboardProps {
   water: WaterIntake;
   workouts: DailyWorkout[];
   onNavigate: (tab: string) => void;
+  cardClass?: string;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ tasks, habits, goals, water, workouts, onNavigate }) => {
+const Dashboard: React.FC<DashboardProps> = ({
+  tasks,
+  habits,
+  goals,
+  water,
+  workouts,
+  onNavigate,
+  cardClass = 'bg-slate-900'
+}) => {
   const completedTasks = tasks.filter(t => t.completed).length;
   const taskProgress = tasks.length > 0 ? (completedTasks / tasks.length) * 100 : 0;
   const waterProgress = (water.current / water.target) * 100;
@@ -53,7 +62,7 @@ const Dashboard: React.FC<DashboardProps> = ({ tasks, habits, goals, water, work
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
       {/* Google Calendar Section - Top Highlight */}
-      <section className="bg-slate-900 border border-slate-800 rounded-3xl p-8 relative overflow-hidden group">
+      <section className={`${cardClass} border border-slate-800 rounded-3xl p-8 relative overflow-hidden group shadow-sm`}>
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 relative z-10">
           <div className="flex-1 w-full">
             <div className="flex items-center gap-3 mb-6">
@@ -96,7 +105,7 @@ const Dashboard: React.FC<DashboardProps> = ({ tasks, habits, goals, water, work
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-slate-900 border border-slate-800 p-6 rounded-3xl hover:border-slate-700 transition-colors">
+        <div className={`${cardClass} border border-slate-800 p-6 rounded-3xl hover:border-slate-700 transition-colors shadow-sm`}>
           <div className="flex items-center justify-between mb-4">
             <div className="p-3 bg-emerald-500/10 rounded-2xl">
               <CheckCircle2 className="w-6 h-6 text-emerald-500" />
@@ -109,7 +118,7 @@ const Dashboard: React.FC<DashboardProps> = ({ tasks, habits, goals, water, work
           </div>
         </div>
 
-        <div className="bg-slate-900 border border-slate-800 p-6 rounded-3xl hover:border-slate-700 transition-colors">
+        <div className={`${cardClass} border border-slate-800 p-6 rounded-3xl hover:border-slate-700 transition-colors shadow-sm`}>
           <div className="flex items-center justify-between mb-4">
             <div className="p-3 bg-indigo-500/10 rounded-2xl">
               <Dumbbell className="w-6 h-6 text-indigo-500" />
@@ -122,7 +131,7 @@ const Dashboard: React.FC<DashboardProps> = ({ tasks, habits, goals, water, work
           </button>
         </div>
 
-        <div className="bg-slate-900 border border-slate-800 p-6 rounded-3xl hover:border-slate-700 transition-colors">
+        <div className={`${cardClass} border border-slate-800 p-6 rounded-3xl hover:border-slate-700 transition-colors shadow-sm`}>
           <div className="flex items-center justify-between mb-4">
             <div className="p-3 bg-sky-500/10 rounded-2xl">
               <Droplet className="w-6 h-6 text-sky-500" />
@@ -135,7 +144,7 @@ const Dashboard: React.FC<DashboardProps> = ({ tasks, habits, goals, water, work
           </div>
         </div>
 
-        <div className="bg-slate-900 border border-slate-800 p-6 rounded-3xl hover:border-slate-700 transition-colors">
+        <div className={`${cardClass} border border-slate-800 p-6 rounded-3xl hover:border-slate-700 transition-colors shadow-sm`}>
           <div className="flex items-center justify-between mb-4">
             <div className="p-3 bg-amber-500/10 rounded-2xl">
               <Trophy className="w-6 h-6 text-amber-500" />
@@ -154,7 +163,7 @@ const Dashboard: React.FC<DashboardProps> = ({ tasks, habits, goals, water, work
 
       <div className="grid grid-cols-1 gap-6">
         {/* Quick Task List */}
-        <div className="bg-slate-900 border border-slate-800 p-8 rounded-3xl flex flex-col shadow-sm">
+        <div className={`${cardClass} border border-slate-800 p-8 rounded-3xl flex flex-col shadow-sm`}>
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-bold text-slate-100">Próximas Tarefas</h3>
             <button onClick={() => onNavigate('tasks')} className="text-xs text-indigo-400 font-bold hover:underline">Ver tudo</button>
