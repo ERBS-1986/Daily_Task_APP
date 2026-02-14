@@ -31,6 +31,10 @@ import CalendarSync from './components/CalendarSync';
 import FocusMode from './components/FocusMode';
 import GymManager from './components/GymManager';
 import Auth from './components/Auth';
+import ProfileModal from './components/ProfileModal';
+import PasswordModal from './components/PasswordModal';
+import { useToast } from './contexts/ToastContext';
+
 
 
 const THEMES: { id: AppTheme, name: string, bgClass: string, sidebarClass: string, color: string }[] = [
@@ -55,6 +59,11 @@ const App: React.FC = () => {
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [isThemeOpen, setIsThemeOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+
+  const { showToast } = useToast();
+
 
   const [currentTheme, setCurrentTheme] = useState<AppTheme>(() => (localStorage.getItem('ff_theme') as AppTheme) || 'default');
   const [isLoadingData, setIsLoadingData] = useState(false);
@@ -348,13 +357,19 @@ const App: React.FC = () => {
 
                     <div className="p-2 space-y-1">
                       <p className="px-3 py-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Configurações</p>
-                      <button className="w-full flex items-center gap-3 px-3 py-2.5 text-xs font-bold text-slate-300 hover:bg-white/5 hover:text-white rounded-xl transition-all">
+                      <button
+                        onClick={() => { setIsProfileModalOpen(true); setIsProfileMenuOpen(false); }}
+                        className="w-full flex items-center gap-3 px-3 py-2.5 text-xs font-bold text-slate-300 hover:bg-white/5 hover:text-white rounded-xl transition-all"
+                      >
                         <div className="w-8 h-8 rounded-lg bg-indigo-600/10 flex items-center justify-center">
                           <UserIcon className="w-4 h-4 text-indigo-400" />
                         </div>
                         Editar Perfil
                       </button>
-                      <button className="w-full flex items-center gap-3 px-3 py-2.5 text-xs font-bold text-slate-300 hover:bg-white/5 hover:text-white rounded-xl transition-all">
+                      <button
+                        onClick={() => { setIsPasswordModalOpen(true); setIsProfileMenuOpen(false); }}
+                        className="w-full flex items-center gap-3 px-3 py-2.5 text-xs font-bold text-slate-300 hover:bg-white/5 hover:text-white rounded-xl transition-all"
+                      >
                         <div className="w-8 h-8 rounded-lg bg-emerald-600/10 flex items-center justify-center">
                           <ShieldCheck className="w-4 h-4 text-emerald-400" />
                         </div>
@@ -383,6 +398,17 @@ const App: React.FC = () => {
           <div className={`${isFocusActive ? 'w-full' : 'max-w-6xl mx-auto space-y-8'}`}>{renderContent()}</div>
         </div>
       </main>
+
+      <ProfileModal
+        isOpen={isProfileModalOpen}
+        onClose={() => setIsProfileModalOpen(false)}
+        showToast={showToast}
+      />
+      <PasswordModal
+        isOpen={isPasswordModalOpen}
+        onClose={() => setIsPasswordModalOpen(false)}
+        showToast={showToast}
+      />
     </div>
   );
 };

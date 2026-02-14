@@ -8,6 +8,8 @@ interface AuthContextType {
     session: Session | null;
     isLoading: boolean;
     signOut: () => Promise<void>;
+    updateProfile: (updates: { name?: string; avatarUrl?: string; email?: string }) => Promise<{ error: any }>;
+    updatePassword: (newPassword: string) => Promise<{ error: any }>;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -15,7 +17,10 @@ const AuthContext = createContext<AuthContextType>({
     session: null,
     isLoading: true,
     signOut: async () => { },
+    updateProfile: async () => ({ error: null }),
+    updatePassword: async () => ({ error: null }),
 });
+
 
 export const useAuth = () => useContext(AuthContext);
 
@@ -71,6 +76,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         };
     }, []);
 
+    const updateProfile = async (updates: { name?: string; avatarUrl?: string; email?: string }) => {
+        const { data, error } = await supabase.auth.updateUser({
+            email: updates.email,
+            data: {
+                full_name: updates.name,
+                avatar_url: updates.avatarUrl
+            }
+        });
+
+        if (!error && data.user) {
+            mapSupabaseUserToAppUser(data.user);
+        }
+        return { error };
+    };
+
+    const updatePassword = async (newPassword: string) => {
+        const { error } = await supabase.auth.updateUser({
+            password: newPassword
+        });
+        return { error };
+    };
+
     const signOut = async () => {
         await supabase.auth.signOut();
         setUser(null);
@@ -78,7 +105,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     return (
-        <AuthContext.Provider value={{ user, session, isLoading, signOut }}>
+        <AuthContext.Provider value={{ user, session, isLoading, signOut, updateProfile, updatePassword }}>
             {children}
         </AuthContext.Provider>
     );
