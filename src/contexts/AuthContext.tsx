@@ -37,12 +37,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     useEffect(() => {
+        console.log('[AuthContext] Iniciando verificação de sessão...');
         // Check active session
         supabase.auth.getSession().then(({ data: { session } }) => {
+            console.log('[AuthContext] Sessão obtida:', session ? 'Sim' : 'Não');
             setSession(session);
             if (session?.user) {
                 mapSupabaseUserToAppUser(session.user);
             } else {
+                console.log('[AuthContext] Nenhum usuário encontrado, parando loading.');
                 setIsLoading(false);
             }
         }).catch(err => {

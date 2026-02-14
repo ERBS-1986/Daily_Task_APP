@@ -1,5 +1,6 @@
 
 import React from 'react';
+console.log('[Daily Task] Aplicativo iniciando...');
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import { AuthProvider } from './contexts/AuthContext';

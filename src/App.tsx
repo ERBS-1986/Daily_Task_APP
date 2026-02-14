@@ -193,6 +193,8 @@ const App: React.FC = () => {
 
   const currentThemeData = THEMES.find(t => t.id === currentTheme) || THEMES[0];
 
+  console.log('[App] Renderizando. isAuthLoading:', isAuthLoading, 'User:', user ? 'Sim' : 'Não');
+
   const renderContent = () => {
     switch (activeTab) {
       case 'dashboard': return <Dashboard tasks={tasks} habits={habits} goals={goals} water={water} workouts={workouts} onNavigate={setActiveTab} />;
