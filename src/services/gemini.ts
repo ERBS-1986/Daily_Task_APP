@@ -1,8 +1,18 @@
-
 import { GoogleGenAI } from "@google/genai";
 
-// Fix: Initialize GoogleGenAI strictly following the SDK guidelines for API key access
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// Lazy initialization to avoid global errors if API_KEY is missing
+let aiInstance: any = null;
+
+const getAI = () => {
+  const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY;
+  if (!apiKey || apiKey === 'PLACEHOLDER_API_KEY') {
+    return null;
+  }
+  if (!aiInstance) {
+    aiInstance = new GoogleGenAI({ apiKey });
+  }
+  return aiInstance;
+};
 
 export const getProductivityAdvice = async (data: {
   tasks: any[],
@@ -22,12 +32,13 @@ export const getProductivityAdvice = async (data: {
       Retorne em Português do Brasil.
     `;
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview',
-      contents: prompt,
-    });
+    const ai = getAI();
+    if (!ai) throw new Error("API Key not configured");
 
-    return response.text;
+    const response = await ai.getGenerativeModel({ model: "gemini-1.5-flash" }).generateContent(prompt);
+
+
+    return response.text();
   } catch (error) {
     console.error("Gemini Error:", error);
     return "Mantenha o foco e a consistência. Pequenos passos levam a grandes conquistas!";
@@ -43,12 +54,13 @@ export const optimizeSchedule = async (tasks: any[]) => {
       Retorne APENAS um texto explicativo curto de por que essa ordem é melhor.
     `;
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview',
-      contents: prompt,
-    });
+    const ai = getAI();
+    if (!ai) throw new Error("API Key not configured");
 
-    return response.text;
+    const response = await ai.getGenerativeModel({ model: "gemini-1.5-flash" }).generateContent(prompt);
+
+
+    return response.text();
   } catch (error) {
     return "Priorize as tarefas mais difíceis no seu horário de maior energia.";
   }

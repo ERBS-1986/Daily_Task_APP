@@ -31,7 +31,7 @@ import CalendarSync from './components/CalendarSync';
 import FocusMode from './components/FocusMode';
 import GymManager from './components/GymManager';
 import Auth from './components/Auth';
-import { getProductivityAdvice } from './services/gemini';
+
 
 const THEMES: { id: AppTheme, name: string, bgClass: string, sidebarClass: string, color: string }[] = [
   { id: 'default', name: 'Padrão', bgClass: 'bg-slate-50 dark:bg-slate-950', sidebarClass: 'bg-slate-100/80 dark:bg-slate-900/80', color: '#64748b' },
@@ -54,10 +54,8 @@ const App: React.FC = () => {
   const [isFocusActive, setIsFocusActive] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [isThemeOpen, setIsThemeOpen] = useState(false);
-  const [isCoachOpen, setIsCoachOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
-  const [coachAdvice, setCoachAdvice] = useState<string>("");
-  const [isUpdatingAdvice, setIsUpdatingAdvice] = useState(false);
+
   const [currentTheme, setCurrentTheme] = useState<AppTheme>(() => (localStorage.getItem('ff_theme') as AppTheme) || 'default');
   const [isLoadingData, setIsLoadingData] = useState(false);
 
@@ -156,19 +154,6 @@ const App: React.FC = () => {
   }, [tasks, habits, goals, water, workouts]);
   */
 
-  const updateCoachAdvice = async () => {
-    setIsUpdatingAdvice(true);
-    const result = await getProductivityAdvice({ tasks, habits, goals });
-    setCoachAdvice(result || "Mantenha o foco absoluto nas suas metas.");
-    setIsUpdatingAdvice(false);
-  };
-
-  useEffect(() => {
-    if (isCoachOpen && !coachAdvice) {
-      updateCoachAdvice();
-    }
-  }, [isCoachOpen]);
-
   const handleLogout = async () => {
     await signOut();
     setIsProfileMenuOpen(false);
@@ -262,7 +247,7 @@ const App: React.FC = () => {
               {/* Color Theme Selector */}
               <div className="relative">
                 <button
-                  onClick={() => { setIsThemeOpen(!isThemeOpen); setIsNotificationsOpen(false); setIsCoachOpen(false); setIsProfileMenuOpen(false); }}
+                  onClick={() => { setIsThemeOpen(!isThemeOpen); setIsNotificationsOpen(false); setIsProfileMenuOpen(false); }}
                   className={`p-2 rounded-xl transition-all ${isThemeOpen ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-400 hover:text-indigo-400 hover:bg-white/5'}`}
                 >
                   <Palette className="w-6 h-6" />
@@ -291,7 +276,7 @@ const App: React.FC = () => {
               {/* Notifications Bell */}
               <div className="relative">
                 <button
-                  onClick={() => { setIsNotificationsOpen(!isNotificationsOpen); setIsThemeOpen(false); setIsCoachOpen(false); setIsProfileMenuOpen(false); markNotificationsAsRead(); }}
+                  onClick={() => { setIsNotificationsOpen(!isNotificationsOpen); setIsThemeOpen(false); setIsProfileMenuOpen(false); markNotificationsAsRead(); }}
                   className={`relative p-2 rounded-xl transition-all ${isNotificationsOpen ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-indigo-400 hover:bg-white/5'}`}
                 >
                   <Bell className="w-6 h-6" />
@@ -334,7 +319,7 @@ const App: React.FC = () => {
               {/* Profile Interactive Button */}
               <div className="relative" ref={profileMenuRef}>
                 <button
-                  onClick={() => { setIsProfileMenuOpen(!isProfileMenuOpen); setIsNotificationsOpen(false); setIsThemeOpen(false); setIsCoachOpen(false); }}
+                  onClick={() => { setIsProfileMenuOpen(!isProfileMenuOpen); setIsNotificationsOpen(false); setIsThemeOpen(false); }}
                   className={`flex items-center gap-3 p-1.5 pl-3 rounded-2xl transition-all border ${isProfileMenuOpen ? 'bg-indigo-600/20 border-indigo-500/50' : 'hover:bg-white/5 border-transparent'}`}
                 >
                   <div className="hidden md:block text-right">
