@@ -14,9 +14,11 @@ import { useAuth } from '../contexts/AuthContext';
 interface GymManagerProps {
   workouts: DailyWorkout[];
   setWorkouts: React.Dispatch<React.SetStateAction<DailyWorkout[]>>;
+  cardClass?: string;
+  isLight?: boolean;
 }
 
-const GymManager: React.FC<GymManagerProps> = ({ workouts, setWorkouts }) => {
+const GymManager: React.FC<GymManagerProps> = ({ workouts, setWorkouts, cardClass, isLight }) => {
   const { user } = useAuth();
   const { showToast } = useToast();
   const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
@@ -228,11 +230,11 @@ const GymManager: React.FC<GymManagerProps> = ({ workouts, setWorkouts }) => {
       {/* Header & Weekly Navigation */}
       <div className="flex flex-col gap-6">
         <div>
-          <h2 className="text-3xl font-bold text-white flex items-center gap-3">
+          <h2 className={`text-3xl font-black flex items-center gap-3 ${isLight ? 'text-slate-900' : 'text-white'}`}>
             <Dumbbell className="w-8 h-8 text-indigo-500" />
             GymFlow Agenda
           </h2>
-          <p className="text-slate-400">Gerencie seus treinos e acompanhe seu progresso diário.</p>
+          <p className={`${isLight ? 'text-slate-600' : 'text-slate-400'} font-medium`}>Gerencie seus treinos e acompanhe seu progresso diário.</p>
         </div>
 
         <div className="flex gap-2 overflow-x-auto pb-4 no-scrollbar">
@@ -241,14 +243,14 @@ const GymManager: React.FC<GymManagerProps> = ({ workouts, setWorkouts }) => {
               key={item.date}
               onClick={() => setSelectedDate(item.date)}
               className={`
-                flex flex-col items-center gap-1 min-w-[110px] p-4 rounded-2xl border transition-all
+                flex flex-col items-center gap-1 min-w-[110px] p-4 rounded-2xl border transition-all backdrop-blur-md
                 ${selectedDate === item.date
-                  ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-600/20'
-                  : 'bg-slate-900 border-slate-800 text-slate-500 hover:border-slate-700'}
+                  ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-600/30'
+                  : `${isLight ? 'bg-white/50 border-white/20 text-slate-500 hover:border-indigo-200' : 'bg-slate-900 border-slate-800 text-slate-500 hover:border-slate-700'}`}
               `}
             >
-              <span className="text-sm font-black">{item.dayName}</span>
-              <div className={`w-1.5 h-1.5 rounded-full mt-1 ${workouts.find(w => w.day === item.date)?.exercises.length ? 'bg-indigo-400' : 'bg-slate-700'}`}></div>
+              <span className="text-sm font-black uppercase tracking-widest">{item.dayName}</span>
+              <div className={`w-1.5 h-1.5 rounded-full mt-1 ${workouts.find(w => w.day === item.date)?.exercises.length ? 'bg-indigo-400' : (isLight ? 'bg-indigo-100' : 'bg-slate-700')}`}></div>
             </button>
           ))}
         </div>
@@ -256,11 +258,11 @@ const GymManager: React.FC<GymManagerProps> = ({ workouts, setWorkouts }) => {
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         <div className="lg:col-span-8 space-y-6">
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 relative overflow-hidden group">
+          <div className={`${cardClass || 'bg-slate-900 border-slate-800'} border p-8 rounded-[3rem] relative overflow-hidden group backdrop-blur-2xl shadow-xl ${isLight ? 'border-white/50' : 'border-slate-800'}`}>
             <div className="flex justify-between items-start mb-8 relative z-10">
               <div>
-                <span className="text-xs font-bold text-indigo-400 uppercase tracking-widest mb-1 block">Treino do dia</span>
-                <h3 className="text-3xl font-black text-white">{currentWorkout.focus}</h3>
+                <span className="text-xs font-black text-indigo-500 uppercase tracking-widest mb-1 block">Treino do dia</span>
+                <h3 className={`text-3xl font-black ${isLight ? 'text-slate-900' : 'text-white'}`}>{currentWorkout.focus}</h3>
               </div>
               <div className="flex items-center gap-3">
                 <button
@@ -299,9 +301,11 @@ const GymManager: React.FC<GymManagerProps> = ({ workouts, setWorkouts }) => {
                   <div
                     key={ex.id}
                     className={`
-                      flex items-center justify-between p-5 rounded-2xl border transition-all
-                      ${ex.completed ? 'bg-indigo-600/5 border-indigo-500/30' : 'bg-slate-950/20 border-slate-800 hover:border-slate-700'}
-                    `}
+                        flex items-center justify-between p-5 rounded-2xl border transition-all backdrop-blur-md
+                        ${ex.completed
+                        ? 'opacity-60 bg-indigo-500/5 border-indigo-500/20'
+                        : `${isLight ? 'bg-white/40 border-white/60 hover:border-indigo-200' : 'bg-slate-950/20 border-slate-800 hover:border-slate-700'}`}
+                      `}
                   >
                     <div className="flex items-center gap-4">
                       <button
@@ -349,7 +353,7 @@ const GymManager: React.FC<GymManagerProps> = ({ workouts, setWorkouts }) => {
           </div>
 
           {/* Rest Timer Interface */}
-          <div className={`bg-slate-900 border transition-all duration-500 p-6 rounded-3xl flex flex-col md:flex-row items-center justify-between gap-6 ${isResting ? 'border-amber-500/50 shadow-lg shadow-amber-500/10' : 'border-slate-800'}`}>
+          <div className={`border transition-all duration-500 p-8 rounded-[3rem] flex flex-col md:flex-row items-center justify-between gap-6 backdrop-blur-2xl shadow-xl ${isResting ? 'border-amber-500/50 shadow-amber-500/10' : (isLight ? 'bg-white/60 border-white/50 shadow-indigo-100/10' : 'bg-slate-900 border-slate-800')}`}>
             <div className="flex items-center gap-4">
               <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-colors ${isResting ? 'bg-amber-500/20' : 'bg-slate-800'}`}>
                 <Timer className={`w-6 h-6 ${isResting ? 'text-amber-500 animate-pulse' : 'text-slate-400'}`} />
@@ -374,7 +378,7 @@ const GymManager: React.FC<GymManagerProps> = ({ workouts, setWorkouts }) => {
 
             <div className="flex items-center gap-8">
               <div className="text-right">
-                <span className={`text-4xl font-black tabular-nums transition-colors ${isResting ? 'text-amber-500' : 'text-slate-200'}`}>
+                <span className={`text-5xl font-black tabular-nums transition-colors ${isResting ? 'text-amber-500' : (isLight ? 'text-slate-900' : 'text-slate-200')}`}>
                   {formatTime(restTime)}
                 </span>
                 <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Tempo</p>
@@ -399,9 +403,9 @@ const GymManager: React.FC<GymManagerProps> = ({ workouts, setWorkouts }) => {
         </div>
 
         <div className="lg:col-span-4 space-y-6 sticky top-8 h-fit">
-          <div className="bg-slate-900 border border-slate-800 p-6 rounded-[2rem] space-y-6">
-            <h4 className="font-black text-lg text-white flex items-center gap-2">
-              <History className="w-5 h-5 text-indigo-500" /> Histórico & Dicas
+          <div className={`border p-8 rounded-[3rem] space-y-6 backdrop-blur-2xl shadow-xl ${cardClass || 'bg-slate-900 border-slate-800'} ${isLight ? 'border-white/50' : 'border-slate-800'}`}>
+            <h4 className={`font-black text-xl flex items-center gap-2 ${isLight ? 'text-slate-900' : 'text-white'}`}>
+              <History className="w-6 h-6 text-indigo-500" /> Histórico & Dicas
             </h4>
             <div className="space-y-4">
               <div className="p-4 bg-white/5 rounded-2xl border border-white/5">

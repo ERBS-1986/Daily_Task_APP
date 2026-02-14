@@ -101,4 +101,4 @@ export interface NotificationItem {
   read: boolean;
 }
 
-export type AppTheme = 'default' | 'red' | 'green' | 'blue' | 'pink' | 'purple';
+export type AppTheme = 'default' | 'red' | 'green' | 'blue' | 'pink' | 'purple' | 'lavender-light';

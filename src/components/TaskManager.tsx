@@ -22,9 +22,11 @@ import { useToast } from '../contexts/ToastContext';
 interface TaskManagerProps {
   tasks: Task[];
   setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
+  cardClass?: string;
+  isLight?: boolean;
 }
 
-const TaskManager: React.FC<TaskManagerProps> = ({ tasks, setTasks }) => {
+const TaskManager: React.FC<TaskManagerProps> = ({ tasks, setTasks, cardClass, isLight }) => {
   const { user } = useAuth();
   const { showToast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
@@ -138,7 +140,7 @@ const TaskManager: React.FC<TaskManagerProps> = ({ tasks, setTasks }) => {
           <input
             type="text"
             placeholder="Pesquisar tarefas..."
-            className="w-full pl-12 pr-4 py-3 bg-slate-900 border border-slate-800 rounded-2xl text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all"
+            className={`w-full pl-12 pr-4 py-3 border rounded-2xl transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500/50 ${isLight ? 'bg-white/50 border-white/20 text-slate-900 placeholder-slate-400' : 'bg-slate-900 border-slate-800 text-slate-200'}`}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -146,7 +148,7 @@ const TaskManager: React.FC<TaskManagerProps> = ({ tasks, setTasks }) => {
 
         <div className="flex items-center gap-3 w-full md:w-auto">
           <select
-            className="bg-slate-900 border border-slate-800 text-slate-300 py-3 px-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+            className={`border py-3 px-4 rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500/50 ${isLight ? 'bg-white/50 border-white/20 text-slate-900' : 'bg-slate-900 border-slate-800 text-slate-300'}`}
             value={filterCategory}
             onChange={(e) => setFilterCategory(e.target.value as Category | 'ALL')}
           >
@@ -171,8 +173,11 @@ const TaskManager: React.FC<TaskManagerProps> = ({ tasks, setTasks }) => {
           <div
             key={task.id}
             className={`
-              group flex items-center justify-between p-4 rounded-2xl border transition-all duration-300
-              ${task.completed ? 'bg-slate-900/40 border-slate-800/50 opacity-60' : 'bg-slate-900 border-slate-800 hover:border-slate-700 shadow-sm'}
+              group flex items-center justify-between p-4 rounded-2xl border transition-all duration-300 backdrop-blur-xl
+              ${task.completed
+                ? 'opacity-60 grayscale-[0.5]'
+                : `${cardClass || 'bg-slate-900 border-slate-800'} hover:scale-[1.01] hover:border-indigo-500/30 shadow-lg shadow-indigo-500/5`}
+              ${isLight ? 'border-white/40' : 'border-slate-800'}
             `}
           >
             <div className="flex items-center gap-4 flex-1">
@@ -188,7 +193,7 @@ const TaskManager: React.FC<TaskManagerProps> = ({ tasks, setTasks }) => {
               </button>
 
               <div className="flex flex-col">
-                <span className={`text-slate-100 font-medium ${task.completed ? 'line-through text-slate-500' : ''}`}>
+                <span className={`font-bold ${task.completed ? 'line-through text-slate-500' : (isLight ? 'text-slate-900' : 'text-slate-100')}`}>
                   {task.title}
                 </span>
                 <div className="flex items-center gap-3 mt-1">
@@ -218,11 +223,11 @@ const TaskManager: React.FC<TaskManagerProps> = ({ tasks, setTasks }) => {
         ))}
 
         {filteredTasks.length === 0 && (
-          <div className="text-center py-20 bg-slate-900/50 rounded-3xl border border-dashed border-slate-800">
-            <div className="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Search className="w-8 h-8 text-slate-600" />
+          <div className={`${cardClass || 'bg-slate-900/50'} backdrop-blur-xl text-center py-20 rounded-[2.5rem] border border-dashed ${isLight ? 'border-indigo-200' : 'border-slate-800'}`}>
+            <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${isLight ? 'bg-indigo-50' : 'bg-slate-800'}`}>
+              <Search className={`w-8 h-8 ${isLight ? 'text-indigo-400' : 'text-slate-600'}`} />
             </div>
-            <h4 className="text-slate-300 font-bold">Nenhuma tarefa encontrada</h4>
+            <h4 className={`font-bold ${isLight ? 'text-slate-800' : 'text-slate-300'}`}>Nenhuma tarefa encontrada</h4>
             <p className="text-slate-500 text-sm max-w-xs mx-auto mt-2">
               Não encontramos tarefas para os filtros aplicados. Tente buscar por outros termos ou crie uma nova.
             </p>

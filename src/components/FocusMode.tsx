@@ -8,6 +8,8 @@ interface FocusModeProps {
   tasks: Task[];
   isGlobalFocusActive: boolean;
   setIsGlobalFocusActive: (active: boolean) => void;
+  cardClass?: string;
+  isLight?: boolean;
 }
 
 type SessionType = 'focus' | 'shortBreak' | 'longBreak';
@@ -18,7 +20,7 @@ const SESSION_LABELS: Record<SessionType, { label: string; color: string; icon: 
   longBreak: { label: 'Pausa Longa', color: 'text-sky-500', icon: <Volume2 className="w-5 h-5" /> },
 };
 
-const FocusMode: React.FC<FocusModeProps> = ({ tasks, isGlobalFocusActive, setIsGlobalFocusActive }) => {
+const FocusMode: React.FC<FocusModeProps> = ({ tasks, isGlobalFocusActive, setIsGlobalFocusActive, cardClass, isLight }) => {
   const { showToast } = useToast();
   const [sessionType, setSessionType] = useState<SessionType>('focus');
   const [durations, setDurations] = useState<Record<SessionType, number>>({
@@ -104,15 +106,17 @@ const FocusMode: React.FC<FocusModeProps> = ({ tasks, isGlobalFocusActive, setIs
   return (
     <div className={`space-y-8 flex flex-col items-center transition-all duration-700 ${isGlobalFocusActive ? 'justify-center min-h-[70vh]' : ''}`}>
       {/* Session Type Selectors */}
-      <div className="flex bg-slate-900/50 p-1 rounded-2xl border border-slate-800 backdrop-blur-sm relative transition-opacity duration-500" style={{ opacity: isGlobalFocusActive ? 0.2 : 1 }}>
+      <div className={`p-1 rounded-2xl border backdrop-blur-md relative transition-opacity duration-500 ${isLight ? 'bg-white/40 border-white/40 shadow-xl' : 'bg-slate-900/50 border-slate-800'}`} style={{ opacity: isGlobalFocusActive ? 0.2 : 1 }}>
         {(Object.keys(SESSION_LABELS) as SessionType[]).map(type => (
           <button
             key={type}
             disabled={isActive}
             onClick={() => setSessionType(type)}
             className={`
-              px-6 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-2
-              ${sessionType === type ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}
+              px-6 py-3 rounded-xl text-sm font-black transition-all flex items-center gap-2
+              ${sessionType === type
+                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30'
+                : `${isLight ? 'text-slate-500 hover:text-indigo-600' : 'text-slate-500 hover:text-slate-300'}`}
               ${isActive ? 'cursor-not-allowed' : ''}
             `}
           >
@@ -125,14 +129,15 @@ const FocusMode: React.FC<FocusModeProps> = ({ tasks, isGlobalFocusActive, setIs
       {/* Main Timer Display */}
       <div className="relative group">
         <div className={`
-          relative w-80 h-80 rounded-full border-8 border-slate-800 flex flex-col items-center justify-center transition-all duration-500
-          ${isActive ? 'scale-110 shadow-[0_0_80px_-20px_rgba(99,102,241,0.4)] border-indigo-500/20' : 'bg-slate-900/30'}
+          relative w-80 h-80 rounded-full border-8 transition-all duration-700 backdrop-blur-3xl shadow-2xl
+          ${isActive ? 'scale-110 shadow-indigo-500/20' : (isLight ? 'bg-white/40 shadow-indigo-100/10' : 'bg-slate-900/30')}
+          ${isLight ? 'border-white/50' : 'border-slate-800'}
         `}>
           <div className="text-slate-500 text-xs font-bold uppercase tracking-[0.2em] mb-3">
             {currentConfig.label}
           </div>
-          <div className="text-8xl font-black text-white tracking-tighter tabular-nums leading-none">
-            {formatTime(timeLeft)}
+          <div className="text-8xl font-black tracking-tighter tabular-nums leading-none drop-shadow-lg">
+            <span className={isLight ? 'text-slate-900' : 'text-white'}>{formatTime(timeLeft)}</span>
           </div>
           <div className={`mt-6 transition-transform duration-500 ${isActive ? 'scale-125' : ''}`}>
             {isActive ? <BellOff className={`w-6 h-6 animate-pulse ${currentConfig.color}`} /> : <Volume2 className="w-6 h-6 text-slate-600" />}
@@ -166,11 +171,11 @@ const FocusMode: React.FC<FocusModeProps> = ({ tasks, isGlobalFocusActive, setIs
 
       {/* Task Selection */}
       {!isGlobalFocusActive && (
-        <div className="w-full max-w-sm bg-slate-900/50 backdrop-blur-md border border-slate-800 p-6 rounded-[2rem] space-y-4">
-          <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest block text-center">Focar em:</label>
+        <div className={`w-full max-w-sm p-6 rounded-[2.5rem] border backdrop-blur-3xl shadow-xl space-y-4 ${cardClass || 'bg-slate-900/50 border-slate-800'} ${isLight ? 'border-white/50 shadow-indigo-100/10' : 'border-slate-800 shadow-black/20'}`}>
+          <label className={`text-[10px] font-black uppercase tracking-widest block text-center ${isLight ? 'text-slate-500' : 'text-slate-500'}`}>Focar em:</label>
           <select
             disabled={isActive}
-            className="w-full bg-slate-800/50 border border-slate-700/50 rounded-2xl px-5 py-3.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all appearance-none text-center font-bold"
+            className={`w-full border rounded-2xl px-5 py-4 text-sm focus:outline-none focus:ring-4 focus:ring-indigo-500/20 transition-all appearance-none text-center font-black ${isLight ? 'bg-white/50 border-indigo-100 text-slate-900' : 'bg-slate-800/50 border-slate-700/50 text-white'}`}
             value={selectedTaskId || ''}
             onChange={(e) => setSelectedTaskId(e.target.value)}
           >
@@ -196,7 +201,7 @@ const FocusMode: React.FC<FocusModeProps> = ({ tasks, isGlobalFocusActive, setIs
       <div className="flex items-center gap-10">
         <button
           onClick={resetTimer}
-          className="p-5 bg-slate-800/80 hover:bg-slate-700 text-slate-400 rounded-3xl transition-all active:scale-90 border border-slate-700/50"
+          className={`p-6 border rounded-[2rem] transition-all active:scale-90 shadow-lg backdrop-blur-md ${isLight ? 'bg-white/60 border-white/50 text-slate-400 hover:text-indigo-500' : 'bg-slate-800/80 border-slate-700/50 text-slate-400 hover:text-white'}`}
         >
           <RotateCcw className="w-7 h-7" />
         </button>

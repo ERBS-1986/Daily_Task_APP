@@ -9,9 +9,11 @@ import { useToast } from '../contexts/ToastContext';
 interface HabitTrackerProps {
   habits: Habit[];
   setHabits: React.Dispatch<React.SetStateAction<Habit[]>>;
+  cardClass?: string;
+  isLight?: boolean;
 }
 
-const HabitTracker: React.FC<HabitTrackerProps> = ({ habits, setHabits }) => {
+const HabitTracker: React.FC<HabitTrackerProps> = ({ habits, setHabits, cardClass, isLight }) => {
   const { user } = useAuth();
   const { showToast } = useToast();
   const [showAddModal, setShowAddModal] = useState(false);
@@ -126,8 +128,8 @@ const HabitTracker: React.FC<HabitTrackerProps> = ({ habits, setHabits }) => {
     <div className="space-y-8 animate-in slide-in-from-right-4 duration-500">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-white">Hábitos Ativos</h2>
-          <p className="text-slate-400 text-sm">Consistência é a chave para o sucesso.</p>
+          <h2 className={`text-2xl font-bold ${isLight ? 'text-slate-900' : 'text-white'}`}>Hábitos Ativos</h2>
+          <p className={`${isLight ? 'text-slate-600' : 'text-slate-400'} text-sm`}>Consistência é a chave para o sucesso.</p>
         </div>
         <button
           onClick={() => setShowAddModal(true)}
@@ -142,12 +144,12 @@ const HabitTracker: React.FC<HabitTrackerProps> = ({ habits, setHabits }) => {
           const isCompletedToday = habit.lastCompleted === new Date().toISOString().split('T')[0];
 
           return (
-            <div key={habit.id} className="group relative bg-slate-900 border border-slate-800 p-6 rounded-3xl hover:border-slate-700 transition-all shadow-sm">
+            <div key={habit.id} className={`group relative p-6 rounded-[2.5rem] border transition-all shadow-xl backdrop-blur-2xl ${cardClass || 'bg-slate-900 border-slate-800'} ${isLight ? 'border-white/50 shadow-indigo-100/20' : 'border-slate-800 shadow-black/20'}`}>
               <button
                 onClick={() => deleteHabit(habit.id)}
-                className="absolute top-4 right-4 p-2 text-slate-600 hover:text-rose-500 opacity-0 group-hover:opacity-100 transition-all"
+                className={`absolute top-6 right-6 p-2 opacity-0 group-hover:opacity-100 transition-all ${isLight ? 'text-slate-400 hover:text-rose-500' : 'text-slate-600 hover:text-rose-500'}`}
               >
-                <Trash2 className="w-4 h-4" />
+                <Trash2 className="w-5 h-5" />
               </button>
 
               <div className="flex items-center justify-between mb-6">
@@ -159,8 +161,8 @@ const HabitTracker: React.FC<HabitTrackerProps> = ({ habits, setHabits }) => {
                     <TrendingUp className="w-6 h-6" />
                   </div>
                   <div>
-                    <h4 className="font-bold text-slate-100">{habit.title}</h4>
-                    <p className="text-xs text-slate-500 uppercase font-semibold">{habit.frequency}</p>
+                    <h4 className={`font-black text-lg ${isLight ? 'text-slate-900' : 'text-slate-100'}`}>{habit.title}</h4>
+                    <p className={`text-xs uppercase font-black tracking-widest ${isLight ? 'text-indigo-600/60' : 'text-slate-500'}`}>{habit.frequency}</p>
                   </div>
                 </div>
 
@@ -184,11 +186,13 @@ const HabitTracker: React.FC<HabitTrackerProps> = ({ habits, setHabits }) => {
                         {date.toLocaleDateString('pt-BR', { weekday: 'short' }).slice(0, 3)}
                       </span>
                       <div className={`
-                        w-8 h-8 rounded-full flex items-center justify-center border transition-colors
-                        ${done ? 'bg-indigo-500 border-indigo-400 text-white' : 'border-slate-800 bg-slate-950/50'}
-                        ${isToday && !done ? 'border-indigo-500' : ''}
+                        w-10 h-10 rounded-2xl flex items-center justify-center border transition-all duration-500
+                        ${done
+                          ? 'bg-indigo-500 border-indigo-400 text-white shadow-lg shadow-indigo-500/30'
+                          : `${isLight ? 'border-indigo-100 bg-white/50' : 'border-slate-800 bg-slate-950/50'}`}
+                        ${isToday && !done ? 'border-indigo-500 ring-2 ring-indigo-500/20' : ''}
                       `}>
-                        {done && <CheckCircle2 className="w-4 h-4" />}
+                        {done && <CheckCircle2 className="w-5 h-5" />}
                       </div>
                     </div>
                   );

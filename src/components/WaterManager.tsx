@@ -13,7 +13,14 @@ import { useAuth } from '../contexts/AuthContext';
 
 // ... (imports)
 
-const WaterManager: React.FC<WaterManagerProps> = ({ water, setWater }) => {
+interface WaterManagerProps {
+  water: WaterIntake;
+  setWater: React.Dispatch<React.SetStateAction<WaterIntake>>;
+  cardClass?: string;
+  isLight?: boolean;
+}
+
+const WaterManager: React.FC<WaterManagerProps> = ({ water, setWater, cardClass, isLight }) => {
   const { user } = useAuth();
   const [isConfiguring, setIsConfiguring] = useState(false);
   const [activeConfigTab, setActiveConfigTab] = useState<'goal' | 'reminders'>('goal');
@@ -119,12 +126,12 @@ const WaterManager: React.FC<WaterManagerProps> = ({ water, setWater }) => {
   return (
     <div className="space-y-8 animate-in slide-in-from-top-4 duration-500">
       <div className="flex flex-col items-center text-center space-y-2 relative">
-        <h2 className="text-3xl font-bold text-white">Lembrete de Hidratação</h2>
-        <p className="text-slate-400">Gerencie sua meta e alertas personalizados.</p>
+        <h2 className={`text-3xl font-black ${isLight ? 'text-slate-900' : 'text-white'}`}>Lembrete de Hidratação</h2>
+        <p className={`${isLight ? 'text-slate-600' : 'text-slate-400'} font-medium`}>Gerencie sua meta e alertas personalizados.</p>
 
         <button
           onClick={() => setIsConfiguring(true)}
-          className="absolute right-0 top-0 p-3 bg-slate-900 border border-slate-800 rounded-2xl text-slate-400 hover:text-indigo-400 transition-colors shadow-lg"
+          className={`absolute right-0 top-0 p-3 border rounded-2xl transition-all shadow-lg ${isLight ? 'bg-white/50 border-white/20 text-indigo-500 hover:bg-white' : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-indigo-400'}`}
           title="Configurações de Hidratação"
         >
           <Settings2 className="w-5 h-5" />
@@ -134,17 +141,17 @@ const WaterManager: React.FC<WaterManagerProps> = ({ water, setWater }) => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
         {/* Visualizer */}
         <div className="flex justify-center">
-          <div className="relative w-64 h-80 bg-slate-900 border-4 border-slate-800 rounded-[3rem] overflow-hidden shadow-2xl group cursor-pointer" onClick={() => addWater(250)}>
+          <div className={`relative w-64 h-80 border-4 rounded-[3rem] overflow-hidden shadow-2xl group cursor-pointer backdrop-blur-3xl ${isLight ? 'bg-white/40 border-white/60' : 'bg-slate-900 border-slate-800'}`} onClick={() => addWater(250)}>
             <div
-              className="absolute bottom-0 left-0 w-full bg-sky-500 transition-all duration-1000 ease-in-out"
+              className={`absolute bottom-0 left-0 w-full transition-all duration-1000 ease-in-out ${isLight ? 'bg-sky-400' : 'bg-sky-500'}`}
               style={{ height: `${percentage}%` }}
             >
               <div className="absolute top-0 left-0 w-[200%] h-10 bg-sky-400/30 -translate-y-full animate-wave"></div>
             </div>
 
             <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
-              <span className="text-4xl font-black text-white drop-shadow-md group-hover:scale-110 transition-transform">{Math.round(percentage)}%</span>
-              <span className="text-slate-300 font-medium">{water.current} / {water.target}ml</span>
+              <span className={`text-5xl font-black drop-shadow-md group-hover:scale-110 transition-transform ${isLight ? 'text-slate-900' : 'text-white'}`}>{Math.round(percentage)}%</span>
+              <span className={`font-black uppercase tracking-widest text-[10px] mt-1 ${isLight ? 'text-slate-600' : 'text-slate-300'}`}>{water.current} / {water.target}ml</span>
               {percentage < 100 && (
                 <div className="mt-4 flex items-center gap-1 text-[10px] text-white/50 uppercase font-bold tracking-widest bg-black/20 px-3 py-1 rounded-full">
                   <Plus className="w-3 h-3" /> Toque para +250ml
@@ -161,12 +168,12 @@ const WaterManager: React.FC<WaterManagerProps> = ({ water, setWater }) => {
               <button
                 key={amount}
                 onClick={() => addWater(amount)}
-                className="bg-slate-900 border border-slate-800 p-6 rounded-3xl hover:border-sky-500 transition-all group relative overflow-hidden"
+                className={`p-6 rounded-[2rem] border transition-all group relative overflow-hidden backdrop-blur-xl ${cardClass || 'bg-slate-900 border-slate-800'} ${isLight ? 'border-white/50 hover:bg-white/60' : 'border-slate-800 hover:border-sky-500'}`}
               >
                 <div className="relative z-10">
                   <Plus className="w-5 h-5 text-sky-500 mb-2 group-hover:scale-125 transition-transform" />
-                  <span className="block text-xl font-bold text-slate-100">{amount}ml</span>
-                  <span className="text-[10px] text-slate-500 uppercase tracking-tighter font-bold">Adicionar</span>
+                  <span className={`block text-xl font-black ${isLight ? 'text-slate-900' : 'text-white'}`}>{amount}ml</span>
+                  <span className={`text-[10px] uppercase tracking-widest font-black ${isLight ? 'text-slate-400' : 'text-slate-500'}`}>Adicionar</span>
                 </div>
                 <div className="absolute bottom-0 left-0 w-full h-1 bg-sky-500/0 group-hover:bg-sky-500/50 transition-all"></div>
               </button>

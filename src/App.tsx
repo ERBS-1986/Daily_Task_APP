@@ -38,12 +38,11 @@ import { useToast } from './contexts/ToastContext';
 
 
 const THEMES: { id: AppTheme, name: string, bgClass: string, sidebarClass: string, cardClass: string, color: string }[] = [
-  { id: 'default', name: 'Padrão', bgClass: 'bg-slate-50 dark:bg-slate-950', sidebarClass: 'bg-slate-100/80 dark:bg-slate-900/80', cardClass: 'bg-white dark:bg-[#434B96]', color: '#6366f1' },
+  { id: 'lavender-light', name: 'Premium Lavender', bgClass: 'bg-[#F0F2FF]', sidebarClass: 'bg-white/60', cardClass: 'bg-white/80', color: '#818CF8' },
+  { id: 'default', name: 'Padrão Dark', bgClass: 'bg-slate-950', sidebarClass: 'bg-slate-900/80', cardClass: 'bg-[#434B96]', color: '#6366f1' },
   { id: 'red', name: 'Vermelho', bgClass: 'bg-red-900', sidebarClass: 'bg-black/40', cardClass: 'bg-red-950/50', color: '#ef4444' },
   { id: 'green', name: 'Verde', bgClass: 'bg-emerald-900', sidebarClass: 'bg-black/40', cardClass: 'bg-emerald-950/50', color: '#10b981' },
   { id: 'blue', name: 'Azul', bgClass: 'bg-blue-900', sidebarClass: 'bg-black/40', cardClass: 'bg-blue-950/50', color: '#3b82f6' },
-  { id: 'pink', name: 'Rosa', bgClass: 'bg-pink-900', sidebarClass: 'bg-black/40', cardClass: 'bg-pink-950/50', color: '#ec4899' },
-  { id: 'purple', name: 'Roxo', bgClass: 'bg-violet-900', sidebarClass: 'bg-black/40', cardClass: 'bg-violet-950/50', color: '#8b5cf6' },
 ];
 
 import { supabase } from './lib/supabase';
@@ -65,7 +64,7 @@ const App: React.FC = () => {
   const { showToast } = useToast();
 
 
-  const [currentTheme, setCurrentTheme] = useState<AppTheme>(() => (localStorage.getItem('ff_theme') as AppTheme) || 'default');
+  const [currentTheme, setCurrentTheme] = useState<AppTheme>(() => (localStorage.getItem('ff_theme') as AppTheme) || 'lavender-light');
   const [isLoadingData, setIsLoadingData] = useState(false);
 
   const profileMenuRef = useRef<HTMLDivElement>(null);
@@ -76,7 +75,11 @@ const App: React.FC = () => {
 
   useEffect(() => {
     localStorage.setItem('ff_theme', currentTheme);
-    document.documentElement.classList.add('dark');
+    if (currentTheme === 'lavender-light') {
+      document.documentElement.classList.remove('dark');
+    } else {
+      document.documentElement.classList.add('dark');
+    }
   }, [currentTheme]);
 
   // Click outside to close profile menu
@@ -208,16 +211,19 @@ const App: React.FC = () => {
   console.log('[App] Renderizando. isAuthLoading:', isAuthLoading, 'User:', user ? 'Sim' : 'Não');
 
   const renderContent = () => {
+    const isLight = currentTheme === 'lavender-light';
+    const commonProps = { cardClass: currentThemeData.cardClass, isLight };
+
     switch (activeTab) {
-      case 'dashboard': return <Dashboard tasks={tasks} habits={habits} goals={goals} water={water} workouts={workouts} onNavigate={setActiveTab} cardClass={currentThemeData.cardClass} />;
-      case 'tasks': return <TaskManager tasks={tasks} setTasks={setTasks} />;
-      case 'habits': return <HabitTracker habits={habits} setHabits={setHabits} />;
-      case 'goals': return <GoalsManager goals={goals} setGoals={setGoals} />;
-      case 'water': return <WaterManager water={water} setWater={setWater} />;
-      case 'gym': return <GymManager workouts={workouts} setWorkouts={setWorkouts} />;
-      case 'calendar': return <CalendarSync />;
-      case 'focus': return <FocusMode tasks={tasks} isGlobalFocusActive={isFocusActive} setIsGlobalFocusActive={setIsFocusActive} />;
-      default: return <Dashboard tasks={tasks} habits={habits} goals={goals} water={water} workouts={workouts} onNavigate={setActiveTab} />;
+      case 'dashboard': return <Dashboard {...commonProps} tasks={tasks} habits={habits} goals={goals} water={water} workouts={workouts} onNavigate={setActiveTab} />;
+      case 'tasks': return <TaskManager {...commonProps} tasks={tasks} setTasks={setTasks} />;
+      case 'habits': return <HabitTracker {...commonProps} habits={habits} setHabits={setHabits} />;
+      case 'goals': return <GoalsManager {...commonProps} goals={goals} setGoals={setGoals} />;
+      case 'water': return <WaterManager {...commonProps} water={water} setWater={setWater} />;
+      case 'gym': return <GymManager {...commonProps} workouts={workouts} setWorkouts={setWorkouts} />;
+      case 'calendar': return <CalendarSync {...commonProps} />;
+      case 'focus': return <FocusMode {...commonProps} tasks={tasks} isGlobalFocusActive={isFocusActive} setIsGlobalFocusActive={setIsFocusActive} />;
+      default: return <Dashboard {...commonProps} tasks={tasks} habits={habits} goals={goals} water={water} workouts={workouts} onNavigate={setActiveTab} />;
     }
   };
 
@@ -227,34 +233,52 @@ const App: React.FC = () => {
         <div className="fixed inset-0 bg-black/60 z-40 lg:hidden backdrop-blur-sm" onClick={() => setIsSidebarOpen(false)} />
       )}
 
-      <aside className={`fixed inset-y-0 left-0 z-50 w-64 ${currentThemeData.sidebarClass} backdrop-blur-xl border-r border-white/5 transform transition-all duration-500 ease-in-out lg:relative lg:translate-x-0 ${isSidebarOpen && !isFocusActive ? 'translate-x-0' : '-translate-x-full'} ${isFocusActive ? 'lg:-translate-x-full lg:hidden' : ''}`}>
+      <aside className={`fixed inset-y-0 left-0 z-50 w-72 ${currentThemeData.sidebarClass} backdrop-blur-2xl border-r border-white/20 transform transition-all duration-500 ease-in-out lg:relative lg:translate-x-0 ${isSidebarOpen && !isFocusActive ? 'translate-x-0' : '-translate-x-full'} ${isFocusActive ? 'lg:-translate-x-full lg:hidden' : ''} shadow-2xl overflow-hidden`}>
         <div className="flex flex-col h-full">
-          <div className="p-6">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-600/20">
-                <CalIcon className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-white tracking-tight">Daily Task</h1>
-                <p className="text-xs text-slate-400">Produtividade</p>
+          {/* Sidebar Header Illustration Area */}
+          <div className="relative h-48 mb-4 overflow-hidden group">
+            <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 z-0"></div>
+            {/* Placeholder for Illustration */}
+            <div className="absolute inset-0 flex items-end p-6 z-10 bg-gradient-to-t from-white/40 to-transparent">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center shadow-xl">
+                  <CalIcon className="w-8 h-8 text-indigo-500" />
+                </div>
+                <div>
+                  <h1 className="text-2xl font-black text-slate-800 tracking-tight leading-tight">Daily Task</h1>
+                  <p className="text-xs font-bold text-indigo-600/70 uppercase tracking-widest">Produtividade</p>
+                </div>
               </div>
             </div>
+            {/* Soft blob decor */}
+            <div className="absolute -top-10 -right-10 w-32 h-32 bg-indigo-400/10 rounded-full blur-3xl"></div>
           </div>
-          <nav className="flex-1 px-4 space-y-1">
+
+          <nav className="flex-1 px-4 space-y-1.5 overflow-y-auto">
             {NAVIGATION.map((item) => (
-              <button key={item.id} onClick={() => { setActiveTab(item.id); setIsSidebarOpen(false); }} className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${activeTab === item.id ? 'bg-white/10 text-white border border-white/10 shadow-sm' : 'text-slate-400 hover:bg-white/5 hover:text-slate-200'}`}>
-                {item.icon}
-                <span className="font-medium">{item.name}</span>
+              <button
+                key={item.id}
+                onClick={() => { setActiveTab(item.id); setIsSidebarOpen(false); }}
+                className={`w-full flex items-center gap-3 px-5 py-4 rounded-2xl transition-all duration-300 ${activeTab === item.id ? 'bg-indigo-600/10 text-indigo-600 border border-indigo-600/10 shadow-sm' : 'text-slate-500 hover:bg-black/5 hover:text-slate-800'}`}
+              >
+                <div className={`transition-transform duration-300 ${activeTab === item.id ? 'scale-110' : ''}`}>
+                  {React.cloneElement(item.icon as React.ReactElement, {
+                    className: `w-5 h-5 ${activeTab === item.id ? 'text-indigo-600' : 'text-slate-400'}`
+                  })}
+                </div>
+                <span className={`font-bold text-sm ${activeTab === item.id ? 'translate-x-1' : ''} transition-transform`}>{item.name}</span>
+                {activeTab === item.id && <div className="ml-auto w-1.5 h-1.5 bg-indigo-600 rounded-full shadow-lg shadow-indigo-600/50"></div>}
               </button>
             ))}
           </nav>
-          <div className="p-4 border-t border-white/5">
+
+          <div className="p-4 border-t border-black/5">
             <button
               onClick={handleLogout}
-              className="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-rose-400 w-full rounded-xl hover:bg-rose-500/10 transition-colors"
+              className="flex items-center gap-3 px-5 py-4 text-slate-400 hover:text-rose-500 w-full rounded-2xl hover:bg-rose-500/5 transition-all group font-bold text-sm"
             >
-              <LogOut className="w-5 h-5" />
-              <span className="font-medium">Sair</span>
+              <LogOut className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+              <span>Sair da Conta</span>
             </button>
           </div>
         </div>
@@ -262,12 +286,12 @@ const App: React.FC = () => {
 
       <main className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
         {!isFocusActive && (
-          <header className="h-16 bg-white/5 backdrop-blur-md border-b border-white/5 flex items-center justify-between px-4 lg:px-8 z-30 animate-in slide-in-from-top-4 duration-500">
-            <button className="lg:hidden p-2 text-slate-400 hover:text-white" onClick={() => setIsSidebarOpen(true)}>
-              <Menu className="w-6 h-6" />
+          <header className={`h-20 ${currentTheme === 'lavender-light' ? 'bg-white/20' : 'bg-white/5'} backdrop-blur-xl border-b border-black/5 flex items-center justify-between px-6 lg:px-10 z-30 animate-in slide-in-from-top-4 duration-700`}>
+            <button className="lg:hidden p-2 text-slate-500 hover:text-indigo-600 transition-colors" onClick={() => setIsSidebarOpen(true)}>
+              <Menu className="w-7 h-7" />
             </button>
-            <div className="flex-1 lg:flex-none">
-              <h2 className="text-lg font-semibold text-slate-100 hidden md:block">{NAVIGATION.find(n => n.id === activeTab)?.name || 'Daily Task'}</h2>
+            <div className="flex-1 lg:flex-none ml-4 lg:ml-0">
+              <h2 className={`text-xl font-bold ${currentTheme === 'lavender-light' ? 'text-slate-800' : 'text-slate-100'} hidden md:block`}>{NAVIGATION.find(n => n.id === activeTab)?.name || 'Daily Task'}</h2>
             </div>
 
             <div className="flex items-center gap-2">

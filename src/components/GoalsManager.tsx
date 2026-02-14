@@ -9,9 +9,11 @@ import { useToast } from '../contexts/ToastContext';
 interface GoalsManagerProps {
   goals: WeeklyGoal[];
   setGoals: React.Dispatch<React.SetStateAction<WeeklyGoal[]>>;
+  cardClass?: string;
+  isLight?: boolean;
 }
 
-const GoalsManager: React.FC<GoalsManagerProps> = ({ goals, setGoals }) => {
+const GoalsManager: React.FC<GoalsManagerProps> = ({ goals, setGoals, cardClass, isLight }) => {
   const { user } = useAuth();
   const { showToast } = useToast();
   const [showAddModal, setShowAddModal] = useState(false);
@@ -107,12 +109,12 @@ const GoalsManager: React.FC<GoalsManagerProps> = ({ goals, setGoals }) => {
     <div className="space-y-8 animate-in slide-in-from-bottom-4 duration-500">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 bg-amber-500/10 rounded-2xl flex items-center justify-center">
+          <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${isLight ? 'bg-amber-100' : 'bg-amber-500/10'}`}>
             <Target className="w-7 h-7 text-amber-500" />
           </div>
           <div>
-            <h2 className="text-2xl font-bold text-white">Metas Semanais</h2>
-            <p className="text-slate-400 text-sm">Grandes objetivos divididos em pequenos passos.</p>
+            <h2 className={`text-2xl font-black ${isLight ? 'text-slate-900' : 'text-white'}`}>Metas Semanais</h2>
+            <p className={`${isLight ? 'text-slate-600' : 'text-slate-400'} text-sm font-medium`}>Grandes objetivos divididos em pequenos passos.</p>
           </div>
         </div>
         <button
@@ -130,7 +132,7 @@ const GoalsManager: React.FC<GoalsManagerProps> = ({ goals, setGoals }) => {
           const isFinished = goal.current >= goal.target;
 
           return (
-            <div key={goal.id} className="bg-slate-900 border border-slate-800 p-8 rounded-3xl space-y-6 relative overflow-hidden group hover:border-amber-500/30 transition-colors">
+            <div key={goal.id} className={`p-8 rounded-[2.5rem] border space-y-6 relative overflow-hidden group transition-all duration-500 backdrop-blur-2xl shadow-xl ${cardClass || 'bg-slate-900 border-slate-800'} ${isLight ? 'border-white/50 hover:bg-white/60 shadow-amber-100/10' : 'border-slate-800 hover:border-amber-500/30 shadow-black/20'}`}>
               <button
                 onClick={() => deleteGoal(goal.id)}
                 className="absolute top-4 right-4 p-2 text-slate-600 hover:text-rose-500 opacity-0 group-hover:opacity-100 transition-all z-20"
@@ -140,8 +142,8 @@ const GoalsManager: React.FC<GoalsManagerProps> = ({ goals, setGoals }) => {
 
               <div className="flex justify-between items-start relative z-10">
                 <div>
-                  <h4 className="text-xl font-bold text-slate-100 mb-1">{goal.title}</h4>
-                  <p className="text-sm text-slate-400">Objetivo para esta semana</p>
+                  <h4 className={`text-xl font-black mb-1 ${isLight ? 'text-slate-900' : 'text-slate-100'}`}>{goal.title}</h4>
+                  <p className={`text-xs uppercase font-black tracking-widest ${isLight ? 'text-slate-400' : 'text-slate-500'}`}>Objetivo para esta semana</p>
                 </div>
                 {isFinished && (
                   <div className="p-2 bg-amber-500/20 rounded-xl">
@@ -152,10 +154,10 @@ const GoalsManager: React.FC<GoalsManagerProps> = ({ goals, setGoals }) => {
 
               <div className="space-y-4 relative z-10">
                 <div className="flex justify-between items-end">
-                  <span className="text-3xl font-black text-slate-100">
-                    {goal.current} <span className="text-sm font-bold text-slate-500 uppercase">{goal.unit}</span>
+                  <span className={`text-3xl font-black ${isLight ? 'text-slate-900' : 'text-slate-100'}`}>
+                    {goal.current} <span className="text-sm font-black text-slate-500 uppercase">{goal.unit}</span>
                   </span>
-                  <span className="text-slate-400 font-bold">de {goal.target}</span>
+                  <span className={`text-xs font-black uppercase tracking-wider ${isLight ? 'text-slate-400' : 'text-slate-500'}`}>de {goal.target}</span>
                 </div>
 
                 <div className="h-4 bg-slate-800 rounded-full overflow-hidden border border-slate-700">
