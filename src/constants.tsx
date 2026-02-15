@@ -23,7 +23,8 @@ export const CATEGORY_ICONS: Record<Category, React.ReactNode> = {
   [Category.PERSONAL]: <User className="w-4 h-4" />,
   [Category.HEALTH]: <Heart className="w-4 h-4" />,
   [Category.STUDY]: <Book className="w-4 h-4" />,
-  [Category.FINANCE]: <DollarSign className="w-4 h-4" />
+  [Category.FINANCE]: <DollarSign className="w-4 h-4" />,
+  [Category.OTHER]: <Sparkles className="w-4 h-4" />
 };
 
 export const NAVIGATION = [

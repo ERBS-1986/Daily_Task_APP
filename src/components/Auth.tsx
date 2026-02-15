@@ -58,49 +58,49 @@ const Auth: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen w-full bg-[#3580BB] flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Background Decorativo */}
-      <div className="absolute top-0 left-0 w-full h-full">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-600/20 rounded-full blur-[120px]"></div>
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-rose-600/20 rounded-full blur-[120px]"></div>
+    <div className="min-h-screen w-full bg-premium-dark flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Premium Background Effects */}
+      <div className="absolute inset-0 z-0">
+        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-indigo-600/20 to-transparent"></div>
+        <div className="absolute inset-x-0 bottom-0 h-1/2 bg-indigo-500/10 blur-[120px]"></div>
       </div>
 
-      <div className="w-full max-w-md relative z-10 animate-in fade-in zoom-in-95 duration-700">
-        <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-2xl shadow-indigo-600/30 mx-auto mb-4">
-            <Calendar className="w-10 h-10 text-white" />
+      <div className="w-full max-w-md relative z-10 animate-in fade-in zoom-in-95 duration-1000">
+        <div className="text-center mb-10">
+          <div className="w-20 h-20 bg-indigo-600 rounded-[2rem] flex items-center justify-center shadow-[0_0_50px_-12px_rgba(79,70,229,0.8)] mx-auto mb-6 transform hover:rotate-6 transition-transform">
+            <Calendar className="w-12 h-12 text-white" />
           </div>
-          <h1 className="text-3xl font-black text-white tracking-tight">Daily Task</h1>
-          <p className="text-slate-400 mt-2 font-medium">Sua jornada de alta performance começa aqui.</p>
+          <h1 className="text-5xl font-black text-white tracking-tight drop-shadow-xl">Daily Task</h1>
+          <p className="text-indigo-100/60 mt-4 font-medium text-lg tracking-wide">Sua jornada de alta performance começa aqui.</p>
         </div>
 
-        <div className="bg-slate-900/40 backdrop-blur-2xl border border-white/5 rounded-[2.5rem] shadow-2xl overflow-hidden">
-          {/* Tabs */}
-          <div className="flex p-2 bg-white/5 border-b border-white/5">
+        <div className="bg-slate-900/40 backdrop-blur-[40px] border border-white/10 rounded-[3rem] shadow-[0_50px_100px_-20px_rgba(0,0,0,0.5)] overflow-hidden scale-105">
+          {/* Custom Tabs from Capa 01 */}
+          <div className="flex p-3 bg-white/5 border-b border-white/5">
             <button
               onClick={() => { setMode('login'); setError(null); }}
-              className={`flex-1 py-3 px-4 rounded-2xl text-sm font-bold transition-all flex items-center justify-center gap-2 ${mode === 'login' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-500 hover:text-white'}`}
+              className={`flex-1 py-4 px-6 rounded-[1.5rem] text-sm font-black transition-all flex items-center justify-center gap-2 ${mode === 'login' ? 'bg-indigo-600 text-white shadow-xl shadow-indigo-600/40 ring-1 ring-white/20' : 'text-slate-400 hover:text-white'}`}
             >
-              <LogIn className="w-4 h-4" /> Entrar
+              <ArrowRight className="w-4 h-4 rotate-0" /> Entrar
             </button>
             <button
               onClick={() => { setMode('signup'); setError(null); }}
-              className={`flex-1 py-3 px-4 rounded-2xl text-sm font-bold transition-all flex items-center justify-center gap-2 ${mode === 'signup' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-500 hover:text-white'}`}
+              className={`flex-1 py-4 px-6 rounded-[1.5rem] text-sm font-black transition-all flex items-center justify-center gap-2 ${mode === 'signup' ? 'bg-indigo-600 text-white shadow-xl shadow-indigo-600/40 ring-1 ring-white/20' : 'text-slate-400 hover:text-white'}`}
             >
               <UserPlus className="w-4 h-4" /> Criar Conta
             </button>
           </div>
 
-          <form onSubmit={handleSubmit} className="p-8 space-y-5">
+          <form onSubmit={handleSubmit} className="p-10 space-y-6">
             {error && (
-              <div className="p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl text-rose-400 text-xs font-bold text-center">
+              <div className="p-4 bg-rose-500/10 border border-rose-500/20 rounded-2xl text-rose-400 text-xs font-bold text-center animate-shake">
                 {error}
               </div>
             )}
 
             {mode === 'signup' && (
               <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">Nome Completo</label>
+                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">NOME COMPLETO</label>
                 <div className="relative">
                   <input
                     type="text"
@@ -108,41 +108,41 @@ const Auth: React.FC = () => {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Seu nome"
-                    className="w-full bg-slate-950/50 border border-slate-800 rounded-2xl px-5 py-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all placeholder:text-slate-600"
+                    className="w-full bg-slate-50 border-none rounded-[1.5rem] px-6 py-4 text-slate-900 font-bold focus:outline-none focus:ring-4 focus:ring-indigo-500/30 transition-all placeholder:text-slate-400"
                   />
                 </div>
               </div>
             )}
 
             <div className="space-y-2">
-              <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-1">E-mail</label>
+              <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">E-MAIL</label>
               <div className="relative group">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-600 group-focus-within:text-indigo-400 transition-colors" />
+                <Mail className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-indigo-600 transition-colors z-10" />
                 <input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="exemplo@email.com"
-                  className="w-full bg-slate-950/50 border border-slate-800 rounded-2xl pl-12 pr-5 py-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all placeholder:text-slate-600"
+                  className="w-full bg-slate-50 border-none rounded-[1.5rem] pl-14 pr-6 py-4 text-slate-900 font-bold focus:outline-none focus:ring-4 focus:ring-indigo-500/30 transition-all placeholder:text-slate-400"
                 />
               </div>
             </div>
 
             <div className="space-y-2">
               <div className="flex justify-between items-center ml-1">
-                <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Senha</label>
-                {mode === 'login' && <button type="button" className="text-[10px] text-indigo-400 hover:underline font-bold uppercase">Esqueceu?</button>}
+                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">SENHA</label>
+                {mode === 'login' && <button type="button" className="text-[10px] text-slate-500 hover:text-white font-black uppercase tracking-widest">ESQUECEU?</button>}
               </div>
               <div className="relative group">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-600 group-focus-within:text-indigo-400 transition-colors" />
+                <Lock className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-indigo-600 transition-colors z-10" />
                 <input
                   type="password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full bg-slate-950/50 border border-slate-800 rounded-2xl pl-12 pr-5 py-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all placeholder:text-slate-600"
+                  className="w-full bg-slate-50 border-none rounded-[1.5rem] pl-14 pr-6 py-4 text-slate-900 font-bold focus:outline-none focus:ring-4 focus:ring-indigo-500/30 transition-all placeholder:text-slate-400"
                 />
               </div>
             </div>
@@ -150,47 +150,23 @@ const Auth: React.FC = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-bold py-4 rounded-2xl shadow-xl shadow-indigo-600/20 transition-all flex items-center justify-center gap-2 mt-4"
+              className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-black py-5 rounded-[1.5rem] shadow-[0_20px_50px_-15px_rgba(79,70,229,0.5)] transition-all flex items-center justify-center gap-3 mt-6 active:scale-95 border border-white/10"
             >
               {isLoading ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
+                <Loader2 className="w-6 h-6 animate-spin" />
               ) : (
                 <>
-                  {mode === 'login' ? 'Entrar no Dashboard' : 'Criar Minha Conta'}
+                  <span className="text-lg">{mode === 'login' ? 'Entrar no Dashboard' : 'Criar Minha Conta'}</span>
                   <ArrowRight className="w-5 h-5" />
                 </>
               )}
             </button>
-
-            {/* Temporariamente removido - Login Social
-            <div className="relative py-4">
-              <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-800"></div></div>
-              <div className="relative flex justify-center text-[10px] font-bold uppercase tracking-widest"><span className="bg-slate-900/0 px-2 text-slate-500">ou continuar com</span></div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <button
-                type="button"
-                onClick={handleGoogleLogin}
-                className="flex items-center justify-center gap-3 py-3 bg-white hover:bg-slate-100 text-slate-900 rounded-2xl font-bold text-xs transition-all shadow-lg"
-              >
-                <Chrome className="w-4 h-4 text-rose-500" /> Google
-              </button>
-              <button
-                type="button"
-                className="flex items-center justify-center gap-3 py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-2xl font-bold text-xs transition-all border border-slate-700 shadow-lg"
-              >
-                <Github className="w-4 h-4" /> Github
-              </button>
-            </div>
-            */}
           </form>
-        </div>
 
-        <p className="text-center mt-8 text-xs text-slate-500 font-medium">
-          Ao continuar, você concorda com nossos <br />
-          <span className="text-slate-300 hover:underline cursor-pointer">Termos de Serviço</span> e <span className="text-slate-300 hover:underline cursor-pointer">Política de Privacidade</span>.
-        </p>
+          <p className="text-center pb-8 px-10 text-[10px] text-slate-500 font-bold uppercase tracking-widest leading-loose">
+            Termos de Serviço • Política de Privacidade
+          </p>
+        </div>
       </div>
     </div>
   );

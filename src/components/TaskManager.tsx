@@ -73,7 +73,7 @@ const TaskManager: React.FC<TaskManagerProps> = ({ tasks, setTasks, cardClass, i
         priority: newPriority,
         completed: false,
         subtasks: [],
-        due_date: dueDateObj
+        due_date: dueDateObj,
       };
 
       if (editingTask) {
@@ -380,6 +380,7 @@ const TaskManager: React.FC<TaskManagerProps> = ({ tasks, setTasks, cardClass, i
                   />
                 </div>
               </div>
+
 
               <div className="pt-4 flex gap-3">
                 <button

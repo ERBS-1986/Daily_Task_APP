@@ -10,7 +10,8 @@ export enum Category {
   PERSONAL = 'Pessoal',
   HEALTH = 'Saúde',
   STUDY = 'Estudos',
-  FINANCE = 'Finanças'
+  FINANCE = 'Finanças',
+  OTHER = 'Outros'
 }
 
 export interface User {

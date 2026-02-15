@@ -57,11 +57,52 @@ const GymManager: React.FC<GymManagerProps> = ({ workouts, setWorkouts, cardClas
     setWeekDays(days);
   }, []);
 
-  const currentWorkout = workouts.find(w => w.day === selectedDate) || {
+  const [currentWorkout, setCurrentWorkout] = useState<DailyWorkout>({
     day: selectedDate,
     focus: 'Treino personalizado',
     exercises: [],
     image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=2070&auto=format&fit=crop'
+  });
+
+  useEffect(() => {
+    if (user) {
+      fetchWorkout(selectedDate);
+    }
+  }, [selectedDate, user]);
+
+  const fetchWorkout = async (date: string) => {
+    try {
+      const { data: workoutData, error: workoutError } = await supabase
+        .from('workouts')
+        .select(`
+          id,
+          day,
+          focus,
+          image,
+          exercises (*)
+        `)
+        .eq('user_id', user?.id)
+        .eq('day', date)
+        .single();
+
+      if (workoutError && workoutError.code !== 'PGRST116') throw workoutError;
+
+      if (workoutData) {
+        setCurrentWorkout({
+          ...workoutData,
+          exercises: workoutData.exercises || []
+        });
+      } else {
+        setCurrentWorkout({
+          day: date,
+          focus: 'Treino personalizado',
+          exercises: [],
+          image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=2070&auto=format&fit=crop'
+        });
+      }
+    } catch (err) {
+      console.error('Error fetching workout:', err);
+    }
   };
 
   // Timer Sound logic
@@ -117,47 +158,63 @@ const GymManager: React.FC<GymManagerProps> = ({ workouts, setWorkouts, cardClas
     return `${m}:${s.toString().padStart(2, '0')}`;
   };
 
-  const handleAddOrEditExercise = () => {
-    if (!formName.trim()) {
+  const handleAddOrEditExercise = async () => {
+    if (!formName.trim() || !user) {
       showToast("Por favor, informe o nome do exercício.", "error");
       return;
     }
 
-    const newExercise: Exercise = {
-      id: isEditMode && editingExerciseId ? editingExerciseId : crypto.randomUUID(),
-      name: formName,
-      sets: formSets,
-      reps: formReps,
-      weight: formWeight || undefined,
-      completed: false
-    };
+    try {
+      let workoutId = (currentWorkout as any).id;
 
-    let updatedWorkouts: DailyWorkout[];
-    const existingWorkoutIdx = workouts.findIndex(w => w.day === selectedDate);
+      // 1. Create workout if not exists
+      if (!workoutId) {
+        const { data: newWorkout, error: wError } = await supabase
+          .from('workouts')
+          .insert({
+            user_id: user.id,
+            day: selectedDate,
+            focus: currentWorkout.focus || 'Treino Personalizado',
+            image: currentWorkout.image
+          })
+          .select()
+          .single();
 
-    if (existingWorkoutIdx >= 0) {
-      updatedWorkouts = [...workouts];
-      if (isEditMode) {
-        updatedWorkouts[existingWorkoutIdx].exercises = updatedWorkouts[existingWorkoutIdx].exercises.map(ex =>
-          ex.id === editingExerciseId ? { ...newExercise, completed: ex.completed } : ex
-        );
-      } else {
-        updatedWorkouts[existingWorkoutIdx].exercises.push(newExercise);
+        if (wError) throw wError;
+        workoutId = newWorkout.id;
       }
-    } else {
-      updatedWorkouts = [...workouts, {
-        day: selectedDate,
-        focus: 'Treino Personalizado',
-        exercises: [newExercise],
-        image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=2070&auto=format&fit=crop'
-      }];
-    }
 
-    setWorkouts(updatedWorkouts);
-    localStorage.setItem('workouts', JSON.stringify(updatedWorkouts));
-    setShowAddModal(false);
-    resetForm();
-    showToast(isEditMode ? "Exercício atualizado!" : "Exercício adicionado!", "success");
+      // 2. Insert/Update exercise
+      const exercisePayload = {
+        workout_id: workoutId,
+        name: formName,
+        sets: formSets,
+        reps: formReps,
+        weight: formWeight || null,
+        completed: false
+      };
+
+      if (isEditMode && editingExerciseId) {
+        const { error } = await supabase
+          .from('exercises')
+          .update(exercisePayload)
+          .eq('id', editingExerciseId);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from('exercises')
+          .insert(exercisePayload);
+        if (error) throw error;
+      }
+
+      await fetchWorkout(selectedDate);
+      setShowAddModal(false);
+      resetForm();
+      showToast(isEditMode ? "Exercício atualizado!" : "Exercício adicionado!", "success");
+    } catch (err) {
+      console.error('Error saving exercise:', err);
+      showToast("Erro ao salvar exercício.", "error");
+    }
   };
 
   const resetForm = () => {
@@ -179,46 +236,71 @@ const GymManager: React.FC<GymManagerProps> = ({ workouts, setWorkouts, cardClas
     setShowAddModal(true);
   };
 
-  const deleteExercise = (id: string) => {
-    const updated = workouts.map(w => {
-      if (w.day === selectedDate) {
-        return { ...w, exercises: w.exercises.filter(ex => ex.id !== id) };
-      }
-      return w;
-    });
-    setWorkouts(updated);
-    localStorage.setItem('workouts', JSON.stringify(updated));
-    showToast("Exercício removido.", "info");
+  const deleteExercise = async (id: string) => {
+    if (!confirm('Deseja remover este exercício?')) return;
+    try {
+      const { error } = await supabase.from('exercises').delete().eq('id', id);
+      if (error) throw error;
+      await fetchWorkout(selectedDate);
+      showToast("Exercício removido.", "info");
+    } catch (err) {
+      showToast("Erro ao remover exercício.", "error");
+    }
   };
 
-  const toggleExerciseComplete = (id: string) => {
-    const updated = workouts.map(w => {
-      if (w.day === selectedDate) {
-        return {
-          ...w,
-          exercises: w.exercises.map(ex => ex.id === id ? { ...ex, completed: !ex.completed } : ex)
-        };
-      }
-      return w;
-    });
-    setWorkouts(updated);
-    localStorage.setItem('workouts', JSON.stringify(updated));
+  const toggleExerciseComplete = async (id: string, currentCompleted: boolean) => {
+    try {
+      const { error } = await supabase.from('exercises').update({ completed: !currentCompleted }).eq('id', id);
+      if (error) throw error;
+      await fetchWorkout(selectedDate);
+    } catch (err) {
+      showToast("Erro ao atualizar exercício.", "error");
+    }
   };
 
-  const cloneWorkout = (targetDate: string) => {
-    if (currentWorkout.exercises.length === 0) return;
+  const cloneWorkout = async (targetDate: string) => {
+    if (currentWorkout.exercises.length === 0 || !user) return;
 
-    const updated = workouts.filter(w => w.day !== targetDate);
-    const clonedWorkout: DailyWorkout = {
-      ...currentWorkout,
-      day: targetDate,
-      exercises: currentWorkout.exercises.map(ex => ({ ...ex, id: crypto.randomUUID(), completed: false }))
-    };
+    try {
+      showToast("Clonando treino...", "info");
 
-    const final = [...updated, clonedWorkout];
-    setWorkouts(final);
-    localStorage.setItem('workouts', JSON.stringify(final));
-    showToast(`Treino clonado para ${targetDate}!`, "success");
+      // 1. Criar o novo treino para o dia alvo
+      const { data: newWorkout, error: wError } = await supabase
+        .from('workouts')
+        .insert({
+          user_id: user.id,
+          day: targetDate,
+          focus: currentWorkout.focus || 'Treino Personalizado',
+          image: currentWorkout.image
+        })
+        .select()
+        .single();
+
+      if (wError) throw wError;
+
+      // 2. Clonar todos os exercícios para o novo workout_id
+      const exercisePayloads = currentWorkout.exercises.map(ex => ({
+        workout_id: newWorkout.id,
+        name: ex.name,
+        sets: ex.sets,
+        reps: ex.reps,
+        weight: ex.weight || null,
+        completed: false
+      }));
+
+      const { error: eError } = await supabase
+        .from('exercises')
+        .insert(exercisePayloads);
+
+      if (eError) throw eError;
+
+      showToast(`Treino clonado para ${targetDate}!`, "success");
+      // Opcional: navegar para o dia alvo ou atualizar a lista global se necessário
+      // fetchWorkout(selectedDate); // Se quiser atualizar o dia atual
+    } catch (err) {
+      console.error('Error cloning workout:', err);
+      showToast("Erro ao clonar treino.", "error");
+    }
   };
 
   const progress = currentWorkout.exercises.length > 0
@@ -309,7 +391,7 @@ const GymManager: React.FC<GymManagerProps> = ({ workouts, setWorkouts, cardClas
                   >
                     <div className="flex items-center gap-4">
                       <button
-                        onClick={() => toggleExerciseComplete(ex.id)}
+                        onClick={() => toggleExerciseComplete(ex.id, ex.completed)}
                         className={`w-6 h-6 rounded-full flex items-center justify-center border transition-all ${ex.completed ? 'bg-indigo-500 border-indigo-400 text-white' : 'border-slate-700 text-transparent hover:border-indigo-500'}`}
                       >
                         <CheckCircle2 className="w-4 h-4" />

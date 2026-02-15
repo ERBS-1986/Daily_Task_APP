@@ -38,11 +38,11 @@ import { useToast } from './contexts/ToastContext';
 
 
 const THEMES: { id: AppTheme, name: string, bgClass: string, sidebarClass: string, cardClass: string, color: string }[] = [
-  { id: 'lavender-light', name: 'Premium Lavender', bgClass: 'bg-[#F0F2FF]', sidebarClass: 'bg-white/60', cardClass: 'bg-white/80', color: '#818CF8' },
-  { id: 'default', name: 'Padrão Dark', bgClass: 'bg-slate-950', sidebarClass: 'bg-slate-900/80', cardClass: 'bg-[#434B96]', color: '#6366f1' },
-  { id: 'red', name: 'Vermelho', bgClass: 'bg-red-900', sidebarClass: 'bg-black/40', cardClass: 'bg-red-950/50', color: '#ef4444' },
-  { id: 'green', name: 'Verde', bgClass: 'bg-emerald-900', sidebarClass: 'bg-black/40', cardClass: 'bg-emerald-950/50', color: '#10b981' },
-  { id: 'blue', name: 'Azul', bgClass: 'bg-blue-900', sidebarClass: 'bg-black/40', cardClass: 'bg-blue-950/50', color: '#3b82f6' },
+  { id: 'lavender-light', name: 'Premium Lavender', bgClass: 'bg-premium-light', sidebarClass: 'bg-white/60', cardClass: 'bg-white/80', color: '#818CF8' },
+  { id: 'default', name: 'Padrão Dark', bgClass: 'bg-premium-dark', sidebarClass: 'bg-slate-900/80', cardClass: 'bg-[#434B96]', color: '#6366f1' },
+  { id: 'red', name: 'Vermelho', bgClass: 'bg-red-900', sidebarClass: 'bg-black/40', cardClass: 'bg-red-950/50', color: '#f87171' },
+  { id: 'green', name: 'Verde', bgClass: 'bg-emerald-900', sidebarClass: 'bg-black/40', cardClass: 'bg-emerald-950/50', color: '#34d399' },
+  { id: 'blue', name: 'Azul', bgClass: 'bg-blue-900', sidebarClass: 'bg-black/40', cardClass: 'bg-blue-950/50', color: '#60a5fa' },
 ];
 
 import { supabase } from './lib/supabase';
@@ -128,7 +128,18 @@ const App: React.FC = () => {
         supabase.from('water_intake').select('*').eq('user_id', user.id).single()
       ]);
 
-      if (tasksResult.data) setTasks(tasksResult.data);
+      if (tasksResult.data) {
+        setTasks(tasksResult.data.map((data: any) => ({
+          id: data.id,
+          title: data.title,
+          category: data.category as Category,
+          priority: data.priority as TaskPriority,
+          completed: data.completed,
+          subTasks: data.subtasks || [],
+          dueDate: data.due_date,
+          reminder: data.reminder
+        })));
+      }
       if (habitsResult.data) setHabits(habitsResult.data);
       if (goalsResult.data) setGoals(goalsResult.data);
       if (waterResult.data) {
@@ -264,7 +275,7 @@ const App: React.FC = () => {
           <div className="relative h-56 mb-4 overflow-hidden group">
             <div className="absolute inset-0 z-0">
               <img
-                src="https://img.freepik.com/premium-vector/professional-man-character-working-laptop-office-with-check-list-modern-flat-illustration_1933-288.jpg"
+                src="https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?q=80&w=1000&auto=format&fit=crop"
                 alt="Productivity"
                 className="w-full h-full object-cover opacity-80"
               />
@@ -278,7 +289,7 @@ const App: React.FC = () => {
                 </div>
                 <div>
                   <h1 className={`text-2xl font-black tracking-tight leading-tight ${currentTheme === 'lavender-light' ? 'text-slate-900' : 'text-white'}`}>Daily Task</h1>
-                  <p className={`text-[10px] font-black uppercase tracking-[0.2em] ${currentTheme === 'lavender-light' ? 'text-indigo-600' : 'text-indigo-400'}`}>Produtividade</p>
+                  <p className={`text-[10px] font-black uppercase tracking-[0.2em] ${currentTheme === 'lavender-light' ? 'text-indigo-600' : 'text-white'}`}>Produtividade</p>
                 </div>
               </div>
             </div>
@@ -323,7 +334,7 @@ const App: React.FC = () => {
               <Menu className="w-7 h-7" />
             </button>
             <div className="flex-1 lg:flex-none ml-4 lg:ml-0">
-              <h2 className={`text-xl font-bold ${currentTheme === 'lavender-light' ? 'text-slate-800' : 'text-slate-100'} hidden md:block`}>{NAVIGATION.find(n => n.id === activeTab)?.name || 'Daily Task'}</h2>
+              <h2 className={`text-xl font-bold ${currentTheme === 'lavender-light' ? 'text-slate-800' : 'text-white'} hidden md:block`}>{NAVIGATION.find(n => n.id === activeTab)?.name || 'Daily Task'}</h2>
             </div>
 
             <div className="flex items-center gap-2">
@@ -410,7 +421,7 @@ const App: React.FC = () => {
                     <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">{user.plan} Plan</p>
                   </div>
                   <div className="relative">
-                    <img src={user.avatar} alt="Avatar" className="w-9 h-9 rounded-xl border-2 border-indigo-500/30 shadow-lg" />
+                    <img src={user.avatar} alt="Avatar" className="w-10 h-10 md:w-11 md:h-11 rounded-xl border-2 border-indigo-500/30 shadow-lg object-cover scale-[1.1]" />
                     <div className="absolute -bottom-1 -right-1 bg-indigo-600 border-2 border-slate-950 rounded-full p-0.5">
                       <ChevronDown className={`w-2.5 h-2.5 text-white transition-transform duration-300 ${isProfileMenuOpen ? 'rotate-180' : ''}`} />
                     </div>

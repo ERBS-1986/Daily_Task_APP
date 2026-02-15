@@ -37,8 +37,13 @@ const Dashboard: React.FC<DashboardProps> = ({
   onNavigate,
   cardClass = 'bg-slate-900'
 }) => {
-  const completedTasks = tasks.filter(t => t.completed).length;
-  const taskProgress = tasks.length > 0 ? (completedTasks / tasks.length) * 100 : 0;
+  const today = new Date().toLocaleDateString('pt-BR');
+  const todayTasks = tasks.filter(t => {
+    if (!t.dueDate) return false;
+    return new Date(t.dueDate).toLocaleDateString('pt-BR') === today;
+  });
+  const completedTodayTasks = todayTasks.filter(t => t.completed).length;
+  const taskProgress = todayTasks.length > 0 ? (completedTodayTasks / todayTasks.length) * 100 : 0;
   const waterProgress = (water.current / water.target) * 100;
 
   const days = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
@@ -74,24 +79,14 @@ const Dashboard: React.FC<DashboardProps> = ({
                 <CheckCircle2 className="w-8 h-8 text-white" />
               </div>
               <div>
-                <h3 className={`text-3xl font-black tracking-tight ${isLight ? 'text-slate-900' : 'text-white'}`}>Tarefas de Hoje</h3>
-                <p className={`text-xs font-black uppercase tracking-[0.2em] ${isLight ? 'text-indigo-600' : 'text-indigo-400 opacity-80'}`}>Progresso Diário</p>
+                <h3 className={`text-3xl font-black tracking-tight ${isLight ? 'text-slate-900' : 'text-white'}`}>Todas as Tarefas</h3>
+                <p className={`text-xs font-black uppercase tracking-[0.2em] ${isLight ? 'text-indigo-600' : 'text-indigo-400 opacity-80'}`}>Progresso Geral</p>
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {tasks.filter(t => {
-                if (!t.dueDate) return false;
-                const taskDate = new Date(t.dueDate).toLocaleDateString('pt-BR');
-                const today = new Date().toLocaleDateString('pt-BR');
-                return taskDate === today;
-              }).length > 0 ? (
-                tasks.filter(t => {
-                  if (!t.dueDate) return false;
-                  const taskDate = new Date(t.dueDate).toLocaleDateString('pt-BR');
-                  const today = new Date().toLocaleDateString('pt-BR');
-                  return taskDate === today;
-                }).slice(0, 4).map(task => (
+              {todayTasks.length > 0 ? (
+                todayTasks.slice(0, 4).map(task => (
                   <div key={task.id} className={`flex items-center gap-4 p-5 rounded-[2rem] border transition-all ${isLight ? 'bg-white border-slate-100 text-slate-900 shadow-sm' : 'bg-slate-800/50 border-white/5 text-white'}`}>
                     <div className={`w-3 h-3 rounded-full ${task.completed ? 'bg-indigo-500 shadow-lg shadow-indigo-500/50' : (isLight ? 'bg-slate-200' : 'bg-slate-700')}`}></div>
                     <span className={`font-bold truncate ${task.completed ? 'opacity-40 italic' : ''}`}>{task.title}</span>
@@ -99,7 +94,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                 ))
               ) : (
                 <div className="col-span-2 py-8 px-8 bg-indigo-500/5 rounded-[2rem] border border-dashed border-indigo-500/20 text-center">
-                  <p className={`font-bold italic ${isLight ? 'text-indigo-600' : 'text-indigo-400'}`}>Tudo em ordem por hoje! Nenhuma tarefa pendente.</p>
+                  <p className={`font-bold italic ${isLight ? 'text-indigo-600' : 'text-indigo-400'}`}>Tudo em ordem por hoje!</p>
                 </div>
               )}
             </div>
@@ -108,7 +103,7 @@ const Dashboard: React.FC<DashboardProps> = ({
               onClick={() => onNavigate('tasks')}
               className="mt-8 bg-indigo-600 hover:bg-indigo-500 text-white py-4 px-10 rounded-2xl flex items-center gap-3 transition-all font-black text-sm shadow-xl shadow-indigo-600/30 active:scale-95 group w-fit"
             >
-              <span>GERENCIAR TAREFAS</span>
+              <span>VER DETALHES</span>
               <ArrowUpRight className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
             </button>
           </div>
@@ -138,7 +133,7 @@ const Dashboard: React.FC<DashboardProps> = ({
             </div>
           </div>
           <p className="text-slate-600 dark:text-slate-400 text-xs font-black uppercase tracking-[0.2em] mb-3 relative z-10">Tarefas de Hoje</p>
-          <p className={`text-3xl font-black ${isLight ? 'text-slate-900' : 'text-white'} relative z-10`}>{completedTasks}/{tasks.length}</p>
+          <p className={`text-3xl font-black ${isLight ? 'text-slate-900' : 'text-white'} relative z-10`}>{completedTodayTasks}/{todayTasks.length}</p>
           <div className="mt-6 w-full bg-slate-100 dark:bg-white/5 h-3 rounded-full overflow-hidden relative z-10 p-0.5 border border-white/50">
             <div className="bg-gradient-to-r from-emerald-400 to-emerald-600 h-full rounded-full transition-all duration-1000 shadow-lg shadow-emerald-500/50" style={{ width: `${taskProgress}%` }}></div>
           </div>
@@ -167,9 +162,15 @@ const Dashboard: React.FC<DashboardProps> = ({
           </div>
           <p className="text-slate-600 dark:text-slate-400 text-sm font-black uppercase tracking-widest mb-2 relative z-10">Hidratação</p>
           <p className={`text-3xl font-black ${isLight ? 'text-slate-900' : 'text-white'} relative z-10`}>{water.current}ml</p>
-          <div className="mt-6 w-full bg-slate-100 dark:bg-white/5 h-3 rounded-full overflow-hidden relative z-10 p-0.5 border border-white/50">
+          <div className="mt-4 w-full bg-slate-100 dark:bg-white/5 h-3 rounded-full overflow-hidden relative z-10 p-0.5 border border-white/50">
             <div className="bg-gradient-to-r from-sky-400 to-sky-600 h-full rounded-full transition-all duration-1000 shadow-lg shadow-sky-500/50" style={{ width: `${Math.min(waterProgress, 100)}%` }}></div>
           </div>
+          <button
+            onClick={() => onNavigate('water')}
+            className={`mt-6 text-xs font-black flex items-center gap-2 hover:translate-x-1 transition-all relative z-10 group ${isLight ? 'text-sky-600' : 'text-sky-400'}`}
+          >
+            VER DETALHES <ArrowUpRight className="w-4 h-4 group-hover:-translate-y-1 transition-transform" />
+          </button>
         </div>
 
         <div className={`${cardClass} border border-white/50 dark:border-white/10 p-8 rounded-[2.5rem] hover:scale-[1.02] transition-all shadow-xl shadow-indigo-100/10 group overflow-hidden relative backdrop-blur-2xl`}>
@@ -201,7 +202,7 @@ const Dashboard: React.FC<DashboardProps> = ({
             <button onClick={() => onNavigate('tasks')} className="text-xs font-black text-indigo-500 hover:text-indigo-600 uppercase tracking-widest bg-indigo-50 py-2 px-4 rounded-full transition-all">Ver Todas</button>
           </div>
           <div className="space-y-4 flex-1 relative z-10">
-            {tasks.filter(t => !t.completed).slice(0, 4).map(task => (
+            {todayTasks.filter(t => !t.completed).slice(0, 4).map(task => (
               <div key={task.id} className="flex items-center gap-5 p-4 rounded-2xl hover:bg-white/50 dark:hover:bg-white/10 transition-all group border border-transparent hover:border-white/50 cursor-pointer shadow-sm hover:shadow-md">
                 <div className="w-6 h-6 rounded-full border-2 border-slate-300 dark:border-slate-700 flex items-center justify-center group-hover:border-indigo-500 transition-colors">
                   <div className="w-2 h-2 bg-indigo-500 rounded-full opacity-0 group-hover:opacity-100 scale-0 group-hover:scale-100 transition-all"></div>
@@ -210,7 +211,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                 <ChevronRight className="ml-auto w-5 h-5 text-slate-300 group-hover:text-indigo-500 group-hover:translate-x-1 transition-all" />
               </div>
             ))}
-            {tasks.filter(t => !t.completed).length === 0 && (
+            {todayTasks.filter(t => !t.completed).length === 0 && (
               <div className="text-center py-12">
                 <div className="w-20 h-20 bg-slate-50 dark:bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner">
                   <CheckCircle2 className="w-10 h-10 text-slate-300" />
