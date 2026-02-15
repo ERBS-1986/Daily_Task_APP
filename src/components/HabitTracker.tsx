@@ -228,9 +228,9 @@ const HabitTracker: React.FC<HabitTrackerProps> = ({ habits, setHabits, cardClas
       {/* Add Habit Modal */}
       {showAddModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm" onClick={() => setShowAddModal(false)}></div>
-          <div className="relative w-full max-w-sm bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl p-6 animate-in zoom-in-95 duration-200">
-            <h3 className="text-xl font-bold text-white mb-6">Novo Hábito</h3>
+          <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-md" onClick={() => setShowAddModal(false)}></div>
+          <div className={`relative w-full max-w-sm border shadow-2xl p-8 animate-in zoom-in-95 duration-200 backdrop-blur-[40px] rounded-[2.5rem] ${isLight ? 'bg-white/90 border-white/40' : 'bg-slate-900/90 border-slate-700/50'}`}>
+            <h3 className={`text-2xl font-black mb-6 ${isLight ? 'text-slate-900' : 'text-white'}`}>Novo Hábito</h3>
 
             <div className="space-y-4">
               <div>
@@ -241,7 +241,7 @@ const HabitTracker: React.FC<HabitTrackerProps> = ({ habits, setHabits, cardClas
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
                   placeholder="Ex: Beber Água, Ler Livro..."
-                  className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className={`w-full px-5 py-4 border rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all ${isLight ? 'bg-white border-slate-200 text-slate-900' : 'bg-slate-800/50 border-slate-700 text-white'}`}
                 />
               </div>
 
@@ -250,7 +250,7 @@ const HabitTracker: React.FC<HabitTrackerProps> = ({ habits, setHabits, cardClas
                 <select
                   value={newFrequency}
                   onChange={(e) => setNewFrequency(e.target.value as 'daily' | 'weekly')}
-                  className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white focus:outline-none"
+                  className={`w-full px-5 py-4 border rounded-2xl focus:outline-none transition-all ${isLight ? 'bg-white border-slate-200 text-slate-900' : 'bg-slate-800/50 border-slate-700 text-white'}`}
                 >
                   <option value="daily">Diariamente</option>
                   <option value="weekly">Semanalmente</option>

@@ -34,7 +34,6 @@ export const NAVIGATION = [
   { id: 'habits', name: 'Hábitos', icon: <Repeat className="w-5 h-5" /> },
   { id: 'goals', name: 'Metas', icon: <Target className="w-5 h-5" /> },
   { id: 'water', name: 'Hidratação', icon: <Droplets className="w-5 h-5" /> },
-  { id: 'calendar', name: 'Calendário', icon: <CalendarIcon className="w-5 h-5" /> },
 ];
 
 export const PRIORITY_COLORS = {

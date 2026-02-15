@@ -129,30 +129,30 @@ const FocusMode: React.FC<FocusModeProps> = ({ tasks, isGlobalFocusActive, setIs
       {/* Main Timer Display */}
       <div className="relative group">
         <div className={`
-          relative w-80 h-80 rounded-full border-8 transition-all duration-700 backdrop-blur-3xl shadow-2xl
+          relative w-64 h-64 rounded-full border-8 transition-all duration-700 backdrop-blur-3xl shadow-2xl flex flex-col items-center justify-center
           ${isActive ? 'scale-110 shadow-indigo-500/20' : (isLight ? 'bg-white/40 shadow-indigo-100/10' : 'bg-slate-900/30')}
           ${isLight ? 'border-white/50' : 'border-slate-800'}
         `}>
-          <div className="text-slate-500 text-xs font-bold uppercase tracking-[0.2em] mb-3">
+          <div className="text-slate-500 text-[10px] font-bold uppercase tracking-[0.2em] mb-1">
             {currentConfig.label}
           </div>
-          <div className="text-8xl font-black tracking-tighter tabular-nums leading-none drop-shadow-lg">
+          <div className="text-6xl font-black tracking-tighter tabular-nums leading-none drop-shadow-lg flex items-center justify-center">
             <span className={isLight ? 'text-slate-900' : 'text-white'}>{formatTime(timeLeft)}</span>
           </div>
-          <div className={`mt-6 transition-transform duration-500 ${isActive ? 'scale-125' : ''}`}>
-            {isActive ? <BellOff className={`w-6 h-6 animate-pulse ${currentConfig.color}`} /> : <Volume2 className="w-6 h-6 text-slate-600" />}
+          <div className={`mt-4 transition-transform duration-500 ${isActive ? 'scale-125' : ''}`}>
+            {isActive ? <BellOff className={`w-5 h-5 animate-pulse ${currentConfig.color}`} /> : <Volume2 className="w-5 h-5 text-slate-600" />}
           </div>
 
           {/* Progress Ring */}
           <svg className="absolute inset-0 -rotate-90 w-full h-full pointer-events-none">
             <circle
-              cx="160" cy="160" r="152"
+              cx="128" cy="128" r="120"
               fill="none"
               stroke="currentColor"
               strokeWidth="6"
               className={`${currentConfig.color} opacity-20`}
-              strokeDasharray="955"
-              strokeDashoffset={955 - (955 * (timeLeft / durations[sessionType]))}
+              strokeDasharray="754"
+              strokeDashoffset={754 - (754 * (timeLeft / durations[sessionType]))}
               style={{ transition: 'stroke-dashoffset 1s linear' }}
               strokeLinecap="round"
             />

@@ -19,6 +19,9 @@ export interface User {
   email: string;
   avatar: string;
   plan: 'Free' | 'Premium';
+  hasSeenWelcome?: boolean;
+  weight?: number;
+  activityLevel?: number;
 }
 
 export interface SubTask {
@@ -33,7 +36,7 @@ export interface Task {
   description?: string;
   category: Category;
   priority: TaskPriority;
-  dueDate?: string;
+  dueDate?: string; // includes time ISO string
   completed: boolean;
   subTasks: SubTask[];
   reminder?: string;
@@ -48,13 +51,16 @@ export interface Habit {
   history: string[]; // dates of completion
 }
 
-export interface WeeklyGoal {
+export interface Goal {
   id: string;
   title: string;
   target: number;
   current: number;
   unit: string;
+  type: 'weekly' | 'monthly';
 }
+
+export type WeeklyGoal = Goal; // Alias for backward compatibility
 
 export interface WaterIntake {
   target: number;

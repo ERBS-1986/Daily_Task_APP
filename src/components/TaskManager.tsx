@@ -11,7 +11,8 @@ import {
   CheckCircle2,
   Circle,
   AlertTriangle,
-  Loader2
+  Loader2,
+  Pencil
 } from 'lucide-react';
 import { Task, Category, TaskPriority } from '../types';
 import { CATEGORY_ICONS, PRIORITY_COLORS } from '../constants';
@@ -32,54 +33,107 @@ const TaskManager: React.FC<TaskManagerProps> = ({ tasks, setTasks, cardClass, i
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCategory, setFilterCategory] = useState<Category | 'ALL'>('ALL');
   const [showAddModal, setShowAddModal] = useState(false);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // New task form state
   const [newTitle, setNewTitle] = useState('');
   const [newCategory, setNewCategory] = useState<Category>(Category.WORK);
   const [newPriority, setNewPriority] = useState<TaskPriority>(TaskPriority.MEDIUM);
+  const [newDueDate, setNewDueDate] = useState('');
+  const [newDueTime, setNewDueTime] = useState('');
+
+  const openEditModal = (task: Task) => {
+    setEditingTask(task);
+    setNewTitle(task.title);
+    setNewCategory(task.category);
+    setNewPriority(task.priority);
+    if (task.dueDate) {
+      const date = new Date(task.dueDate);
+      setNewDueDate(date.toISOString().split('T')[0]);
+      setNewDueTime(date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', hour12: false }));
+    } else {
+      setNewDueDate('');
+      setNewDueTime('');
+    }
+    setShowAddModal(true);
+  };
 
   const handleAddTask = async () => {
     if (!newTitle.trim() || !user) return;
     setIsSubmitting(true);
 
     try {
+      const dueDateObj = newDueDate && newDueTime ? `${newDueDate}T${newDueTime}` : newDueDate ? `${newDueDate}T00:00:00` : null;
+
       const newTaskPayload = {
         user_id: user.id,
         title: newTitle,
         category: newCategory,
         priority: newPriority,
         completed: false,
-        subtasks: []
+        subtasks: [],
+        due_date: dueDateObj
       };
 
-      const { data, error } = await supabase
-        .from('tasks')
-        .insert(newTaskPayload)
-        .select()
-        .single();
+      if (editingTask) {
+        const { data, error } = await supabase
+          .from('tasks')
+          .update(newTaskPayload)
+          .eq('id', editingTask.id)
+          .select()
+          .single();
 
-      if (error) throw error;
+        if (error) throw error;
 
-      if (data) {
-        // Map back to App Task type
-        const newTask: Task = {
-          id: data.id,
-          title: data.title,
-          category: data.category as Category,
-          priority: data.priority as TaskPriority,
-          completed: data.completed,
-          subTasks: data.subtasks || [],
-          dueDate: data.due_date,
-          reminder: data.reminder
-        };
-        setTasks([newTask, ...tasks]);
-        setNewTitle('');
-        setShowAddModal(false);
+        if (data) {
+          const updatedTask: Task = {
+            id: data.id,
+            title: data.title,
+            category: data.category as Category,
+            priority: data.priority as TaskPriority,
+            completed: data.completed,
+            subTasks: data.subtasks || [],
+            dueDate: data.due_date,
+            reminder: data.reminder
+          };
+          setTasks(tasks.map(t => t.id === editingTask.id ? updatedTask : t));
+          showToast('Tarefa atualizada com sucesso!', 'success');
+        }
+      } else {
+        const { data, error } = await supabase
+          .from('tasks')
+          .insert(newTaskPayload)
+          .select()
+          .single();
+
+        if (error) throw error;
+
+        if (data) {
+          // Map back to App Task type
+          const newTask: Task = {
+            id: data.id,
+            title: data.title,
+            category: data.category as Category,
+            priority: data.priority as TaskPriority,
+            completed: data.completed,
+            subTasks: data.subtasks || [],
+            dueDate: data.due_date,
+            reminder: data.reminder
+          };
+          setTasks([newTask, ...tasks]);
+          showToast('Tarefa criada com sucesso!', 'success');
+        }
       }
+
+      setNewTitle('');
+      setNewDueDate('');
+      setNewDueTime('');
+      setEditingTask(null);
+      setShowAddModal(false);
     } catch (error) {
-      console.error('Error adding task:', error);
-      showToast('Erro ao criar tarefa. Tente novamente.', 'error');
+      console.error('Error adding/updating task:', error);
+      showToast('Erro ao salvar tarefa. Tente novamente.', 'error');
     } finally {
       setIsSubmitting(false);
     }
@@ -125,11 +179,26 @@ const TaskManager: React.FC<TaskManagerProps> = ({ tasks, setTasks, cardClass, i
     }
   };
 
-  const filteredTasks = tasks.filter(task => {
-    const matchesSearch = task.title.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = filterCategory === 'ALL' || task.category === filterCategory;
-    return matchesSearch && matchesCategory;
-  });
+  const filteredTasks = tasks
+    .filter(task => {
+      const matchesSearch = task.title.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCategory = filterCategory === 'ALL' || task.category === filterCategory;
+      return matchesSearch && matchesCategory;
+    })
+    .sort((a, b) => {
+      // 1. Sort by completed status (uncompleted first)
+      if (a.completed !== b.completed) return a.completed ? 1 : -1;
+
+      // 2. Sort by Date/Time
+      const dateA = a.dueDate ? new Date(a.dueDate).getTime() : Infinity;
+      const dateB = b.dueDate ? new Date(b.dueDate).getTime() : Infinity;
+
+      if (dateA !== dateB) return dateA - dateB;
+
+      // 3. Sort by Priority (HIGH > MEDIUM > LOW)
+      const priorityOrder = { [TaskPriority.HIGH]: 0, [TaskPriority.MEDIUM]: 1, [TaskPriority.LOW]: 2 };
+      return priorityOrder[a.priority] - priorityOrder[b.priority];
+    });
 
   return (
     <div className="space-y-6 animate-in slide-in-from-bottom-4 duration-500">
@@ -158,7 +227,7 @@ const TaskManager: React.FC<TaskManagerProps> = ({ tasks, setTasks, cardClass, i
             ))}
           </select>
           <button
-            onClick={() => setShowAddModal(true)}
+            onClick={() => { setEditingTask(null); setNewTitle(''); setNewDueDate(''); setNewDueTime(''); setShowAddModal(true); }}
             className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-6 rounded-2xl transition-colors shadow-lg shadow-indigo-500/20"
           >
             <Plus className="w-5 h-5" />
@@ -196,14 +265,20 @@ const TaskManager: React.FC<TaskManagerProps> = ({ tasks, setTasks, cardClass, i
                 <span className={`font-bold ${task.completed ? 'line-through text-slate-500' : (isLight ? 'text-slate-900' : 'text-slate-100')}`}>
                   {task.title}
                 </span>
-                <div className="flex items-center gap-3 mt-1">
-                  <span className="flex items-center gap-1 text-xs text-slate-500">
+                <div className="flex flex-wrap items-center gap-2 mt-1">
+                  <span className="flex items-center gap-1 text-[10px] text-slate-500 font-bold uppercase tracking-wider">
                     {CATEGORY_ICONS[task.category]}
                     {task.category}
                   </span>
-                  <span className={`text-[10px] px-2 py-0.5 rounded-full border ${PRIORITY_COLORS[task.priority]}`}>
+                  <span className={`text-[10px] px-2 py-0.5 rounded-full border font-bold ${PRIORITY_COLORS[task.priority]}`}>
                     {task.priority}
                   </span>
+                  {task.dueDate && (
+                    <span className="flex items-center gap-1 text-[10px] text-indigo-400 font-bold bg-indigo-500/10 px-2 py-0.5 rounded-full border border-indigo-500/20">
+                      <CalIcon className="w-3 h-3" />
+                      {new Date(task.dueDate).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
@@ -215,8 +290,11 @@ const TaskManager: React.FC<TaskManagerProps> = ({ tasks, setTasks, cardClass, i
               >
                 <Trash2 className="w-5 h-5" />
               </button>
-              <button className="p-2 text-slate-500 hover:text-indigo-400 transition-colors">
-                <MoreVertical className="w-5 h-5" />
+              <button
+                onClick={() => openEditModal(task)}
+                className="p-2 text-slate-500 hover:text-indigo-400 transition-colors"
+              >
+                <Pencil className="w-5 h-5" />
               </button>
             </div>
           </div>
@@ -235,12 +313,12 @@ const TaskManager: React.FC<TaskManagerProps> = ({ tasks, setTasks, cardClass, i
         )}
       </div>
 
-      {/* Add Task Modal */}
+      {/* Add/Edit Task Modal */}
       {showAddModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm" onClick={() => setShowAddModal(false)}></div>
-          <div className="relative w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl p-8 animate-in zoom-in-95 duration-200">
-            <h3 className="text-xl font-bold text-white mb-6">Nova Tarefa</h3>
+          <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-md" onClick={() => setShowAddModal(false)}></div>
+          <div className={`relative w-full max-w-md border shadow-2xl p-8 animate-in zoom-in-95 duration-200 backdrop-blur-[40px] rounded-[2.5rem] ${isLight ? 'bg-white/90 border-white/40' : 'bg-slate-900/90 border-slate-700/50'}`}>
+            <h3 className={`text-2xl font-black mb-6 ${isLight ? 'text-slate-900' : 'text-white'}`}>{editingTask ? 'Editar Tarefa' : 'Nova Tarefa'}</h3>
 
             <div className="space-y-4">
               <div>
@@ -251,7 +329,7 @@ const TaskManager: React.FC<TaskManagerProps> = ({ tasks, setTasks, cardClass, i
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
                   placeholder="O que precisa ser feito?"
-                  className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className={`w-full px-5 py-4 border rounded-2xl transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500 ${isLight ? 'bg-white border-slate-200 text-slate-900' : 'bg-slate-800/50 border-slate-700 text-white'}`}
                 />
               </div>
 
@@ -261,7 +339,7 @@ const TaskManager: React.FC<TaskManagerProps> = ({ tasks, setTasks, cardClass, i
                   <select
                     value={newCategory}
                     onChange={(e) => setNewCategory(e.target.value as Category)}
-                    className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white focus:outline-none"
+                    className={`w-full px-4 py-3 border rounded-xl focus:outline-none ${isLight ? 'bg-white border-slate-200 text-slate-900' : 'bg-slate-800 border-slate-700 text-white'}`}
                   >
                     {Object.values(Category).map(cat => (
                       <option key={cat} value={cat}>{cat}</option>
@@ -273,12 +351,33 @@ const TaskManager: React.FC<TaskManagerProps> = ({ tasks, setTasks, cardClass, i
                   <select
                     value={newPriority}
                     onChange={(e) => setNewPriority(e.target.value as TaskPriority)}
-                    className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white focus:outline-none"
+                    className={`w-full px-4 py-3 border rounded-xl focus:outline-none ${isLight ? 'bg-white border-slate-200 text-slate-900' : 'bg-slate-800 border-slate-700 text-white'}`}
                   >
                     {Object.values(TaskPriority).map(prio => (
                       <option key={prio} value={prio}>{prio}</option>
                     ))}
                   </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Data</label>
+                  <input
+                    type="date"
+                    value={newDueDate}
+                    onChange={(e) => setNewDueDate(e.target.value)}
+                    className={`w-full px-4 py-3 border rounded-xl focus:outline-none ${isLight ? 'bg-white border-slate-200 text-slate-900' : 'bg-slate-800 border-slate-700 text-white'}`}
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Hora</label>
+                  <input
+                    type="time"
+                    value={newDueTime}
+                    onChange={(e) => setNewDueTime(e.target.value)}
+                    className={`w-full px-4 py-3 border rounded-xl focus:outline-none ${isLight ? 'bg-white border-slate-200 text-slate-900' : 'bg-slate-800 border-slate-700 text-white'}`}
+                  />
                 </div>
               </div>
 

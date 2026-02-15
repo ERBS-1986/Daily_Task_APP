@@ -105,12 +105,8 @@ const App: React.FC = () => {
     if (user) {
       fetchData();
 
-      // Mostrar boas-vindas apenas na primeira vez nesta sessão
-      const hasWelcomed = sessionStorage.getItem('daily_task_welcomed');
-      if (!hasWelcomed) {
-        setNotifications([{ id: 'welcome', title: 'Bem-vindo de volta!', message: 'Sua jornada de alta performance continua.', time: 'Agora', type: 'info', read: false }]);
-        sessionStorage.setItem('daily_task_welcomed', 'true');
-      }
+      // Show welcome only on FIRST login ever (saved in DB)
+      checkWelcome();
     } else {
       // Clear data on logout
       setTasks([]);
@@ -171,6 +167,36 @@ const App: React.FC = () => {
     }
   };
 
+  const checkWelcome = async () => {
+    if (!user) return;
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('has_seen_welcome')
+        .eq('id', user.id)
+        .single();
+
+      if (error && error.code !== 'PGRST116') throw error; // PGRST116 is "not found"
+
+      if (!data || !data.has_seen_welcome) {
+        setNotifications([{
+          id: 'welcome',
+          title: 'Seja bem-vindo(a)! 🚀',
+          message: 'Sua jornada de produtividade começa aqui. Configure suas metas e hidratação!',
+          time: 'Agora',
+          type: 'info',
+          read: false
+        }]);
+
+        await supabase
+          .from('profiles')
+          .upsert({ id: user.id, has_seen_welcome: true });
+      }
+    } catch (error) {
+      console.error('Error checking welcome:', error);
+    }
+  };
+
   // Sync to Supabase (Optimistic UI updates should be handled in specific components, 
   // but for now we can rely on fetching or individual update functions passed down)
   // NOTE: The previous code synced to localStorage on every change. 
@@ -221,7 +247,6 @@ const App: React.FC = () => {
       case 'goals': return <GoalsManager {...commonProps} goals={goals} setGoals={setGoals} />;
       case 'water': return <WaterManager {...commonProps} water={water} setWater={setWater} />;
       case 'gym': return <GymManager {...commonProps} workouts={workouts} setWorkouts={setWorkouts} />;
-      case 'calendar': return <CalendarSync {...commonProps} />;
       case 'focus': return <FocusMode {...commonProps} tasks={tasks} isGlobalFocusActive={isFocusActive} setIsGlobalFocusActive={setIsFocusActive} />;
       default: return <Dashboard {...commonProps} tasks={tasks} habits={habits} goals={goals} water={water} workouts={workouts} onNavigate={setActiveTab} />;
     }
@@ -236,22 +261,27 @@ const App: React.FC = () => {
       <aside className={`fixed inset-y-0 left-0 z-50 w-72 ${currentThemeData.sidebarClass} backdrop-blur-2xl border-r border-white/20 transform transition-all duration-500 ease-in-out lg:relative lg:translate-x-0 ${isSidebarOpen && !isFocusActive ? 'translate-x-0' : '-translate-x-full'} ${isFocusActive ? 'lg:-translate-x-full lg:hidden' : ''} shadow-2xl overflow-hidden`}>
         <div className="flex flex-col h-full">
           {/* Sidebar Header Illustration Area */}
-          <div className="relative h-48 mb-4 overflow-hidden group">
-            <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 z-0"></div>
-            {/* Placeholder for Illustration */}
-            <div className="absolute inset-0 flex items-end p-6 z-10 bg-gradient-to-t from-white/40 to-transparent">
+          <div className="relative h-56 mb-4 overflow-hidden group">
+            <div className="absolute inset-0 z-0">
+              <img
+                src="https://img.freepik.com/premium-vector/professional-man-character-working-laptop-office-with-check-list-modern-flat-illustration_1933-288.jpg"
+                alt="Productivity"
+                className="w-full h-full object-cover opacity-80"
+              />
+              <div className="absolute inset-0 bg-indigo-900/10 backdrop-blur-[2px]"></div>
+            </div>
+
+            <div className="absolute inset-0 flex items-end p-6 z-10 bg-gradient-to-t from-white via-white/40 to-transparent dark:from-slate-900 dark:via-slate-900/40">
               <div className="flex items-center gap-4">
-                <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center shadow-xl">
-                  <CalIcon className="w-8 h-8 text-indigo-500" />
+                <div className="w-14 h-14 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-xl shadow-indigo-600/20">
+                  <CalIcon className="w-8 h-8 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-2xl font-black text-slate-800 tracking-tight leading-tight">Daily Task</h1>
-                  <p className="text-xs font-bold text-indigo-600/70 uppercase tracking-widest">Produtividade</p>
+                  <h1 className={`text-2xl font-black tracking-tight leading-tight ${currentTheme === 'lavender-light' ? 'text-slate-900' : 'text-white'}`}>Daily Task</h1>
+                  <p className={`text-[10px] font-black uppercase tracking-[0.2em] ${currentTheme === 'lavender-light' ? 'text-indigo-600' : 'text-indigo-400'}`}>Produtividade</p>
                 </div>
               </div>
             </div>
-            {/* Soft blob decor */}
-            <div className="absolute -top-10 -right-10 w-32 h-32 bg-indigo-400/10 rounded-full blur-3xl"></div>
           </div>
 
           <nav className="flex-1 px-4 space-y-1.5 overflow-y-auto">
@@ -259,15 +289,17 @@ const App: React.FC = () => {
               <button
                 key={item.id}
                 onClick={() => { setActiveTab(item.id); setIsSidebarOpen(false); }}
-                className={`w-full flex items-center gap-3 px-5 py-4 rounded-2xl transition-all duration-300 ${activeTab === item.id ? 'bg-indigo-600/10 text-indigo-600 border border-indigo-600/10 shadow-sm' : 'text-slate-500 hover:bg-black/5 hover:text-slate-800'}`}
+                className={`w-full flex items-center gap-3 px-6 py-4 rounded-2xl transition-all duration-300 ${activeTab === item.id
+                  ? 'bg-indigo-600 text-white shadow-xl shadow-indigo-600/20'
+                  : `font-bold ${currentTheme === 'lavender-light' ? 'text-slate-700 hover:bg-indigo-50 hover:text-indigo-600' : 'text-slate-400 hover:bg-white/5 hover:text-white'}`}`}
               >
-                <div className={`transition-transform duration-300 ${activeTab === item.id ? 'scale-110' : ''}`}>
+                <div className={`transition-all duration-300 ${activeTab === item.id ? 'scale-110' : ''}`}>
                   {React.cloneElement(item.icon as React.ReactElement, {
-                    className: `w-5 h-5 ${activeTab === item.id ? 'text-indigo-600' : 'text-slate-400'}`
+                    className: `w-5 h-5 ${activeTab === item.id ? 'text-white' : 'text-current opacity-70'}`
                   })}
                 </div>
-                <span className={`font-bold text-sm ${activeTab === item.id ? 'translate-x-1' : ''} transition-transform`}>{item.name}</span>
-                {activeTab === item.id && <div className="ml-auto w-1.5 h-1.5 bg-indigo-600 rounded-full shadow-lg shadow-indigo-600/50"></div>}
+                <span className="text-sm tracking-tight">{item.name}</span>
+                {activeTab === item.id && <div className="ml-auto w-1.5 h-1.5 bg-white rounded-full shadow-lg"></div>}
               </button>
             ))}
           </nav>

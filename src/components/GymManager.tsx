@@ -425,9 +425,9 @@ const GymManager: React.FC<GymManagerProps> = ({ workouts, setWorkouts, cardClas
       {showAddModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-950/90 backdrop-blur-md" onClick={() => { setShowAddModal(false); resetForm(); }}></div>
-          <div className="relative w-full max-w-md bg-slate-900 border border-slate-800 rounded-[2.5rem] shadow-2xl p-8 animate-in zoom-in-95 duration-200">
+          <div className={`relative w-full max-w-md border rounded-[2.5rem] shadow-2xl p-8 animate-in zoom-in-95 duration-200 backdrop-blur-2xl ${isLight ? 'bg-white/90 border-white/20' : 'bg-slate-900 border-slate-800'}`}>
             <div className="flex items-center justify-between mb-8">
-              <h3 className="text-2xl font-black text-white">{isEditMode ? 'Editar Exercício' : 'Novo Exercício'}</h3>
+              <h3 className={`text-2xl font-black ${isLight ? 'text-slate-900' : 'text-white'}`}>{isEditMode ? 'Editar Exercício' : 'Novo Exercício'}</h3>
               <button onClick={() => { setShowAddModal(false); resetForm(); }} className="text-slate-500 hover:text-white">
                 <X className="w-6 h-6" />
               </button>
@@ -442,7 +442,7 @@ const GymManager: React.FC<GymManagerProps> = ({ workouts, setWorkouts, cardClas
                   value={formName}
                   onChange={(e) => setFormName(e.target.value)}
                   placeholder="Ex: Supino Reto, Agachamento..."
-                  className="w-full px-5 py-4 bg-slate-800/50 border border-slate-700 rounded-2xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+                  className={`w-full px-5 py-4 border rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all ${isLight ? 'bg-white border-slate-200 text-slate-900' : 'bg-slate-800/50 border-slate-700 text-white'}`}
                 />
               </div>
 
@@ -453,7 +453,7 @@ const GymManager: React.FC<GymManagerProps> = ({ workouts, setWorkouts, cardClas
                     type="number"
                     value={formSets}
                     onChange={(e) => setFormSets(parseInt(e.target.value))}
-                    className="w-full px-5 py-4 bg-slate-800/50 border border-slate-700 rounded-2xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className={`w-full px-5 py-4 border rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 ${isLight ? 'bg-white border-slate-200 text-slate-900' : 'bg-slate-800/50 border-slate-700 text-white'}`}
                   />
                 </div>
                 <div>
@@ -463,7 +463,7 @@ const GymManager: React.FC<GymManagerProps> = ({ workouts, setWorkouts, cardClas
                     value={formReps}
                     onChange={(e) => setFormReps(e.target.value)}
                     placeholder="Ex: 12 ou 10-12"
-                    className="w-full px-5 py-4 bg-slate-800/50 border border-slate-700 rounded-2xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className={`w-full px-5 py-4 border rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 ${isLight ? 'bg-white border-slate-200 text-slate-900' : 'bg-slate-800/50 border-slate-700 text-white'}`}
                   />
                 </div>
               </div>
@@ -475,7 +475,7 @@ const GymManager: React.FC<GymManagerProps> = ({ workouts, setWorkouts, cardClas
                   value={formWeight}
                   onChange={(e) => setFormWeight(e.target.value)}
                   placeholder="Ex: 40"
-                  className="w-full px-5 py-4 bg-slate-800/50 border border-slate-700 rounded-2xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className={`w-full px-5 py-4 border rounded-2xl focus:outline-none focus:ring-2 focus:ring-indigo-500 ${isLight ? 'bg-white border-slate-200 text-slate-900' : 'bg-slate-800/50 border-slate-700 text-white'}`}
                 />
               </div>
 

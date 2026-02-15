@@ -65,49 +65,64 @@ const Dashboard: React.FC<DashboardProps> = ({
   return (
     <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-1000 p-2">
       {/* Top Banner - Hero Section */}
-      <section className={`${cardClass} border border-white/40 rounded-[3rem] p-10 relative overflow-hidden group shadow-2xl shadow-indigo-200/20 backdrop-blur-3xl`}>
-        <div className="flex flex-col md:flex-row justify-between items-center gap-10 relative z-10 text-center md:text-left">
+      {/* Daily Tasks Hero Section */}
+      <section className={`${cardClass} border rounded-[3rem] p-10 relative overflow-hidden group shadow-2xl backdrop-blur-[40px] ${isLight ? 'border-indigo-100 shadow-indigo-100/30' : 'border-white/10 shadow-black/40'}`}>
+        <div className="flex flex-col md:flex-row justify-between gap-10 relative z-10">
           <div className="flex-1">
-            <div className="flex items-center gap-4 mb-6 justify-center md:justify-start">
-              <div className="p-3 bg-indigo-500/10 rounded-2xl shadow-inner">
-                <CalIcon className="w-8 h-8 text-indigo-500" />
+            <div className="flex items-center gap-4 mb-8">
+              <div className="p-4 bg-indigo-600 rounded-[1.5rem] shadow-lg shadow-indigo-600/30">
+                <CheckCircle2 className="w-8 h-8 text-white" />
               </div>
               <div>
-                <h3 className={`text-2xl font-black ${isLight ? 'text-slate-900' : 'text-white'}`}>Sua Agenda de Hoje</h3>
-                <p className="text-sm font-bold text-indigo-700/60 uppercase tracking-widest">Google Calendar Sync</p>
+                <h3 className={`text-3xl font-black tracking-tight ${isLight ? 'text-slate-900' : 'text-white'}`}>Tarefas de Hoje</h3>
+                <p className={`text-xs font-black uppercase tracking-[0.2em] ${isLight ? 'text-indigo-600' : 'text-indigo-400 opacity-80'}`}>Progresso Diário</p>
               </div>
             </div>
 
-            <div className="space-y-6">
-              <div className="bg-white/30 dark:bg-black/20 border border-white/50 dark:border-white/5 p-8 rounded-[2rem] flex flex-col items-center justify-center text-center group/card transition-all hover:bg-white/40">
-                <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mb-4 shadow-xl shadow-indigo-100">
-                  <CalIcon className="w-8 h-8 text-indigo-300" />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {tasks.filter(t => {
+                if (!t.dueDate) return false;
+                const taskDate = new Date(t.dueDate).toLocaleDateString('pt-BR');
+                const today = new Date().toLocaleDateString('pt-BR');
+                return taskDate === today;
+              }).length > 0 ? (
+                tasks.filter(t => {
+                  if (!t.dueDate) return false;
+                  const taskDate = new Date(t.dueDate).toLocaleDateString('pt-BR');
+                  const today = new Date().toLocaleDateString('pt-BR');
+                  return taskDate === today;
+                }).slice(0, 4).map(task => (
+                  <div key={task.id} className={`flex items-center gap-4 p-5 rounded-[2rem] border transition-all ${isLight ? 'bg-white border-slate-100 text-slate-900 shadow-sm' : 'bg-slate-800/50 border-white/5 text-white'}`}>
+                    <div className={`w-3 h-3 rounded-full ${task.completed ? 'bg-indigo-500 shadow-lg shadow-indigo-500/50' : (isLight ? 'bg-slate-200' : 'bg-slate-700')}`}></div>
+                    <span className={`font-bold truncate ${task.completed ? 'opacity-40 italic' : ''}`}>{task.title}</span>
+                  </div>
+                ))
+              ) : (
+                <div className="col-span-2 py-8 px-8 bg-indigo-500/5 rounded-[2rem] border border-dashed border-indigo-500/20 text-center">
+                  <p className={`font-bold italic ${isLight ? 'text-indigo-600' : 'text-indigo-400'}`}>Tudo em ordem por hoje! Nenhuma tarefa pendente.</p>
                 </div>
-                <p className={`text-lg font-black ${isLight ? 'text-slate-800' : 'text-white'}`}>Tudo limpo por aqui!</p>
-                <p className="text-sm text-slate-500 mt-1 font-medium italic">Conecte sua agenda para otimizar seu tempo.</p>
-              </div>
-
-              <button
-                onClick={() => onNavigate('tasks')}
-                className="w-full bg-indigo-600 hover:bg-indigo-500 text-white p-5 rounded-2xl flex items-center justify-center gap-3 transition-all font-black text-sm shadow-xl shadow-indigo-600/20 active:scale-95 group"
-              >
-                <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" />
-                <span>PLANEJAR NOVA ATIVIDADE</span>
-              </button>
+              )}
             </div>
+
+            <button
+              onClick={() => onNavigate('tasks')}
+              className="mt-8 bg-indigo-600 hover:bg-indigo-500 text-white py-4 px-10 rounded-2xl flex items-center gap-3 transition-all font-black text-sm shadow-xl shadow-indigo-600/30 active:scale-95 group w-fit"
+            >
+              <span>GERENCIAR TAREFAS</span>
+              <ArrowUpRight className="w-5 h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+            </button>
           </div>
 
-          <div className="hidden lg:block w-72 h-72 relative animate-pulse-slow">
-            <div className="absolute inset-0 bg-indigo-400/20 rounded-full blur-[80px]"></div>
-            <div className="relative z-10 w-full h-full bg-white/20 rounded-[3rem] border border-white/40 flex items-center justify-center">
-              <TrendingUp className="w-32 h-32 text-indigo-400/50" />
+          <div className="hidden lg:flex w-64 h-64 bg-indigo-600/5 rounded-[3rem] border border-indigo-500/10 items-center justify-center relative">
+            <div className="text-center">
+              <p className={`text-6xl font-black ${isLight ? 'text-indigo-600' : 'text-indigo-400'}`}>{Math.round(taskProgress)}%</p>
+              <p className={`text-[10px] font-black uppercase tracking-widest mt-2 ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>Concluído</p>
             </div>
           </div>
         </div>
 
-        {/* Decorative elements */}
-        <div className="absolute -top-24 -right-24 w-64 h-64 bg-indigo-400/10 rounded-full blur-[100px] animate-blob"></div>
-        <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-purple-400/10 rounded-full blur-[100px] animate-blob animation-delay-2000"></div>
+        {/* Premium background blur effects */}
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-600/5 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2"></div>
       </section>
 
       {/* Stats Grid */}
@@ -122,8 +137,8 @@ const Dashboard: React.FC<DashboardProps> = ({
               <TrendingUp className="w-6 h-6 text-emerald-500/40" />
             </div>
           </div>
-          <p className="text-slate-500 text-sm font-bold uppercase tracking-widest mb-2 relative z-10">Tarefas de Hoje</p>
-          <p className={`text-3xl font-black ${isLight ? 'text-slate-800' : 'text-white'} relative z-10`}>{completedTasks}/{tasks.length}</p>
+          <p className="text-slate-600 dark:text-slate-400 text-xs font-black uppercase tracking-[0.2em] mb-3 relative z-10">Tarefas de Hoje</p>
+          <p className={`text-3xl font-black ${isLight ? 'text-slate-900' : 'text-white'} relative z-10`}>{completedTasks}/{tasks.length}</p>
           <div className="mt-6 w-full bg-slate-100 dark:bg-white/5 h-3 rounded-full overflow-hidden relative z-10 p-0.5 border border-white/50">
             <div className="bg-gradient-to-r from-emerald-400 to-emerald-600 h-full rounded-full transition-all duration-1000 shadow-lg shadow-emerald-500/50" style={{ width: `${taskProgress}%` }}></div>
           </div>
@@ -136,9 +151,9 @@ const Dashboard: React.FC<DashboardProps> = ({
               <Dumbbell className="w-7 h-7 text-indigo-500" />
             </div>
           </div>
-          <p className="text-slate-500 text-sm font-bold uppercase tracking-widest mb-2 relative z-10">Treino de Hoje</p>
-          <p className={`text-2xl font-black ${isLight ? 'text-slate-800' : 'text-white'} line-clamp-1 relative z-10`}>{todayWorkout?.focus || 'Descanso'}</p>
-          <button onClick={() => onNavigate('gym')} className="mt-6 text-sm text-indigo-500 font-black flex items-center gap-2 hover:translate-x-1 transition-all relative z-10 group">
+          <p className="text-slate-600 dark:text-slate-400 text-xs font-black uppercase tracking-[0.2em] mb-3 relative z-10">Treino de Hoje</p>
+          <p className={`text-2xl font-black ${isLight ? 'text-slate-900' : 'text-white'} line-clamp-1 relative z-10`}>{todayWorkout?.focus || 'Descanso'}</p>
+          <button onClick={() => onNavigate('gym')} className={`mt-6 text-xs font-black flex items-center gap-2 hover:translate-x-1 transition-all relative z-10 group ${isLight ? 'text-indigo-600' : 'text-indigo-400'}`}>
             ACESSAR TREINO <ArrowUpRight className="w-4 h-4 group-hover:-translate-y-1 transition-transform" />
           </button>
         </div>
@@ -164,11 +179,11 @@ const Dashboard: React.FC<DashboardProps> = ({
               <Trophy className="w-7 h-7 text-amber-500" />
             </div>
           </div>
-          <p className="text-slate-500 text-sm font-bold uppercase tracking-widest mb-2 relative z-10">Metas Ativas</p>
-          <p className={`text-3xl font-black ${isLight ? 'text-slate-800' : 'text-white'} relative z-10`}>{goals.length}</p>
+          <p className="text-slate-600 dark:text-slate-400 text-xs font-black uppercase tracking-[0.2em] mb-3 relative z-10">Metas Ativas</p>
+          <p className={`text-3xl font-black ${isLight ? 'text-slate-900' : 'text-white'} relative z-10`}>{goals.length}</p>
           <button
             onClick={() => onNavigate('goals')}
-            className="mt-6 text-sm text-amber-600 font-black flex items-center gap-2 hover:translate-x-1 transition-all relative z-10 group"
+            className={`mt-6 text-xs font-black flex items-center gap-2 hover:translate-x-1 transition-all relative z-10 group ${isLight ? 'text-amber-600' : 'text-amber-400'}`}
           >
             VER DETALHES <ArrowUpRight className="w-4 h-4 group-hover:-translate-y-1 transition-transform" />
           </button>

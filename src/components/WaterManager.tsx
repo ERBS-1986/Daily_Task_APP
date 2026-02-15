@@ -41,12 +41,27 @@ const WaterManager: React.FC<WaterManagerProps> = ({ water, setWater, cardClass,
     try {
       const { error } = await supabase
         .from('water_intake')
-        .update(newWaterData)
-        .eq('user_id', user.id);
+        .upsert({
+          user_id: user.id,
+          ...newWaterData,
+          updated_at: new Date().toISOString()
+        });
 
       if (error) throw error;
     } catch (error) {
       console.error('Error updating water:', error);
+    }
+  };
+
+  const updateProfileInDb = async (updates: any) => {
+    if (!user) return;
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .upsert({ id: user.id, ...updates, updated_at: new Date().toISOString() });
+      if (error) throw error;
+    } catch (error) {
+      console.error('Error updating profile:', error);
     }
   };
 
@@ -62,9 +77,10 @@ const WaterManager: React.FC<WaterManagerProps> = ({ water, setWater, cardClass,
   };
 
   const handleSaveAll = () => {
+    const newTarget = weight * activity;
     const newSettings: WaterIntake = {
       ...water,
-      target: weight * activity,
+      target: newTarget,
       remindersEnabled,
       reminderType,
       reminderInterval: interval,
@@ -72,21 +88,16 @@ const WaterManager: React.FC<WaterManagerProps> = ({ water, setWater, cardClass,
     };
 
     setWater(newSettings);
-    updateWaterInDb({
-      target: newSettings.target,
-      unit: 'ml' // Ensure unit is present if needed, though usually static
-      // We might want to save reminder settings too if we expand the DB schema.
-      // For now, the DB schema only has target, current, unit. 
-      // Reminder settings are local/context based in this simplistic version,
-      // OR we should have added them to the DB. 
-      // Given the prompt "Prepare for Real Users", ideally we persist everything.
-      // But the schema I created earlier was:
-      // create table water_intake (user_id, target, current, unit, updated_at).
-      // It missed reminder settings.
-      // I will save what I can (target/current) and mention this limitation or 
-      // (Better) I will silently update the schema in my head plan or just skip persisting reminders for this step if user didn't ask for schema update.
-      // Actually, the user approved "Goals and Water Persistence".
-      // Use what we have: Persist Target and Current.
+    updateWaterInDb({ target: newTarget, current: water.current });
+    updateProfileInDb({
+      weight,
+      activity_level: activity,
+      water_reminders: {
+        enabled: remindersEnabled,
+        type: reminderType,
+        interval,
+        scheduledTimes
+      }
     });
     setIsConfiguring(false);
   };
@@ -207,7 +218,7 @@ const WaterManager: React.FC<WaterManagerProps> = ({ water, setWater, cardClass,
       {isConfiguring && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-950/90 backdrop-blur-md" onClick={() => setIsConfiguring(false)}></div>
-          <div className="relative w-full max-w-lg bg-slate-900 border border-slate-800 rounded-[2.5rem] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
+          <div className={`relative w-full max-w-lg border shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh] backdrop-blur-[40px] rounded-[3rem] ${isLight ? 'bg-white/90 border-white/40' : 'bg-slate-900/90 border-slate-700/50'}`}>
 
             {/* Modal Tabs */}
             <div className="flex bg-slate-800/50 p-2 border-b border-slate-800">

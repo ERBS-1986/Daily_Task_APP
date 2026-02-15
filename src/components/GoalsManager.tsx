@@ -20,6 +20,7 @@ const GoalsManager: React.FC<GoalsManagerProps> = ({ goals, setGoals, cardClass,
   const [newTitle, setNewTitle] = useState('');
   const [newTarget, setNewTarget] = useState<number>(10);
   const [newUnit, setNewUnit] = useState('');
+  const [activeGoalTab, setActiveGoalTab] = useState<'weekly' | 'monthly'>('weekly');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleAddGoal = async () => {
@@ -32,7 +33,8 @@ const GoalsManager: React.FC<GoalsManagerProps> = ({ goals, setGoals, cardClass,
         title: newTitle,
         target: newTarget,
         current: 0,
-        unit: newUnit || 'unidades'
+        unit: newUnit || 'unidades',
+        type: activeGoalTab
       };
 
       const { data, error } = await supabase
@@ -109,25 +111,40 @@ const GoalsManager: React.FC<GoalsManagerProps> = ({ goals, setGoals, cardClass,
     <div className="space-y-8 animate-in slide-in-from-bottom-4 duration-500">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${isLight ? 'bg-amber-100' : 'bg-amber-500/10'}`}>
-            <Target className="w-7 h-7 text-amber-500" />
-          </div>
           <div>
-            <h2 className={`text-2xl font-black ${isLight ? 'text-slate-900' : 'text-white'}`}>Metas Semanais</h2>
-            <p className={`${isLight ? 'text-slate-600' : 'text-slate-400'} text-sm font-medium`}>Grandes objetivos divididos em pequenos passos.</p>
+            <h2 className={`text-2xl font-black ${isLight ? 'text-slate-900' : 'text-white'}`}>Metas {activeGoalTab === 'weekly' ? 'Semanais' : 'Mensais'}</h2>
+            <p className={`${isLight ? 'text-slate-600' : 'text-slate-400'} text-sm font-medium`}>
+              {activeGoalTab === 'weekly' ? 'Grandes objetivos divididos em pequenos passos.' : 'Foco a longo prazo para o seu sucesso.'}
+            </p>
           </div>
         </div>
-        <button
-          onClick={() => setShowAddModal(true)}
-          className="px-5 py-3 bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold rounded-2xl transition-all flex items-center gap-2 shadow-lg shadow-amber-500/5"
-        >
-          <Plus className="w-5 h-5" />
-          Nova Meta
-        </button>
+        <div className="flex gap-2">
+          <div className="flex bg-slate-800/50 p-1 rounded-2xl border border-slate-700/50 mr-2">
+            <button
+              onClick={() => setActiveGoalTab('weekly')}
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${activeGoalTab === 'weekly' ? 'bg-amber-500 text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}
+            >
+              Semanal
+            </button>
+            <button
+              onClick={() => setActiveGoalTab('monthly')}
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${activeGoalTab === 'monthly' ? 'bg-amber-500 text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}
+            >
+              Mensal
+            </button>
+          </div>
+          <button
+            onClick={() => setShowAddModal(true)}
+            className="px-5 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-2xl transition-all flex items-center gap-2 shadow-lg shadow-amber-500/5"
+          >
+            <Plus className="w-5 h-5" />
+            Nova Meta
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {goals.map(goal => {
+        {goals.filter(g => (g.type || 'weekly') === activeGoalTab).map(goal => {
           const progress = (goal.current / goal.target) * 100;
           const isFinished = goal.current >= goal.target;
 
@@ -143,7 +160,7 @@ const GoalsManager: React.FC<GoalsManagerProps> = ({ goals, setGoals, cardClass,
               <div className="flex justify-between items-start relative z-10">
                 <div>
                   <h4 className={`text-xl font-black mb-1 ${isLight ? 'text-slate-900' : 'text-slate-100'}`}>{goal.title}</h4>
-                  <p className={`text-xs uppercase font-black tracking-widest ${isLight ? 'text-slate-400' : 'text-slate-500'}`}>Objetivo para esta semana</p>
+                  <p className={`text-xs uppercase font-black tracking-widest ${isLight ? 'text-slate-400' : 'text-slate-500'}`}>Objetivo para este {goal.type === 'monthly' ? 'mês' : 'semanal'}</p>
                 </div>
                 {isFinished && (
                   <div className="p-2 bg-amber-500/20 rounded-xl">
@@ -199,9 +216,9 @@ const GoalsManager: React.FC<GoalsManagerProps> = ({ goals, setGoals, cardClass,
       {/* Add Goal Modal */}
       {showAddModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm" onClick={() => setShowAddModal(false)}></div>
-          <div className="relative w-full max-w-sm bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl p-6 animate-in zoom-in-95 duration-200">
-            <h3 className="text-xl font-bold text-white mb-6">Nova Meta Semanal</h3>
+          <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-md" onClick={() => setShowAddModal(false)}></div>
+          <div className={`relative w-full max-w-sm border shadow-2xl p-8 animate-in zoom-in-95 duration-200 backdrop-blur-[40px] rounded-[2.5rem] ${isLight ? 'bg-white/90 border-white/40' : 'bg-slate-900/90 border-slate-700/50'}`}>
+            <h3 className={`text-2xl font-black mb-6 ${isLight ? 'text-slate-900' : 'text-white'}`}>Nova Meta {activeGoalTab === 'weekly' ? 'Semanal' : 'Mensal'}</h3>
 
             <div className="space-y-4">
               <div>
@@ -212,7 +229,7 @@ const GoalsManager: React.FC<GoalsManagerProps> = ({ goals, setGoals, cardClass,
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
                   placeholder="Ex: Ler Livros, Correr..."
-                  className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  className={`w-full px-5 py-4 border rounded-2xl focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all ${isLight ? 'bg-white border-slate-200 text-slate-900' : 'bg-slate-800/50 border-slate-700 text-white'}`}
                 />
               </div>
 
@@ -223,7 +240,7 @@ const GoalsManager: React.FC<GoalsManagerProps> = ({ goals, setGoals, cardClass,
                     type="number"
                     value={newTarget}
                     onChange={(e) => setNewTarget(Number(e.target.value))}
-                    className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    className={`w-full px-5 py-4 border rounded-2xl focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all ${isLight ? 'bg-white border-slate-200 text-slate-900' : 'bg-slate-800/50 border-slate-700 text-white'}`}
                   />
                 </div>
                 <div>
@@ -233,7 +250,7 @@ const GoalsManager: React.FC<GoalsManagerProps> = ({ goals, setGoals, cardClass,
                     value={newUnit}
                     onChange={(e) => setNewUnit(e.target.value)}
                     placeholder="Ex: km, pgs..."
-                    className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    className={`w-full px-5 py-4 border rounded-2xl focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all ${isLight ? 'bg-white border-slate-200 text-slate-900' : 'bg-slate-800/50 border-slate-700 text-white'}`}
                   />
                 </div>
               </div>
