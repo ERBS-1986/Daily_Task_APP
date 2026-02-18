@@ -1,7 +1,8 @@
 
 import React, { useState } from 'react';
 import { Habit } from '../types';
-import { Plus, Flame, CheckCircle2, Circle, TrendingUp, X, Loader2, Trash2 } from 'lucide-react';
+import { Plus, Flame, TrendingUp, X, Loader2, Trash2 } from 'lucide-react';
+import Checkbox from './Checkbox';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
@@ -192,7 +193,11 @@ const HabitTracker: React.FC<HabitTrackerProps> = ({ habits, setHabits, cardClas
                           : `${isLight ? 'border-indigo-100 bg-white/50' : 'border-slate-800 bg-slate-950/50'}`}
                         ${isToday && !done ? 'border-indigo-500 ring-2 ring-indigo-500/20' : ''}
                       `}>
-                        {done && <CheckCircle2 className="w-5 h-5" />}
+                        <Checkbox
+                          checked={done}
+                          onChange={() => !done && isToday && completeHabit(habit.id)}
+                          className={done ? 'bg-transparent border-transparent' : ''}
+                        />
                       </div>
                     </div>
                   );

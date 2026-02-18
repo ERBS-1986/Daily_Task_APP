@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
+import Checkbox from './Checkbox';
 import { DailyWorkout, Exercise } from '../types';
 import {
   Dumbbell, Plus, CheckCircle2, Circle, Calendar,
@@ -390,12 +391,10 @@ const GymManager: React.FC<GymManagerProps> = ({ workouts, setWorkouts, cardClas
                       `}
                   >
                     <div className="flex items-center gap-4">
-                      <button
-                        onClick={() => toggleExerciseComplete(ex.id, ex.completed)}
-                        className={`w-6 h-6 rounded-full flex items-center justify-center border transition-all ${ex.completed ? 'bg-indigo-500 border-indigo-400 text-white' : 'border-slate-700 text-transparent hover:border-indigo-500'}`}
-                      >
-                        <CheckCircle2 className="w-4 h-4" />
-                      </button>
+                      <Checkbox
+                        checked={ex.completed}
+                        onChange={() => toggleExerciseComplete(ex.id, ex.completed)}
+                      />
                       <div>
                         <h5 className={`font-bold transition-colors ${ex.completed ? 'text-slate-500 line-through' : 'text-slate-100'}`}>{ex.name}</h5>
                         <p className="text-xs text-slate-500 font-medium">{ex.sets} séries • {ex.reps} reps {ex.weight && `• ${ex.weight}kg`}</p>
@@ -487,16 +486,26 @@ const GymManager: React.FC<GymManagerProps> = ({ workouts, setWorkouts, cardClas
         <div className="lg:col-span-4 space-y-6 sticky top-8 h-fit">
           <div className={`border p-8 rounded-[3rem] space-y-6 backdrop-blur-2xl shadow-xl ${cardClass || 'bg-slate-900 border-slate-800'} ${isLight ? 'border-white/50' : 'border-slate-800'}`}>
             <h4 className={`font-black text-xl flex items-center gap-2 ${isLight ? 'text-slate-900' : 'text-white'}`}>
-              <History className="w-6 h-6 text-indigo-500" /> Histórico & Dicas
+              <History className="w-6 h-6 text-indigo-500" /> Histórico
             </h4>
-            <div className="space-y-4">
-              <div className="p-4 bg-white/5 rounded-2xl border border-white/5">
+            <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 no-scrollbar">
+              {workouts.filter(w => w.day < selectedDate && w.exercises.length > 0).length > 0 ? (
+                workouts.filter(w => w.day < selectedDate && w.exercises.length > 0).sort((a, b) => b.day.localeCompare(a.day)).map(w => (
+                  <div key={w.day} className="p-4 bg-white/5 rounded-2xl border border-white/5 hover:bg-white/10 transition-all cursor-pointer" onClick={() => setSelectedDate(w.day)}>
+                    <p className="text-[10px] text-indigo-400 font-bold uppercase mb-1">{new Date(w.day).toLocaleDateString('pt-BR')}</p>
+                    <p className="text-sm text-slate-200 font-bold">{w.focus}</p>
+                    <p className="text-[10px] text-slate-500 mt-1">{w.exercises.filter(e => e.completed).length}/{w.exercises.length} concluídos</p>
+                  </div>
+                ))
+              ) : (
+                <div className="p-4 bg-white/5 rounded-2xl border border-white/5 text-center">
+                  <p className="text-sm text-slate-500 italic">Nenhum treino passado encontrado no sistema.</p>
+                </div>
+              )}
+
+              <div className="p-4 bg-white/5 rounded-2xl border border-white/5 mt-4">
                 <p className="text-[10px] text-slate-500 font-bold uppercase mb-1">Dica de Hoje</p>
                 <p className="text-sm text-slate-300 font-medium italic">"A constância supera a intensidade. Não pare até terminar todas as séries!"</p>
-              </div>
-              <div className="p-4 bg-indigo-600/5 rounded-2xl border border-indigo-500/10">
-                <p className="text-[10px] text-indigo-400 font-bold uppercase mb-1">Resumo Semanal</p>
-                <p className="text-sm text-slate-300 font-bold">Treinos realizados: {workouts.filter(w => w.exercises.some(ex => ex.completed)).length}</p>
               </div>
             </div>
           </div>

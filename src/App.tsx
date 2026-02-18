@@ -33,6 +33,7 @@ import GymManager from './components/GymManager';
 import Auth from './components/Auth';
 import ProfileModal from './components/ProfileModal';
 import PasswordModal from './components/PasswordModal';
+import NotificationSettingsModal from './components/NotificationSettingsModal';
 import { useToast } from './contexts/ToastContext';
 
 
@@ -40,9 +41,9 @@ import { useToast } from './contexts/ToastContext';
 const THEMES: { id: AppTheme, name: string, bgClass: string, sidebarClass: string, cardClass: string, color: string }[] = [
   { id: 'lavender-light', name: 'Premium Lavender', bgClass: 'bg-premium-light', sidebarClass: 'bg-white/60', cardClass: 'bg-white/80', color: '#818CF8' },
   { id: 'default', name: 'Padrão Dark', bgClass: 'bg-premium-dark', sidebarClass: 'bg-slate-900/80', cardClass: 'bg-[#434B96]', color: '#6366f1' },
-  { id: 'red', name: 'Vermelho', bgClass: 'bg-red-900', sidebarClass: 'bg-black/40', cardClass: 'bg-red-950/50', color: '#f87171' },
-  { id: 'green', name: 'Verde', bgClass: 'bg-emerald-900', sidebarClass: 'bg-black/40', cardClass: 'bg-emerald-950/50', color: '#34d399' },
-  { id: 'blue', name: 'Azul', bgClass: 'bg-blue-900', sidebarClass: 'bg-black/40', cardClass: 'bg-blue-950/50', color: '#60a5fa' },
+  { id: 'red', name: 'Vermelho', bgClass: 'bg-red-600', sidebarClass: 'bg-black/40', cardClass: 'bg-red-700/50', color: '#f87171' },
+  { id: 'green', name: 'Verde', bgClass: 'bg-emerald-600', sidebarClass: 'bg-black/40', cardClass: 'bg-emerald-700/50', color: '#34d399' },
+  { id: 'blue', name: 'Azul', bgClass: 'bg-blue-600', sidebarClass: 'bg-black/40', cardClass: 'bg-blue-700/50', color: '#60a5fa' },
 ];
 
 import { supabase } from './lib/supabase';
@@ -60,6 +61,7 @@ const App: React.FC = () => {
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+  const [isNotifSettingsOpen, setIsNotifSettingsOpen] = useState(false);
 
   const { showToast } = useToast();
 
@@ -121,11 +123,12 @@ const App: React.FC = () => {
     setIsLoadingData(true);
 
     try {
-      const [tasksResult, habitsResult, goalsResult, waterResult] = await Promise.all([
+      const [tasksResult, habitsResult, goalsResult, waterResult, workoutsResult] = await Promise.all([
         supabase.from('tasks').select('*'),
         supabase.from('habits').select('*'),
         supabase.from('goals').select('*'),
-        supabase.from('water_intake').select('*').eq('user_id', user.id).single()
+        supabase.from('water_intake').select('*').eq('user_id', user.id).single(),
+        supabase.from('workouts').select('*, exercises(*)').eq('user_id', user.id)
       ]);
 
       if (tasksResult.data) {
@@ -169,6 +172,10 @@ const App: React.FC = () => {
         };
         const { error } = await supabase.from('water_intake').insert(defaultWater);
         if (!error) setWater(prev => ({ ...prev, ...defaultWater }));
+      }
+
+      if (workoutsResult.data) {
+        setWorkouts(workoutsResult.data);
       }
 
     } catch (error) {
@@ -264,7 +271,7 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className={`flex h-screen overflow-hidden transition-colors duration-1000 ${currentThemeData.bgClass}`}>
+    <div className={`flex h-screen overflow-hidden transition-colors duration-1000 ${currentThemeData.bgClass} ${currentTheme === 'lavender-light' ? 'text-black' : 'text-white'}`}>
       {isSidebarOpen && !isFocusActive && (
         <div className="fixed inset-0 bg-black/60 z-40 lg:hidden backdrop-blur-sm" onClick={() => setIsSidebarOpen(false)} />
       )}
@@ -452,6 +459,15 @@ const App: React.FC = () => {
                         Editar Perfil
                       </button>
                       <button
+                        onClick={() => { setIsNotifSettingsOpen(true); setIsProfileMenuOpen(false); }}
+                        className="w-full flex items-center gap-3 px-3 py-2.5 text-xs font-bold text-slate-300 hover:bg-white/5 hover:text-white rounded-xl transition-all"
+                      >
+                        <div className="w-8 h-8 rounded-lg bg-orange-600/10 flex items-center justify-center">
+                          <Bell className="w-4 h-4 text-orange-400" />
+                        </div>
+                        Configuração de Alertas
+                      </button>
+                      <button
                         onClick={() => { setIsPasswordModalOpen(true); setIsProfileMenuOpen(false); }}
                         className="w-full flex items-center gap-3 px-3 py-2.5 text-xs font-bold text-slate-300 hover:bg-white/5 hover:text-white rounded-xl transition-all"
                       >
@@ -492,6 +508,11 @@ const App: React.FC = () => {
       <PasswordModal
         isOpen={isPasswordModalOpen}
         onClose={() => setIsPasswordModalOpen(false)}
+        showToast={showToast}
+      />
+      <NotificationSettingsModal
+        isOpen={isNotifSettingsOpen}
+        onClose={() => setIsNotifSettingsOpen(false)}
         showToast={showToast}
       />
     </div>

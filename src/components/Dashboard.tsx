@@ -37,18 +37,19 @@ const Dashboard: React.FC<DashboardProps> = ({
   onNavigate,
   cardClass = 'bg-slate-900'
 }) => {
-  const today = new Date().toLocaleDateString('pt-BR');
+  const todayObj = new Date();
+  const todayDateLocal = `${todayObj.getFullYear()}-${String(todayObj.getMonth() + 1).padStart(2, '0')}-${String(todayObj.getDate()).padStart(2, '0')}`;
   const todayTasks = tasks.filter(t => {
     if (!t.dueDate) return false;
-    return new Date(t.dueDate).toLocaleDateString('pt-BR') === today;
+    const taskDate = new Date(t.dueDate);
+    const taskDateLocal = `${taskDate.getFullYear()}-${String(taskDate.getMonth() + 1).padStart(2, '0')}-${String(taskDate.getDate()).padStart(2, '0')}`;
+    return taskDateLocal === todayDateLocal;
   });
   const completedTodayTasks = todayTasks.filter(t => t.completed).length;
   const taskProgress = todayTasks.length > 0 ? (completedTodayTasks / todayTasks.length) * 100 : 0;
   const waterProgress = (water.current / water.target) * 100;
 
-  const days = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
-  const todayName = days[new Date().getDay()];
-  const todayWorkout = workouts.find(w => w.day === todayName);
+  const todayWorkout = workouts.find(w => w.day === todayDateLocal);
 
 
   // Calcular dados reais da semana baseado nas tarefas
@@ -89,7 +90,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                 todayTasks.slice(0, 4).map(task => (
                   <div key={task.id} className={`flex items-center gap-4 p-5 rounded-[2rem] border transition-all ${isLight ? 'bg-white border-slate-100 text-slate-900 shadow-sm' : 'bg-slate-800/50 border-white/5 text-white'}`}>
                     <div className={`w-3 h-3 rounded-full ${task.completed ? 'bg-indigo-500 shadow-lg shadow-indigo-500/50' : (isLight ? 'bg-slate-200' : 'bg-slate-700')}`}></div>
-                    <span className={`font-bold truncate ${task.completed ? 'opacity-40 italic' : ''}`}>{task.title}</span>
+                    <span className={`font-black truncate ${task.completed ? 'opacity-40 italic' : ''}`}>{task.title}</span>
                   </div>
                 ))
               ) : (
@@ -207,7 +208,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                 <div className="w-6 h-6 rounded-full border-2 border-slate-300 dark:border-slate-700 flex items-center justify-center group-hover:border-indigo-500 transition-colors">
                   <div className="w-2 h-2 bg-indigo-500 rounded-full opacity-0 group-hover:opacity-100 scale-0 group-hover:scale-100 transition-all"></div>
                 </div>
-                <span className={`text-base font-bold ${isLight ? 'text-slate-700' : 'text-slate-200'} group-hover:text-indigo-600 transition-colors`}>{task.title}</span>
+                <span className={`text-base font-black ${isLight ? 'text-slate-700' : 'text-slate-200'} group-hover:text-indigo-600 transition-colors`}>{task.title}</span>
                 <ChevronRight className="ml-auto w-5 h-5 text-slate-300 group-hover:text-indigo-500 group-hover:translate-x-1 transition-all" />
               </div>
             ))}

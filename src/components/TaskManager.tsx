@@ -8,12 +8,11 @@ import {
   Calendar as CalIcon,
   Tag,
   Trash2,
-  CheckCircle2,
-  Circle,
   AlertTriangle,
   Loader2,
   Pencil
 } from 'lucide-react';
+import Checkbox from './Checkbox';
 import { Task, Category, TaskPriority } from '../types';
 import { CATEGORY_ICONS, PRIORITY_COLORS } from '../constants';
 import { supabase } from '../lib/supabase';
@@ -250,19 +249,13 @@ const TaskManager: React.FC<TaskManagerProps> = ({ tasks, setTasks, cardClass, i
             `}
           >
             <div className="flex items-center gap-4 flex-1">
-              <button
-                onClick={() => toggleTask(task.id, task.completed)}
-                className="transition-transform active:scale-90"
-              >
-                {task.completed ? (
-                  <CheckCircle2 className="w-6 h-6 text-indigo-500" />
-                ) : (
-                  <Circle className="w-6 h-6 text-slate-600 group-hover:text-indigo-400" />
-                )}
-              </button>
+              <Checkbox
+                checked={task.completed}
+                onChange={() => toggleTask(task.id, task.completed)}
+              />
 
               <div className="flex flex-col">
-                <span className={`font-bold ${task.completed ? 'line-through text-slate-500' : (isLight ? 'text-slate-900' : 'text-slate-100')}`}>
+                <span className={`font-black ${task.completed ? 'line-through text-slate-500' : (isLight ? 'text-slate-900' : 'text-slate-100')}`}>
                   {task.title}
                 </span>
                 <div className="flex flex-wrap items-center gap-2 mt-1">

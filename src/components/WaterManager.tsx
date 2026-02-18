@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Droplet, Plus, Minus, Info, Settings2, Save, X, Clock, Bell, CalendarClock, Trash2 } from 'lucide-react';
+import { Droplet, Plus, Minus, Info, Settings2, Save, X, Clock, Bell, CalendarClock, Trash2, Music } from 'lucide-react';
 import { WaterIntake } from '../types';
 
 interface WaterManagerProps {
@@ -35,6 +35,7 @@ const WaterManager: React.FC<WaterManagerProps> = ({ water, setWater, cardClass,
   const [interval, setInterval] = useState(water.reminderInterval || 60);
   const [scheduledTimes, setScheduledTimes] = useState<string[]>(water.scheduledTimes || []);
   const [newTime, setNewTime] = useState('08:00');
+  const [notifSound, setNotifSound] = useState(() => localStorage.getItem('ff_water_sound') || 'default');
 
   const updateWaterInDb = async (newWaterData: Partial<WaterIntake>) => {
     if (!user) return;
@@ -99,6 +100,7 @@ const WaterManager: React.FC<WaterManagerProps> = ({ water, setWater, cardClass,
         scheduledTimes
       }
     });
+    localStorage.setItem('ff_water_sound', notifSound);
     setIsConfiguring(false);
   };
 
@@ -331,34 +333,51 @@ const WaterManager: React.FC<WaterManagerProps> = ({ water, setWater, cardClass,
                           <p className="text-[10px] text-slate-500 text-center uppercase font-bold">Sugestão: 60 ou 90 minutos</p>
                         </div>
                       ) : (
-                        <div className="space-y-4">
-                          <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">Seus Horários</label>
-                          <div className="flex gap-2">
-                            <input
-                              type="time"
-                              value={newTime}
-                              onChange={(e) => setNewTime(e.target.value)}
-                              className="flex-1 bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-white focus:outline-none"
-                            />
-                            <button
-                              onClick={addScheduledTime}
-                              className="px-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold text-xs transition-colors"
+                        <>
+                          <div className="space-y-4">
+                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest px-1 flex items-center gap-2 mt-4">
+                              <Music className="w-4 h-4" /> Toque do Lembrete
+                            </label>
+                            <select
+                              value={notifSound}
+                              onChange={(e) => setNotifSound(e.target.value)}
+                              className="w-full px-4 py-3 bg-slate-800/50 border border-slate-700/50 rounded-2xl text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-all font-medium"
                             >
-                              Adicionar
-                            </button>
+                              <option value="default">Padrão Digital</option>
+                              <option value="soft">Suave e Calmo</option>
+                              <option value="energy">Energético</option>
+                              <option value="minimal">Minimalista</option>
+                            </select>
                           </div>
-                          <div className="flex flex-wrap gap-2">
-                            {scheduledTimes.map(time => (
-                              <div key={time} className="flex items-center gap-2 bg-slate-800 border border-slate-700 px-3 py-1.5 rounded-full text-xs text-white">
-                                {time}
-                                <button onClick={() => removeScheduledTime(time)} className="hover:text-rose-400">
-                                  <X className="w-3 h-3" />
-                                </button>
-                              </div>
-                            ))}
-                            {scheduledTimes.length === 0 && <p className="text-xs text-slate-600 italic">Nenhum horário definido...</p>}
+                          <div className="space-y-4">
+                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">Seus Horários</label>
+                            <div className="flex gap-2">
+                              <input
+                                type="time"
+                                value={newTime}
+                                onChange={(e) => setNewTime(e.target.value)}
+                                className="flex-1 bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-white focus:outline-none"
+                              />
+                              <button
+                                onClick={addScheduledTime}
+                                className="px-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold text-xs transition-colors"
+                              >
+                                Adicionar
+                              </button>
+                            </div>
+                            <div className="flex flex-wrap gap-2">
+                              {scheduledTimes.map(time => (
+                                <div key={time} className="flex items-center gap-2 bg-slate-800 border border-slate-700 px-3 py-1.5 rounded-full text-xs text-white">
+                                  {time}
+                                  <button onClick={() => removeScheduledTime(time)} className="hover:text-rose-400">
+                                    <X className="w-3 h-3" />
+                                  </button>
+                                </div>
+                              ))}
+                              {scheduledTimes.length === 0 && <p className="text-xs text-slate-600 italic">Nenhum horário definido...</p>}
+                            </div>
                           </div>
-                        </div>
+                        </>
                       )}
                     </div>
                   )}
