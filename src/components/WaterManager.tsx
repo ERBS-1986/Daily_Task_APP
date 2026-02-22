@@ -300,16 +300,16 @@ const WaterManager: React.FC<WaterManagerProps> = ({ water, setWater, cardClass,
 
                   {remindersEnabled && (
                     <div className="space-y-6">
-                      <div className="flex p-1 bg-slate-950/50 rounded-2xl border border-slate-800">
+                      <div className={`p-3 grid grid-cols-2 gap-2 bg-slate-800/50 rounded-2xl border border-slate-700`}>
                         <button
                           onClick={() => setReminderType('interval')}
-                          className={`flex-1 py-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${reminderType === 'interval' ? 'bg-slate-800 text-white shadow-md' : 'text-slate-500'}`}
+                          className={`flex-1 py-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${reminderType === 'interval' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-500'}`}
                         >
                           <Clock className="w-4 h-4" /> Intervalo
                         </button>
                         <button
                           onClick={() => setReminderType('scheduled')}
-                          className={`flex-1 py-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${reminderType === 'scheduled' ? 'bg-slate-800 text-white shadow-md' : 'text-slate-500'}`}
+                          className={`flex-1 py-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${reminderType === 'scheduled' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-500'}`}
                         >
                           <CalendarClock className="w-4 h-4" /> Horários Fixos
                         </button>
@@ -388,7 +388,7 @@ const WaterManager: React.FC<WaterManagerProps> = ({ water, setWater, cardClass,
             <div className="p-8 bg-slate-900 border-t border-slate-800">
               <button
                 onClick={handleSaveAll}
-                className="w-full py-4 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-2xl transition-all shadow-lg shadow-indigo-600/30 flex items-center justify-center gap-2"
+                className="w-full py-4 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-2xl transition-all shadow-lg shadow-indigo-600/20 flex items-center justify-center gap-2"
               >
                 <Save className="w-5 h-5" />
                 Salvar Todas as Configurações

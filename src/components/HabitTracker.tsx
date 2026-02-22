@@ -211,7 +211,7 @@ const HabitTracker: React.FC<HabitTrackerProps> = ({ habits, setHabits, cardClas
                   w-full py-3 rounded-xl font-bold transition-all
                   ${isCompletedToday
                     ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 cursor-default'
-                    : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-500/20'}
+                    : 'bg-indigo-500 hover:bg-indigo-400 text-white shadow-lg shadow-indigo-500/20'}
                 `}
               >
                 {isCompletedToday ? 'Concluído Hoje' : 'Marcar como Feito'}

@@ -328,7 +328,7 @@ const GymManager: React.FC<GymManagerProps> = ({ workouts, setWorkouts, cardClas
               className={`
                 flex flex-col items-center gap-1 min-w-[110px] p-4 rounded-2xl border transition-all backdrop-blur-md
                 ${selectedDate === item.date
-                  ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-600/30'
+                  ? 'bg-indigo-500 border-indigo-400 text-white shadow-lg shadow-indigo-500/30'
                   : `${isLight ? 'bg-white/50 border-white/20 text-slate-500 hover:border-indigo-200' : 'bg-slate-900 border-slate-800 text-slate-500 hover:border-slate-700'}`}
               `}
             >
@@ -374,7 +374,7 @@ const GymManager: React.FC<GymManagerProps> = ({ workouts, setWorkouts, cardClas
                   <p className="text-slate-600 text-sm mt-2 max-w-xs mx-auto">Não encontramos treinos para este dia. Adicione um novo treino para começar.</p>
                   <button
                     onClick={() => setShowAddModal(true)}
-                    className="mt-6 p-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-full shadow-lg shadow-indigo-600/20 active:scale-95 transition-all"
+                    className="mt-6 p-4 bg-indigo-500 hover:bg-indigo-400 text-white rounded-full shadow-lg shadow-indigo-500/20 active:scale-95 transition-all"
                   >
                     <Plus className="w-8 h-8" />
                   </button>
@@ -573,7 +573,7 @@ const GymManager: React.FC<GymManagerProps> = ({ workouts, setWorkouts, cardClas
               <div className="pt-4">
                 <button
                   onClick={handleAddOrEditExercise}
-                  className="w-full py-5 bg-indigo-600 hover:bg-indigo-500 text-white font-black rounded-2xl transition-all shadow-lg shadow-indigo-600/20 flex items-center justify-center gap-2"
+                  className="w-full py-5 bg-indigo-500 hover:bg-indigo-400 text-white font-black rounded-2xl transition-all shadow-lg shadow-indigo-500/20 flex items-center justify-center gap-2"
                 >
                   <Save className="w-5 h-5" />
                   {isEditMode ? 'Salvar Alterações' : 'Adicionar ao Treino'}

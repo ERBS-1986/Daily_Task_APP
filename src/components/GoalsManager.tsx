@@ -122,20 +122,20 @@ const GoalsManager: React.FC<GoalsManagerProps> = ({ goals, setGoals, cardClass,
           <div className="flex bg-slate-800/50 p-1 rounded-2xl border border-slate-700/50 mr-2">
             <button
               onClick={() => setActiveGoalTab('weekly')}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${activeGoalTab === 'weekly' ? 'bg-amber-500 text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${activeGoalTab === 'weekly' ? 'bg-amber-400 text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}
             >
               Semanal
             </button>
             <button
               onClick={() => setActiveGoalTab('monthly')}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${activeGoalTab === 'monthly' ? 'bg-amber-500 text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${activeGoalTab === 'monthly' ? 'bg-amber-400 text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}
             >
               Mensal
             </button>
           </div>
           <button
             onClick={() => setShowAddModal(true)}
-            className="px-5 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-2xl transition-all flex items-center gap-2 shadow-lg shadow-amber-500/5"
+            className="px-5 py-3 bg-indigo-500 hover:bg-indigo-400 text-white font-bold rounded-2xl transition-all flex items-center gap-2 shadow-lg shadow-amber-500/5"
           >
             <Plus className="w-5 h-5" />
             Nova Meta
@@ -265,7 +265,7 @@ const GoalsManager: React.FC<GoalsManagerProps> = ({ goals, setGoals, cardClass,
                 <button
                   onClick={handleAddGoal}
                   disabled={isSubmitting}
-                  className="flex-1 py-3 bg-amber-600 hover:bg-amber-500 disabled:opacity-50 text-white font-bold rounded-xl transition-colors flex items-center justify-center gap-2"
+                  className="flex-1 py-3 bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-white font-bold rounded-xl transition-colors flex items-center justify-center gap-2"
                 >
                   {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Salvar Meta'}
                 </button>

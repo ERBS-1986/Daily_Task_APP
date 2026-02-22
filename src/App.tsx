@@ -41,9 +41,9 @@ import { useToast } from './contexts/ToastContext';
 const THEMES: { id: AppTheme, name: string, bgClass: string, sidebarClass: string, cardClass: string, color: string }[] = [
   { id: 'lavender-light', name: 'Premium Lavender', bgClass: 'bg-premium-light', sidebarClass: 'bg-white/60', cardClass: 'bg-white/80', color: '#818CF8' },
   { id: 'default', name: 'Padrão Dark', bgClass: 'bg-premium-dark', sidebarClass: 'bg-slate-900/80', cardClass: 'bg-[#434B96]', color: '#6366f1' },
-  { id: 'red', name: 'Vermelho', bgClass: 'bg-red-600', sidebarClass: 'bg-black/40', cardClass: 'bg-red-700/50', color: '#f87171' },
-  { id: 'green', name: 'Verde', bgClass: 'bg-emerald-600', sidebarClass: 'bg-black/40', cardClass: 'bg-emerald-700/50', color: '#34d399' },
-  { id: 'blue', name: 'Azul', bgClass: 'bg-blue-600', sidebarClass: 'bg-black/40', cardClass: 'bg-blue-700/50', color: '#60a5fa' },
+  { id: 'red', name: 'Vermelho', bgClass: 'bg-red-400', sidebarClass: 'bg-black/20', cardClass: 'bg-red-500/30', color: '#fca5a5' },
+  { id: 'green', name: 'Verde', bgClass: 'bg-emerald-400', sidebarClass: 'bg-black/20', cardClass: 'bg-emerald-500/30', color: '#6ee7b7' },
+  { id: 'blue', name: 'Azul', bgClass: 'bg-blue-400', sidebarClass: 'bg-black/20', cardClass: 'bg-blue-500/30', color: '#93c5fd' },
 ];
 
 import { supabase } from './lib/supabase';

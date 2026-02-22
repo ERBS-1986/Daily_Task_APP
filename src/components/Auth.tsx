@@ -67,7 +67,7 @@ const Auth: React.FC = () => {
 
       <div className="w-full max-w-md relative z-10 animate-in fade-in zoom-in-95 duration-1000">
         <div className="text-center mb-10">
-          <div className="w-20 h-20 bg-indigo-600 rounded-[2rem] flex items-center justify-center shadow-[0_0_50px_-12px_rgba(79,70,229,0.8)] mx-auto mb-6 transform hover:rotate-6 transition-transform">
+          <div className="w-20 h-20 bg-indigo-500 rounded-[2rem] flex items-center justify-center shadow-[0_0_50px_-12px_rgba(79,70,229,0.5)] mx-auto mb-6 transform hover:rotate-6 transition-transform">
             <Calendar className="w-12 h-12 text-white" />
           </div>
           <h1 className="text-5xl font-black text-white tracking-tight drop-shadow-xl">Daily Task</h1>
@@ -150,7 +150,7 @@ const Auth: React.FC = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-black py-5 rounded-[1.5rem] shadow-[0_20px_50px_-15px_rgba(79,70,229,0.5)] transition-all flex items-center justify-center gap-3 mt-6 active:scale-95 border border-white/10"
+              className="w-full bg-indigo-500 hover:bg-indigo-400 disabled:opacity-50 text-white font-black py-5 rounded-[1.5rem] shadow-[0_20px_50px_-15px_rgba(79,70,229,0.4)] transition-all flex items-center justify-center gap-3 mt-6 active:scale-95 border border-white/10"
             >
               {isLoading ? (
                 <Loader2 className="w-6 h-6 animate-spin" />

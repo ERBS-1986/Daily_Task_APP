@@ -136,7 +136,7 @@ const Dashboard: React.FC<DashboardProps> = ({
           <p className="text-white/60 text-xs font-black uppercase tracking-[0.2em] mb-3 relative z-10">Tarefas de Hoje</p>
           <p className={`text-3xl font-black ${isLight ? 'text-slate-900' : 'text-white'} relative z-10`}>{completedTodayTasks}/{todayTasks.length}</p>
           <div className="mt-6 w-full bg-slate-100 dark:bg-white/5 h-3 rounded-full overflow-hidden relative z-10 p-0.5 border border-white/50">
-            <div className="bg-gradient-to-r from-emerald-400 to-emerald-600 h-full rounded-full transition-all duration-1000 shadow-lg shadow-emerald-500/50" style={{ width: `${taskProgress}%` }}></div>
+            <div className="bg-gradient-to-r from-emerald-300 to-emerald-500 h-full rounded-full transition-all duration-1000 shadow-lg shadow-emerald-400/50" style={{ width: `${taskProgress}%` }}></div>
           </div>
         </div>
 
@@ -164,7 +164,7 @@ const Dashboard: React.FC<DashboardProps> = ({
           <p className="text-slate-600 dark:text-slate-400 text-sm font-black uppercase tracking-widest mb-2 relative z-10">Hidratação</p>
           <p className={`text-3xl font-black ${isLight ? 'text-slate-900' : 'text-white'} relative z-10`}>{water.current}ml</p>
           <div className="mt-4 w-full bg-slate-100 dark:bg-white/5 h-3 rounded-full overflow-hidden relative z-10 p-0.5 border border-white/50">
-            <div className="bg-gradient-to-r from-sky-400 to-sky-600 h-full rounded-full transition-all duration-1000 shadow-lg shadow-sky-500/50" style={{ width: `${Math.min(waterProgress, 100)}%` }}></div>
+            <div className="bg-gradient-to-r from-sky-300 to-sky-500 h-full rounded-full transition-all duration-1000 shadow-lg shadow-sky-400/50" style={{ width: `${Math.min(waterProgress, 100)}%` }}></div>
           </div>
           <button
             onClick={() => onNavigate('water')}

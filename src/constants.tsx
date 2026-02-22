@@ -38,7 +38,7 @@ export const NAVIGATION = [
 ];
 
 export const PRIORITY_COLORS = {
-  LOW: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
-  MEDIUM: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
-  HIGH: 'bg-rose-500/20 text-rose-400 border-rose-500/30'
+  LOW: 'bg-emerald-400/20 text-emerald-300 border-emerald-400/30',
+  MEDIUM: 'bg-amber-400/20 text-amber-300 border-amber-400/30',
+  HIGH: 'bg-rose-400/20 text-rose-300 border-rose-400/30'
 };

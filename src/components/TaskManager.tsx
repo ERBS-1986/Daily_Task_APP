@@ -227,7 +227,7 @@ const TaskManager: React.FC<TaskManagerProps> = ({ tasks, setTasks, cardClass, i
           </select>
           <button
             onClick={() => { setEditingTask(null); setNewTitle(''); setNewDueDate(''); setNewDueTime(''); setShowAddModal(true); }}
-            className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-6 rounded-2xl transition-colors shadow-lg shadow-indigo-500/20"
+            className="flex items-center gap-2 px-6 py-3 bg-indigo-500 hover:bg-indigo-400 text-white rounded-xl transition-all font-bold text-sm shadow-lg shadow-indigo-500/20"
           >
             <Plus className="w-5 h-5" />
             Adicionar
@@ -385,7 +385,7 @@ const TaskManager: React.FC<TaskManagerProps> = ({ tasks, setTasks, cardClass, i
                 <button
                   onClick={handleAddTask}
                   disabled={isSubmitting}
-                  className="flex-1 py-3 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white font-bold rounded-xl transition-colors flex items-center justify-center gap-2"
+                  className="flex-1 py-3 bg-indigo-500 hover:bg-indigo-400 disabled:opacity-50 text-white font-bold rounded-xl transition-colors flex items-center justify-center gap-2"
                 >
                   {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Salvar'}
                 </button>
