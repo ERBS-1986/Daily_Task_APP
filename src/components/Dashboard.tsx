@@ -198,26 +198,32 @@ const Dashboard: React.FC<DashboardProps> = ({
           <div className="flex items-center justify-between mb-8 relative z-10">
             <div className="flex items-center gap-3">
               <div className="w-2 h-8 bg-indigo-500 rounded-full"></div>
-              <h3 className={`text-2xl font-black ${isLight ? 'text-slate-800' : 'text-white'}`}>Foco Imediato</h3>
+              <h3 className={`text-2xl font-black ${isLight ? 'text-slate-800' : 'text-white'}`}>Hábitos Ativos</h3>
             </div>
-            <button onClick={() => onNavigate('tasks')} className="text-xs font-black text-indigo-500 hover:text-indigo-600 uppercase tracking-widest bg-indigo-50 py-2 px-4 rounded-full transition-all">Ver Todas</button>
+            <button onClick={() => onNavigate('habits')} className="text-xs font-black text-indigo-500 hover:text-indigo-600 uppercase tracking-widest bg-indigo-50 py-2 px-4 rounded-full transition-all">Ver Todos</button>
           </div>
           <div className="space-y-4 flex-1 relative z-10">
-            {todayTasks.filter(t => !t.completed).slice(0, 4).map(task => (
-              <div key={task.id} className="flex items-center gap-5 p-4 rounded-2xl hover:bg-white/50 dark:hover:bg-white/10 transition-all group border border-transparent hover:border-white/50 cursor-pointer shadow-sm hover:shadow-md">
+            {habits.filter(h => h.lastCompleted !== todayDateLocal).slice(0, 4).map(habit => (
+              <div key={habit.id} className="flex items-center gap-5 p-4 rounded-2xl hover:bg-white/50 dark:hover:bg-white/10 transition-all group border border-transparent hover:border-white/50 cursor-pointer shadow-sm hover:shadow-md" onClick={() => onNavigate('habits')}>
                 <div className="w-6 h-6 rounded-full border-2 border-slate-300 dark:border-slate-700 flex items-center justify-center group-hover:border-indigo-500 transition-colors">
                   <div className="w-2 h-2 bg-indigo-500 rounded-full opacity-0 group-hover:opacity-100 scale-0 group-hover:scale-100 transition-all"></div>
                 </div>
-                <span className={`text-base font-black ${isLight ? 'text-slate-700' : 'text-white'} group-hover:text-indigo-600 transition-colors`}>{task.title}</span>
-                <ChevronRight className="ml-auto w-5 h-5 text-slate-300 group-hover:text-indigo-500 group-hover:translate-x-1 transition-all" />
+                <span className={`text-base font-black ${isLight ? 'text-slate-700' : 'text-white'} group-hover:text-indigo-600 transition-colors`}>{habit.title}</span>
+                <div className="ml-auto flex items-center gap-2">
+                  <div className="flex items-center gap-1 text-rose-500 bg-rose-500/10 px-2 py-0.5 rounded-full text-[10px] font-bold">
+                    <Flame className="w-3 h-3" />
+                    {habit.streak}
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-indigo-500 group-hover:translate-x-1 transition-all" />
+                </div>
               </div>
             ))}
-            {todayTasks.filter(t => !t.completed).length === 0 && (
+            {habits.filter(h => h.lastCompleted !== todayDateLocal).length === 0 && (
               <div className="text-center py-12">
                 <div className="w-20 h-20 bg-slate-50 dark:bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner">
-                  <CheckCircle2 className="w-10 h-10 text-slate-300" />
+                  <Flame className="w-10 h-10 text-slate-300" />
                 </div>
-                <p className="text-slate-400 font-bold italic">Sua lista está limpa! Aproveite o momento.</p>
+                <p className="text-slate-400 font-bold italic">Todos os hábitos concluídos! Parabéns pela consistência.</p>
               </div>
             )}
           </div>

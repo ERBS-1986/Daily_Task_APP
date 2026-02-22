@@ -41,9 +41,6 @@ import { useToast } from './contexts/ToastContext';
 const THEMES: { id: AppTheme, name: string, bgClass: string, sidebarClass: string, cardClass: string, color: string }[] = [
   { id: 'lavender-light', name: 'Lavanda', bgClass: 'bg-premium-light', sidebarClass: 'bg-white/60', cardClass: 'bg-white/80', color: '#818CF8' },
   { id: 'default', name: 'Blacknight', bgClass: 'bg-premium-dark', sidebarClass: 'bg-slate-900/80', cardClass: 'bg-[#434B96]', color: '#6366f1' },
-  { id: 'red', name: 'Vermelho', bgClass: 'bg-red-400', sidebarClass: 'bg-black/20', cardClass: 'bg-red-500/30', color: '#fca5a5' },
-  { id: 'green', name: 'Verde', bgClass: 'bg-emerald-400', sidebarClass: 'bg-black/20', cardClass: 'bg-emerald-500/30', color: '#6ee7b7' },
-  { id: 'blue', name: 'Azul', bgClass: 'bg-blue-400', sidebarClass: 'bg-black/20', cardClass: 'bg-blue-500/30', color: '#93c5fd' },
 ];
 
 import { supabase } from './lib/supabase';

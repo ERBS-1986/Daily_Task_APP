@@ -190,19 +190,22 @@ const WaterManager: React.FC<WaterManagerProps> = ({ water, setWater, cardClass,
               <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Meta AguaLife</label>
               <div className="space-y-6">
                 <div>
-                  <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Seu Peso (kg)</label>
-                  <div className="flex items-center gap-4 bg-slate-800/30 border border-slate-700/50 p-2 rounded-2xl">
-                    <button onClick={() => setWeight(Math.max(20, weight - 1))} className="p-3 hover:bg-slate-700/50 rounded-xl text-white transition-colors">
-                      <Minus className="w-5 h-5" />
+                  <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Seu Peso (KG)</label>
+                  <div className="flex items-center gap-4 bg-slate-400/50 border border-white/10 p-4 rounded-2xl">
+                    <button onClick={() => setWeight(Math.max(20, weight - 1))} className="p-1 hover:bg-black/10 rounded-lg text-white transition-colors">
+                      <Minus className="w-4 h-4" />
                     </button>
-                    <input
-                      type="number"
-                      value={weight}
-                      onChange={(e) => setWeight(Number(e.target.value))}
-                      className={`flex-1 bg-transparent text-center text-2xl font-black focus:outline-none ${isLight ? 'text-black' : 'text-white'}`}
-                    />
-                    <button onClick={() => setWeight(weight + 1)} className="p-3 hover:bg-slate-700/50 rounded-xl text-white transition-colors">
-                      <Plus className="w-5 h-5" />
+                    <div className="flex-1 flex items-center justify-center gap-2">
+                      <span className="text-white text-2xl font-medium opacity-50">—</span>
+                      <input
+                        type="number"
+                        value={weight}
+                        onChange={(e) => setWeight(Number(e.target.value))}
+                        className="w-16 bg-transparent text-center text-4xl font-black text-white focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      />
+                    </div>
+                    <button onClick={() => setWeight(weight + 1)} className="p-1 hover:bg-black/10 rounded-lg text-white transition-colors">
+                      <Plus className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
