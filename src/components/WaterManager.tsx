@@ -140,15 +140,7 @@ const WaterManager: React.FC<WaterManagerProps> = ({ water, setWater, cardClass,
     <div className="space-y-8 animate-in slide-in-from-top-4 duration-500">
       <div className="flex flex-col items-center text-center space-y-2 relative">
         <h2 className={`text-3xl font-black ${isLight ? 'text-slate-900' : 'text-white'}`}>Lembrete de Hidratação</h2>
-        <p className={`${isLight ? 'text-slate-600' : 'text-slate-400'} font-medium`}>Gerencie sua meta e alertas personalizados.</p>
-
-        <button
-          onClick={() => setIsConfiguring(true)}
-          className={`absolute right-0 top-0 p-3 border rounded-2xl transition-all shadow-lg ${isLight ? 'bg-white/50 border-white/20 text-indigo-500 hover:bg-white' : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-indigo-400'}`}
-          title="Configurações de Hidratação"
-        >
-          <Settings2 className="w-5 h-5" />
-        </button>
+        <p className={`${isLight ? 'text-slate-600' : 'text-slate-400'} font-medium`}>Gerencie sua meta e alertas personalizados abaixo.</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
@@ -175,7 +167,7 @@ const WaterManager: React.FC<WaterManagerProps> = ({ water, setWater, cardClass,
         </div>
 
         {/* Controls */}
-        <div className="space-y-6">
+        <div className="space-y-6 mt-8">
           <div className="grid grid-cols-2 gap-4">
             {[200, 350, 500, 1000].map(amount => (
               <button
@@ -193,210 +185,147 @@ const WaterManager: React.FC<WaterManagerProps> = ({ water, setWater, cardClass,
             ))}
           </div>
 
-          <div className="bg-slate-900/50 border border-slate-800 p-6 rounded-3xl flex items-start gap-4">
-            <Bell className={`w-6 h-6 shrink-0 ${water.remindersEnabled ? 'text-sky-400' : 'text-slate-600'}`} />
-            <div>
-              <p className="text-sm font-bold text-slate-200">
-                {water.remindersEnabled ? "Lembretes Ativos" : "Lembretes Silenciados"}
-              </p>
-              <p className="text-xs text-slate-500 leading-relaxed mt-1">
-                {water.reminderType === 'interval'
-                  ? `Notificações a cada ${water.reminderInterval} minutos.`
-                  : `Alertas nos horários: ${water.scheduledTimes?.join(', ') || 'nenhum'}.`}
-              </p>
-            </div>
-          </div>
-
-          <button
-            onClick={resetWater}
-            className="w-full py-4 text-slate-500 hover:text-rose-400 text-sm font-bold transition-colors"
-          >
-            Zerar contagem de hoje
-          </button>
-        </div>
-      </div>
-
-      {/* Advanced Configuration Modal */}
-      {isConfiguring && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-950/90 backdrop-blur-md" onClick={() => setIsConfiguring(false)}></div>
-          <div className={`relative w-full max-w-lg border shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh] backdrop-blur-[40px] rounded-[3rem] ${isLight ? 'bg-white/90 border-white/40' : 'bg-slate-900/90 border-slate-700/50'}`}>
-
-            {/* Modal Tabs */}
-            <div className="flex bg-slate-800/50 p-2 border-b border-slate-800">
-              <button
-                onClick={() => setActiveConfigTab('goal')}
-                className={`flex-1 py-3 px-4 rounded-2xl text-sm font-bold transition-all flex items-center justify-center gap-2 ${activeConfigTab === 'goal' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}
-              >
-                <Settings2 className="w-4 h-4" /> Meta AguaLife
-              </button>
-              <button
-                onClick={() => setActiveConfigTab('reminders')}
-                className={`flex-1 py-3 px-4 rounded-2xl text-sm font-bold transition-all flex items-center justify-center gap-2 ${activeConfigTab === 'reminders' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-400 hover:text-white'}`}
-              >
-                <Clock className="w-4 h-4" /> Lembretes
-              </button>
-            </div>
-
-            <div className="flex-1 overflow-y-auto p-8 space-y-6">
-              {activeConfigTab === 'goal' ? (
-                <div className="space-y-6 animate-in fade-in duration-300">
-                  <div>
-                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Seu Peso (kg)</label>
-                    <div className="flex items-center gap-4 bg-slate-800 border border-slate-700 p-2 rounded-2xl">
-                      <button onClick={() => setWeight(Math.max(20, weight - 1))} className="p-3 hover:bg-slate-700 rounded-xl text-white transition-colors">
-                        <Minus className="w-5 h-5" />
-                      </button>
-                      <input
-                        type="number"
-                        value={weight}
-                        onChange={(e) => setWeight(Number(e.target.value))}
-                        className="flex-1 bg-transparent text-center text-2xl font-black text-white focus:outline-none"
-                      />
-                      <button onClick={() => setWeight(weight + 1)} className="p-3 hover:bg-slate-700 rounded-xl text-white transition-colors">
-                        <Plus className="w-5 h-5" />
-                      </button>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Nível de Atividade</label>
-                    <div className="grid grid-cols-2 gap-3">
-                      {[
-                        { label: 'Sedentário', value: 30 },
-                        { label: 'Moderado', value: 35 },
-                        { label: 'Intenso', value: 40 },
-                        { label: 'Atleta', value: 45 }
-                      ].map((opt) => (
-                        <button
-                          key={opt.value}
-                          onClick={() => setActivity(opt.value)}
-                          className={`px-4 py-4 rounded-2xl text-xs font-bold transition-all border ${activity === opt.value ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg' : 'bg-slate-800 border-slate-700 text-slate-400'}`}
-                        >
-                          {opt.label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="p-6 bg-indigo-600/10 border border-indigo-500/20 rounded-3xl text-center">
-                    <p className="text-xs text-indigo-400 font-bold uppercase mb-1">Cálculo AguaLife</p>
-                    <p className="text-4xl font-black text-white">{weight * activity}ml <span className="text-sm font-medium text-slate-500">/ dia</span></p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className={`p-8 rounded-[2.5rem] border backdrop-blur-2xl shadow-xl ${cardClass || 'bg-slate-900 border-slate-800'} ${isLight ? 'border-white/50' : 'border-slate-800'}`}>
+              <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Meta AguaLife</label>
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Seu Peso (kg)</label>
+                  <div className="flex items-center gap-4 bg-slate-800/30 border border-slate-700/50 p-2 rounded-2xl">
+                    <button onClick={() => setWeight(Math.max(20, weight - 1))} className="p-3 hover:bg-slate-700/50 rounded-xl text-white transition-colors">
+                      <Minus className="w-5 h-5" />
+                    </button>
+                    <input
+                      type="number"
+                      value={weight}
+                      onChange={(e) => setWeight(Number(e.target.value))}
+                      className="flex-1 bg-transparent text-center text-2xl font-black text-white focus:outline-none"
+                    />
+                    <button onClick={() => setWeight(weight + 1)} className="p-3 hover:bg-slate-700/50 rounded-xl text-white transition-colors">
+                      <Plus className="w-5 h-5" />
+                    </button>
                   </div>
                 </div>
-              ) : (
+                <div>
+                  <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Nível de Atividade</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {[
+                      { label: 'Sedentário', value: 30 },
+                      { label: 'Moderado', value: 35 },
+                      { label: 'Intenso', value: 40 },
+                      { label: 'Atleta', value: 45 }
+                    ].map((opt) => (
+                      <button
+                        key={opt.value}
+                        onClick={() => setActivity(opt.value)}
+                        className={`px-3 py-3 rounded-xl text-[10px] font-black uppercase transition-all border ${activity === opt.value ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg' : 'bg-slate-800/30 border-slate-700/50 text-slate-500'}`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="p-4 bg-indigo-600/10 border border-indigo-500/20 rounded-2xl text-center">
+                  <p className="text-[10px] text-indigo-400 font-black uppercase mb-1">Cálculo AguaLife</p>
+                  <p className="text-3xl font-black text-white">{weight * activity}ml <span className="text-xs font-medium text-slate-500">/ dia</span></p>
+                </div>
+              </div>
+            </div>
+
+            <div className={`p-8 rounded-[2.5rem] border backdrop-blur-2xl shadow-xl ${cardClass || 'bg-slate-900 border-slate-800'} ${isLight ? 'border-white/50' : 'border-slate-800'}`}>
+              <div className="flex items-center justify-between mb-6">
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">Notificações</label>
+                <button
+                  onClick={() => setRemindersEnabled(!remindersEnabled)}
+                  className={`w-12 h-6 rounded-full transition-colors relative ${remindersEnabled ? 'bg-indigo-600' : 'bg-slate-700'}`}
+                >
+                  <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${remindersEnabled ? 'right-1' : 'left-1'}`}></div>
+                </button>
+              </div>
+
+              {remindersEnabled ? (
                 <div className="space-y-6 animate-in fade-in duration-300">
-                  <div className="flex items-center justify-between p-4 bg-slate-800/50 rounded-2xl border border-slate-700">
-                    <div className="flex items-center gap-3">
-                      <Bell className={`w-5 h-5 ${remindersEnabled ? 'text-indigo-400' : 'text-slate-500'}`} />
-                      <span className="font-bold text-slate-200">Ativar Notificações</span>
-                    </div>
+                  <div className="grid grid-cols-2 gap-2 bg-slate-800/30 p-1.5 rounded-2xl">
                     <button
-                      onClick={() => setRemindersEnabled(!remindersEnabled)}
-                      className={`w-12 h-6 rounded-full transition-colors relative ${remindersEnabled ? 'bg-indigo-600' : 'bg-slate-700'}`}
+                      onClick={() => setReminderType('interval')}
+                      className={`py-2.5 rounded-xl text-[10px] font-black uppercase transition-all flex items-center justify-center gap-2 ${reminderType === 'interval' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-500'}`}
                     >
-                      <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${remindersEnabled ? 'right-1' : 'left-1'}`}></div>
+                      <Clock className="w-3.5 h-3.5" /> Intervalo
+                    </button>
+                    <button
+                      onClick={() => setReminderType('scheduled')}
+                      className={`py-2.5 rounded-xl text-[10px] font-black uppercase transition-all flex items-center justify-center gap-2 ${reminderType === 'scheduled' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-500'}`}
+                    >
+                      <CalendarClock className="w-3.5 h-3.5" /> Fixos
                     </button>
                   </div>
 
-                  {remindersEnabled && (
-                    <div className="space-y-6">
-                      <div className={`p-3 grid grid-cols-2 gap-2 bg-slate-800/50 rounded-2xl border border-slate-700`}>
+                  {reminderType === 'interval' ? (
+                    <div className="space-y-3">
+                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest">A cada {interval} min</label>
+                      <input
+                        type="range"
+                        min="15" max="240" step="15"
+                        value={interval}
+                        onChange={(e) => setInterval(Number(e.target.value))}
+                        className="w-full accent-indigo-500 h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer"
+                      />
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      <div className="flex gap-2">
+                        <input
+                          type="time"
+                          value={newTime}
+                          onChange={(e) => setNewTime(e.target.value)}
+                          className="flex-1 bg-slate-800/50 border border-slate-700/50 rounded-xl px-3 py-2 text-sm text-white focus:outline-none"
+                        />
                         <button
-                          onClick={() => setReminderType('interval')}
-                          className={`flex-1 py-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${reminderType === 'interval' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-500'}`}
+                          onClick={addScheduledTime}
+                          className="px-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold text-[10px] uppercase transition-colors"
                         >
-                          <Clock className="w-4 h-4" /> Intervalo
-                        </button>
-                        <button
-                          onClick={() => setReminderType('scheduled')}
-                          className={`flex-1 py-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${reminderType === 'scheduled' ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-500'}`}
-                        >
-                          <CalendarClock className="w-4 h-4" /> Horários Fixos
+                          Add
                         </button>
                       </div>
-
-                      {reminderType === 'interval' ? (
-                        <div className="space-y-4">
-                          <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">A cada quantos minutos?</label>
-                          <div className="flex items-center gap-4">
-                            <input
-                              type="range"
-                              min="15" max="240" step="15"
-                              value={interval}
-                              onChange={(e) => setInterval(Number(e.target.value))}
-                              className="flex-1 accent-indigo-500"
-                            />
-                            <span className="w-20 text-center py-2 bg-slate-800 border border-slate-700 rounded-xl font-bold text-white">
-                              {interval} min
-                            </span>
+                      <div className="flex flex-wrap gap-1.5 max-h-[100px] overflow-y-auto no-scrollbar">
+                        {scheduledTimes.map(time => (
+                          <div key={time} className="flex items-center gap-1.5 bg-slate-800/50 border border-slate-700/50 px-2.5 py-1 rounded-full text-[10px] font-black text-white">
+                            {time}
+                            <button onClick={() => removeScheduledTime(time)} className="hover:text-rose-400">
+                              <X className="w-3 h-3" />
+                            </button>
                           </div>
-                          <p className="text-[10px] text-slate-500 text-center uppercase font-bold">Sugestão: 60 ou 90 minutos</p>
-                        </div>
-                      ) : (
-                        <>
-                          <div className="space-y-4">
-                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest px-1 flex items-center gap-2 mt-4">
-                              <Music className="w-4 h-4" /> Toque do Lembrete
-                            </label>
-                            <select
-                              value={notifSound}
-                              onChange={(e) => setNotifSound(e.target.value)}
-                              className="w-full px-4 py-3 bg-slate-800/50 border border-slate-700/50 rounded-2xl text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 transition-all font-medium"
-                            >
-                              <option value="default">Padrão Digital</option>
-                              <option value="soft">Suave e Calmo</option>
-                              <option value="energy">Energético</option>
-                              <option value="minimal">Minimalista</option>
-                            </select>
-                          </div>
-                          <div className="space-y-4">
-                            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">Seus Horários</label>
-                            <div className="flex gap-2">
-                              <input
-                                type="time"
-                                value={newTime}
-                                onChange={(e) => setNewTime(e.target.value)}
-                                className="flex-1 bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-white focus:outline-none"
-                              />
-                              <button
-                                onClick={addScheduledTime}
-                                className="px-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold text-xs transition-colors"
-                              >
-                                Adicionar
-                              </button>
-                            </div>
-                            <div className="flex flex-wrap gap-2">
-                              {scheduledTimes.map(time => (
-                                <div key={time} className="flex items-center gap-2 bg-slate-800 border border-slate-700 px-3 py-1.5 rounded-full text-xs text-white">
-                                  {time}
-                                  <button onClick={() => removeScheduledTime(time)} className="hover:text-rose-400">
-                                    <X className="w-3 h-3" />
-                                  </button>
-                                </div>
-                              ))}
-                              {scheduledTimes.length === 0 && <p className="text-xs text-slate-600 italic">Nenhum horário definido...</p>}
-                            </div>
-                          </div>
-                        </>
-                      )}
+                        ))}
+                      </div>
                     </div>
                   )}
                 </div>
+              ) : (
+                <div className="py-8 text-center bg-slate-800/10 border border-dashed border-slate-700/30 rounded-2xl">
+                  <Bell className="w-10 h-10 text-slate-700 mx-auto mb-2 opacity-50" />
+                  <p className="text-[10px] text-slate-600 font-black uppercase tracking-widest">Alertas Desativados</p>
+                </div>
               )}
             </div>
+          </div>
 
-            <div className="p-8 bg-slate-900 border-t border-slate-800">
-              <button
-                onClick={handleSaveAll}
-                className="w-full py-4 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-2xl transition-all shadow-lg shadow-indigo-600/20 flex items-center justify-center gap-2"
-              >
-                <Save className="w-5 h-5" />
-                Salvar Todas as Configurações
-              </button>
-            </div>
+          <div className="flex gap-4 items-center">
+            <button
+              onClick={handleSaveAll}
+              className="flex-1 py-5 bg-indigo-600 hover:bg-indigo-500 text-white font-black uppercase tracking-widest text-xs rounded-3xl transition-all shadow-xl shadow-indigo-600/20 active:scale-95 flex items-center justify-center gap-3"
+            >
+              <Save className="w-5 h-5" />
+              Salvar Configurações
+            </button>
+            <button
+              onClick={resetWater}
+              className="py-5 px-8 text-slate-500 hover:text-rose-400 text-[10px] font-black uppercase tracking-widest transition-colors border border-transparent hover:border-rose-400/20 rounded-3xl"
+            >
+              Zerar Hoje
+            </button>
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 };
