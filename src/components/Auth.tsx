@@ -71,7 +71,7 @@ const Auth: React.FC = () => {
             <Calendar className="w-12 h-12 text-white" />
           </div>
           <h1 className="text-5xl font-black text-white tracking-tight drop-shadow-xl">Daily Task</h1>
-          <p className="text-indigo-100/60 mt-4 font-medium text-lg tracking-wide">Sua jornada de alta performance começa aqui.</p>
+          <p className="text-white mt-4 font-medium text-lg tracking-wide">Sua jornada de alta performance começa aqui.</p>
         </div>
 
         <div className="bg-slate-900/40 backdrop-blur-[40px] border border-white/10 rounded-[3rem] shadow-[0_50px_100px_-20px_rgba(0,0,0,0.5)] overflow-hidden scale-105">
@@ -163,7 +163,7 @@ const Auth: React.FC = () => {
             </button>
           </form>
 
-          <p className="text-center pb-8 px-10 text-[10px] text-slate-500 font-bold uppercase tracking-widest leading-loose">
+          <p className="text-center pb-8 px-10 text-[10px] text-white/40 font-bold uppercase tracking-widest leading-loose">
             Termos de Serviço • Política de Privacidade
           </p>
         </div>

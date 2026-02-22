@@ -81,7 +81,7 @@ const Dashboard: React.FC<DashboardProps> = ({
               </div>
               <div>
                 <h3 className={`text-3xl font-black tracking-tight ${isLight ? 'text-slate-900' : 'text-white'}`}>Todas as Tarefas</h3>
-                <p className={`text-xs font-black uppercase tracking-[0.2em] ${isLight ? 'text-indigo-600' : 'text-indigo-400 opacity-80'}`}>Progresso Geral</p>
+                <p className={`text-xs font-black uppercase tracking-[0.2em] ${isLight ? 'text-indigo-600' : 'text-white/80'}`}>Progresso Geral</p>
               </div>
             </div>
 
@@ -112,7 +112,7 @@ const Dashboard: React.FC<DashboardProps> = ({
           <div className="hidden lg:flex w-64 h-64 bg-indigo-600/5 rounded-[3rem] border border-indigo-500/10 items-center justify-center relative">
             <div className="text-center">
               <p className={`text-6xl font-black ${isLight ? 'text-indigo-600' : 'text-indigo-400'}`}>{Math.round(taskProgress)}%</p>
-              <p className={`text-[10px] font-black uppercase tracking-widest mt-2 ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>Concluído</p>
+              <p className={`text-[10px] font-black uppercase tracking-widest mt-2 ${isLight ? 'text-slate-500' : 'text-white/60'}`}>Concluído</p>
             </div>
           </div>
         </div>
@@ -133,7 +133,7 @@ const Dashboard: React.FC<DashboardProps> = ({
               <TrendingUp className="w-6 h-6 text-emerald-500/40" />
             </div>
           </div>
-          <p className="text-slate-600 dark:text-slate-400 text-xs font-black uppercase tracking-[0.2em] mb-3 relative z-10">Tarefas de Hoje</p>
+          <p className="text-white/60 text-xs font-black uppercase tracking-[0.2em] mb-3 relative z-10">Tarefas de Hoje</p>
           <p className={`text-3xl font-black ${isLight ? 'text-slate-900' : 'text-white'} relative z-10`}>{completedTodayTasks}/{todayTasks.length}</p>
           <div className="mt-6 w-full bg-slate-100 dark:bg-white/5 h-3 rounded-full overflow-hidden relative z-10 p-0.5 border border-white/50">
             <div className="bg-gradient-to-r from-emerald-400 to-emerald-600 h-full rounded-full transition-all duration-1000 shadow-lg shadow-emerald-500/50" style={{ width: `${taskProgress}%` }}></div>
