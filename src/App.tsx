@@ -39,8 +39,8 @@ import { useToast } from './contexts/ToastContext';
 
 
 const THEMES: { id: AppTheme, name: string, bgClass: string, sidebarClass: string, cardClass: string, color: string }[] = [
-  { id: 'lavender-light', name: 'Premium Lavender', bgClass: 'bg-premium-light', sidebarClass: 'bg-white/60', cardClass: 'bg-white/80', color: '#818CF8' },
-  { id: 'default', name: 'Padrão Dark', bgClass: 'bg-premium-dark', sidebarClass: 'bg-slate-900/80', cardClass: 'bg-[#434B96]', color: '#6366f1' },
+  { id: 'lavender-light', name: 'Lavanda', bgClass: 'bg-premium-light', sidebarClass: 'bg-white/60', cardClass: 'bg-white/80', color: '#818CF8' },
+  { id: 'default', name: 'Blacknight', bgClass: 'bg-premium-dark', sidebarClass: 'bg-slate-900/80', cardClass: 'bg-[#434B96]', color: '#6366f1' },
   { id: 'red', name: 'Vermelho', bgClass: 'bg-red-400', sidebarClass: 'bg-black/20', cardClass: 'bg-red-500/30', color: '#fca5a5' },
   { id: 'green', name: 'Verde', bgClass: 'bg-emerald-400', sidebarClass: 'bg-black/20', cardClass: 'bg-emerald-500/30', color: '#6ee7b7' },
   { id: 'blue', name: 'Azul', bgClass: 'bg-blue-400', sidebarClass: 'bg-black/20', cardClass: 'bg-blue-500/30', color: '#93c5fd' },
@@ -295,8 +295,8 @@ const App: React.FC = () => {
                   <CalIcon className="w-8 h-8 text-white" />
                 </div>
                 <div>
-                  <h1 className={`text-2xl font-black tracking-tight leading-tight ${currentTheme === 'lavender-light' ? 'text-slate-900' : 'text-white'}`}>Daily Task</h1>
-                  <p className={`text-[10px] font-black uppercase tracking-[0.2em] ${currentTheme === 'lavender-light' ? 'text-indigo-600' : 'text-white'}`}>Produtividade</p>
+                  <h1 className={`text-2xl font-black tracking-tight leading-tight ${currentTheme === 'lavender-light' ? 'text-black' : 'text-white'}`}>Daily Task</h1>
+                  <p className={`text-[10px] font-black uppercase tracking-[0.2em] ${currentTheme === 'lavender-light' ? 'text-black/60' : 'text-white'}`}>Produtividade</p>
                 </div>
               </div>
             </div>
@@ -309,7 +309,7 @@ const App: React.FC = () => {
                 onClick={() => { setActiveTab(item.id); setIsSidebarOpen(false); }}
                 className={`w-full flex items-center gap-3 px-6 py-4 rounded-2xl transition-all duration-300 ${activeTab === item.id
                   ? 'bg-indigo-600 text-white shadow-xl shadow-indigo-600/20'
-                  : `font-bold ${currentTheme === 'lavender-light' ? 'text-slate-700 hover:bg-indigo-50 hover:text-indigo-600' : 'text-slate-400 hover:bg-white/5 hover:text-white'}`}`}
+                  : `font-bold ${currentTheme === 'lavender-light' ? 'text-black hover:bg-indigo-50 hover:text-indigo-600' : 'text-slate-400 hover:bg-white/5 hover:text-white'}`}`}
               >
                 <div className={`transition-all duration-300 ${activeTab === item.id ? 'scale-110' : ''}`}>
                   {React.cloneElement(item.icon as React.ReactElement, {
@@ -325,7 +325,7 @@ const App: React.FC = () => {
           <div className="p-4 border-t border-black/5">
             <button
               onClick={handleLogout}
-              className="flex items-center gap-3 px-5 py-4 text-slate-400 hover:text-rose-500 w-full rounded-2xl hover:bg-rose-500/5 transition-all group font-bold text-sm"
+              className={`flex items-center gap-3 px-5 py-4 w-full rounded-2xl transition-all group font-bold text-sm ${currentTheme === 'lavender-light' ? 'text-black hover:bg-rose-500/5 hover:text-rose-500' : 'text-slate-400 hover:text-rose-500 hover:bg-rose-500/5'}`}
             >
               <LogOut className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
               <span>Sair da Conta</span>
@@ -424,8 +424,8 @@ const App: React.FC = () => {
                   className={`flex items-center gap-3 p-1.5 pl-3 rounded-2xl transition-all border ${isProfileMenuOpen ? 'bg-indigo-600/20 border-indigo-500/50' : 'hover:bg-white/5 border-transparent'}`}
                 >
                   <div className="hidden md:block text-right">
-                    <p className="text-sm font-bold text-slate-200">{user.name}</p>
-                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">{user.plan} Plan</p>
+                    <p className={`text-sm font-bold ${currentTheme === 'lavender-light' ? 'text-black' : 'text-white'}`}>{user.name}</p>
+                    <p className={`text-[10px] font-bold uppercase tracking-wider ${currentTheme === 'lavender-light' ? 'text-black/60' : 'text-white/60'}`}>{user.plan} Plan</p>
                   </div>
                   <div className="relative">
                     <img src={user.avatar} alt="Avatar" className="w-10 h-10 md:w-11 md:h-11 rounded-xl border-2 border-indigo-500/30 shadow-lg object-cover scale-[1.1]" />

@@ -80,8 +80,8 @@ const Dashboard: React.FC<DashboardProps> = ({
                 <CheckCircle2 className="w-8 h-8 text-white" />
               </div>
               <div>
-                <h3 className={`text-3xl font-black tracking-tight ${isLight ? 'text-slate-900' : 'text-white'}`}>Todas as Tarefas</h3>
-                <p className={`text-xs font-black uppercase tracking-[0.2em] ${isLight ? 'text-indigo-600' : 'text-white/80'}`}>Progresso Geral</p>
+                <h3 className={`text-3xl font-black tracking-tight ${isLight ? 'text-black' : 'text-white'}`}>Todas as Tarefas</h3>
+                <p className={`text-xs font-black uppercase tracking-[0.2em] ${isLight ? 'text-black/60' : 'text-white/80'}`}>Progresso Geral</p>
               </div>
             </div>
 
@@ -95,7 +95,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                 ))
               ) : (
                 <div className="col-span-2 py-8 px-8 bg-indigo-500/5 rounded-[2rem] border border-dashed border-indigo-500/20 text-center">
-                  <p className={`font-bold italic ${isLight ? 'text-indigo-600' : 'text-indigo-400'}`}>Tudo em ordem por hoje!</p>
+                  <p className={`font-bold italic ${isLight ? 'text-black/40' : 'text-white'}`}>Tudo em ordem por hoje!</p>
                 </div>
               )}
             </div>
@@ -111,8 +111,8 @@ const Dashboard: React.FC<DashboardProps> = ({
 
           <div className="hidden lg:flex w-64 h-64 bg-indigo-600/5 rounded-[3rem] border border-indigo-500/10 items-center justify-center relative">
             <div className="text-center">
-              <p className={`text-6xl font-black ${isLight ? 'text-indigo-600' : 'text-indigo-400'}`}>{Math.round(taskProgress)}%</p>
-              <p className={`text-[10px] font-black uppercase tracking-widest mt-2 ${isLight ? 'text-slate-500' : 'text-white/60'}`}>Concluído</p>
+              <p className={`text-6xl font-black ${isLight ? 'text-black' : 'text-white'}`}>{Math.round(taskProgress)}%</p>
+              <p className={`text-[10px] font-black uppercase tracking-widest mt-2 ${isLight ? 'text-black/40' : 'text-white/60'}`}>Concluído</p>
             </div>
           </div>
         </div>
@@ -133,8 +133,8 @@ const Dashboard: React.FC<DashboardProps> = ({
               <TrendingUp className="w-6 h-6 text-emerald-500/40" />
             </div>
           </div>
-          <p className="text-white/60 text-xs font-black uppercase tracking-[0.2em] mb-3 relative z-10">Tarefas de Hoje</p>
-          <p className={`text-3xl font-black ${isLight ? 'text-slate-900' : 'text-white'} relative z-10`}>{completedTodayTasks}/{todayTasks.length}</p>
+          <p className={`${isLight ? 'text-black/60' : 'text-white/60'} text-xs font-black uppercase tracking-[0.2em] mb-3 relative z-10`}>Tarefas de Hoje</p>
+          <p className={`text-3xl font-black ${isLight ? 'text-black' : 'text-white'} relative z-10`}>{completedTodayTasks}/{todayTasks.length}</p>
           <div className="mt-6 w-full bg-slate-100 dark:bg-white/5 h-3 rounded-full overflow-hidden relative z-10 p-0.5 border border-white/50">
             <div className="bg-gradient-to-r from-emerald-300 to-emerald-500 h-full rounded-full transition-all duration-1000 shadow-lg shadow-emerald-400/50" style={{ width: `${taskProgress}%` }}></div>
           </div>
@@ -147,8 +147,8 @@ const Dashboard: React.FC<DashboardProps> = ({
               <Dumbbell className="w-7 h-7 text-indigo-500" />
             </div>
           </div>
-          <p className="text-slate-600 dark:text-slate-400 text-xs font-black uppercase tracking-[0.2em] mb-3 relative z-10">Treino de Hoje</p>
-          <p className={`text-2xl font-black ${isLight ? 'text-slate-900' : 'text-white'} line-clamp-1 relative z-10`}>{todayWorkout?.focus || 'Descanso'}</p>
+          <p className={`${isLight ? 'text-black/60' : 'text-slate-400 dark:text-slate-400'} text-xs font-black uppercase tracking-[0.2em] mb-3 relative z-10`}>Treino de Hoje</p>
+          <p className={`text-2xl font-black ${isLight ? 'text-black' : 'text-white'} line-clamp-1 relative z-10`}>{todayWorkout?.focus || 'Descanso'}</p>
           <button onClick={() => onNavigate('gym')} className={`mt-6 text-xs font-black flex items-center gap-2 hover:translate-x-1 transition-all relative z-10 group ${isLight ? 'text-indigo-600' : 'text-indigo-400'}`}>
             ACESSAR TREINO <ArrowUpRight className="w-4 h-4 group-hover:-translate-y-1 transition-transform" />
           </button>
@@ -161,8 +161,8 @@ const Dashboard: React.FC<DashboardProps> = ({
               <Droplet className="w-7 h-7 text-sky-500" />
             </div>
           </div>
-          <p className="text-slate-600 dark:text-slate-400 text-sm font-black uppercase tracking-widest mb-2 relative z-10">Hidratação</p>
-          <p className={`text-3xl font-black ${isLight ? 'text-slate-900' : 'text-white'} relative z-10`}>{water.current}ml</p>
+          <p className={`${isLight ? 'text-black/60' : 'text-slate-400 dark:text-slate-400'} text-sm font-black uppercase tracking-widest mb-2 relative z-10`}>Hidratação</p>
+          <p className={`text-3xl font-black ${isLight ? 'text-black' : 'text-white'} relative z-10`}>{water.current}ml</p>
           <div className="mt-4 w-full bg-slate-100 dark:bg-white/5 h-3 rounded-full overflow-hidden relative z-10 p-0.5 border border-white/50">
             <div className="bg-gradient-to-r from-sky-300 to-sky-500 h-full rounded-full transition-all duration-1000 shadow-lg shadow-sky-400/50" style={{ width: `${Math.min(waterProgress, 100)}%` }}></div>
           </div>
@@ -181,8 +181,8 @@ const Dashboard: React.FC<DashboardProps> = ({
               <Trophy className="w-7 h-7 text-amber-500" />
             </div>
           </div>
-          <p className="text-slate-600 dark:text-slate-400 text-xs font-black uppercase tracking-[0.2em] mb-3 relative z-10">Metas Ativas</p>
-          <p className={`text-3xl font-black ${isLight ? 'text-slate-900' : 'text-white'} relative z-10`}>{goals.length}</p>
+          <p className={`${isLight ? 'text-black/60' : 'text-slate-400 dark:text-slate-400'} text-xs font-black uppercase tracking-[0.2em] mb-3 relative z-10`}>Metas Ativas</p>
+          <p className={`text-3xl font-black ${isLight ? 'text-black' : 'text-white'} relative z-10`}>{goals.length}</p>
           <button
             onClick={() => onNavigate('goals')}
             className={`mt-6 text-xs font-black flex items-center gap-2 hover:translate-x-1 transition-all relative z-10 group ${isLight ? 'text-amber-600' : 'text-amber-400'}`}
