@@ -139,8 +139,8 @@ const WaterManager: React.FC<WaterManagerProps> = ({ water, setWater, cardClass,
   return (
     <div className="space-y-8 animate-in slide-in-from-top-4 duration-500">
       <div className="flex flex-col items-center text-center space-y-2 relative">
-        <h2 className={`text-3xl font-black ${isLight ? 'text-slate-900' : 'text-white'}`}>Lembrete de Hidratação</h2>
-        <p className={`${isLight ? 'text-slate-600' : 'text-slate-400'} font-medium`}>Gerencie sua meta e alertas personalizados abaixo.</p>
+        <h2 className={`text-3xl font-black ${isLight ? 'text-black' : 'text-white'}`}>Lembrete de Hidratação</h2>
+        <p className={`${isLight ? 'text-black/60' : 'text-white/60'} font-medium`}>Gerencie sua meta e alertas personalizados abaixo.</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
@@ -155,8 +155,8 @@ const WaterManager: React.FC<WaterManagerProps> = ({ water, setWater, cardClass,
             </div>
 
             <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
-              <span className={`text-5xl font-black drop-shadow-md group-hover:scale-110 transition-transform ${isLight ? 'text-slate-900' : 'text-white'}`}>{Math.round(percentage)}%</span>
-              <span className={`font-black uppercase tracking-widest text-[10px] mt-1 ${isLight ? 'text-slate-600' : 'text-slate-300'}`}>{water.current} / {water.target}ml</span>
+              <span className={`text-5xl font-black drop-shadow-md group-hover:scale-110 transition-transform ${isLight ? 'text-black' : 'text-white'}`}>{Math.round(percentage)}%</span>
+              <span className={`font-black uppercase tracking-widest text-[10px] mt-1 ${isLight ? 'text-black/60' : 'text-white'}`}>{water.current} / {water.target}ml</span>
               {percentage < 100 && (
                 <div className="mt-4 flex items-center gap-1 text-[10px] text-white/50 uppercase font-bold tracking-widest bg-black/20 px-3 py-1 rounded-full">
                   <Plus className="w-3 h-3" /> Toque para +250ml
@@ -177,8 +177,8 @@ const WaterManager: React.FC<WaterManagerProps> = ({ water, setWater, cardClass,
               >
                 <div className="relative z-10">
                   <Plus className="w-5 h-5 text-sky-500 mb-2 group-hover:scale-125 transition-transform" />
-                  <span className={`block text-xl font-black ${isLight ? 'text-slate-900' : 'text-white'}`}>{amount}ml</span>
-                  <span className={`text-[10px] uppercase tracking-widest font-black ${isLight ? 'text-slate-400' : 'text-slate-500'}`}>Adicionar</span>
+                  <span className={`block text-xl font-black ${isLight ? 'text-black' : 'text-white'}`}>{amount}ml</span>
+                  <span className={`text-[10px] uppercase tracking-widest font-black ${isLight ? 'text-black/40' : 'text-white/40'}`}>Adicionar</span>
                 </div>
                 <div className="absolute bottom-0 left-0 w-full h-1 bg-sky-500/0 group-hover:bg-sky-500/50 transition-all"></div>
               </button>
@@ -199,7 +199,7 @@ const WaterManager: React.FC<WaterManagerProps> = ({ water, setWater, cardClass,
                       type="number"
                       value={weight}
                       onChange={(e) => setWeight(Number(e.target.value))}
-                      className="flex-1 bg-transparent text-center text-2xl font-black text-white focus:outline-none"
+                      className={`flex-1 bg-transparent text-center text-2xl font-black focus:outline-none ${isLight ? 'text-black' : 'text-white'}`}
                     />
                     <button onClick={() => setWeight(weight + 1)} className="p-3 hover:bg-slate-700/50 rounded-xl text-white transition-colors">
                       <Plus className="w-5 h-5" />
@@ -227,7 +227,7 @@ const WaterManager: React.FC<WaterManagerProps> = ({ water, setWater, cardClass,
                 </div>
                 <div className="p-4 bg-indigo-600/10 border border-indigo-500/20 rounded-2xl text-center">
                   <p className="text-[10px] text-indigo-400 font-black uppercase mb-1">Cálculo AguaLife</p>
-                  <p className="text-3xl font-black text-white">{weight * activity}ml <span className="text-xs font-medium text-slate-500">/ dia</span></p>
+                  <p className={`text-3xl font-black ${isLight ? 'text-black' : 'text-white'}`}>{weight * activity}ml <span className="text-xs font-medium text-slate-500">/ dia</span></p>
                 </div>
               </div>
             </div>
@@ -278,7 +278,7 @@ const WaterManager: React.FC<WaterManagerProps> = ({ water, setWater, cardClass,
                           type="time"
                           value={newTime}
                           onChange={(e) => setNewTime(e.target.value)}
-                          className="flex-1 bg-slate-800/50 border border-slate-700/50 rounded-xl px-3 py-2 text-sm text-white focus:outline-none"
+                          className={`flex-1 bg-slate-800/50 border border-slate-700/50 rounded-xl px-3 py-2 text-sm focus:outline-none ${isLight ? 'text-black' : 'text-white'}`}
                         />
                         <button
                           onClick={addScheduledTime}
@@ -289,7 +289,7 @@ const WaterManager: React.FC<WaterManagerProps> = ({ water, setWater, cardClass,
                       </div>
                       <div className="flex flex-wrap gap-1.5 max-h-[100px] overflow-y-auto no-scrollbar">
                         {scheduledTimes.map(time => (
-                          <div key={time} className="flex items-center gap-1.5 bg-slate-800/50 border border-slate-700/50 px-2.5 py-1 rounded-full text-[10px] font-black text-white">
+                          <div key={time} className={`flex items-center gap-1.5 bg-slate-800/50 border border-slate-700/50 px-2.5 py-1 rounded-full text-[10px] font-black ${isLight ? 'text-black' : 'text-white'}`}>
                             {time}
                             <button onClick={() => removeScheduledTime(time)} className="hover:text-rose-400">
                               <X className="w-3 h-3" />

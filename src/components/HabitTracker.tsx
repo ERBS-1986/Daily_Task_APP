@@ -129,8 +129,8 @@ const HabitTracker: React.FC<HabitTrackerProps> = ({ habits, setHabits, cardClas
     <div className="space-y-8 animate-in slide-in-from-right-4 duration-500">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className={`text-2xl font-bold ${isLight ? 'text-slate-900' : 'text-white'}`}>Hábitos Ativos</h2>
-          <p className={`${isLight ? 'text-slate-600' : 'text-slate-400'} text-sm`}>Consistência é a chave para o sucesso.</p>
+          <h2 className={`text-2xl font-bold ${isLight ? 'text-black' : 'text-white'}`}>Hábitos Ativos</h2>
+          <p className={`${isLight ? 'text-black/60' : 'text-white/60'} text-sm`}>Consistência é a chave para o sucesso.</p>
         </div>
         <button
           onClick={() => setShowAddModal(true)}
@@ -162,8 +162,8 @@ const HabitTracker: React.FC<HabitTrackerProps> = ({ habits, setHabits, cardClas
                     <TrendingUp className="w-6 h-6" />
                   </div>
                   <div>
-                    <h4 className={`font-black text-lg ${isLight ? 'text-slate-900' : 'text-slate-100'}`}>{habit.title}</h4>
-                    <p className={`text-xs uppercase font-black tracking-widest ${isLight ? 'text-indigo-600/60' : 'text-slate-500'}`}>{habit.frequency}</p>
+                    <h4 className={`font-black text-lg ${isLight ? 'text-black' : 'text-white'}`}>{habit.title}</h4>
+                    <p className={`text-xs uppercase font-black tracking-widest ${isLight ? 'text-indigo-600/60' : 'text-white/40'}`}>{habit.frequency}</p>
                   </div>
                 </div>
 

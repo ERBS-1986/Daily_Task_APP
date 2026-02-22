@@ -17,9 +17,10 @@ interface GymManagerProps {
   setWorkouts: React.Dispatch<React.SetStateAction<DailyWorkout[]>>;
   cardClass?: string;
   isLight?: boolean;
+  themeId?: string;
 }
 
-const GymManager: React.FC<GymManagerProps> = ({ workouts, setWorkouts, cardClass, isLight }) => {
+const GymManager: React.FC<GymManagerProps> = ({ workouts, setWorkouts, cardClass, isLight, themeId }) => {
   const { user } = useAuth();
   const { showToast } = useToast();
   const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
@@ -357,7 +358,7 @@ const GymManager: React.FC<GymManagerProps> = ({ workouts, setWorkouts, cardClas
                 </button>
                 <div className="text-right ml-4">
                   <p className="text-xs text-slate-500 font-bold uppercase">Progresso</p>
-                  <p className={`text-xl font-black ${document.documentElement.classList.contains('dark') ? 'text-black' : (isLight ? 'text-indigo-600' : 'text-white')}`}>{Math.round(progress)}%</p>
+                  <p className={`text-xl font-black ${isLight ? 'text-black' : 'text-white'}`}>{Math.round(progress)}%</p>
                 </div>
               </div>
             </div>
@@ -396,8 +397,8 @@ const GymManager: React.FC<GymManagerProps> = ({ workouts, setWorkouts, cardClas
                         onChange={() => toggleExerciseComplete(ex.id, ex.completed)}
                       />
                       <div>
-                        <h5 className={`font-bold transition-colors ${ex.completed ? 'text-slate-500 line-through' : (document.documentElement.classList.contains('dark') ? 'text-black' : 'text-slate-100')}`}>{ex.name}</h5>
-                        <p className={`text-xs font-medium ${document.documentElement.classList.contains('dark') ? 'text-black/60' : 'text-slate-500'}`}>{ex.sets} séries • {ex.reps} reps {ex.weight && `• ${ex.weight}kg`}</p>
+                        <h5 className={`font-bold transition-colors ${ex.completed ? 'text-slate-500 line-through' : (isLight ? 'text-black' : 'text-slate-100')}`}>{ex.name}</h5>
+                        <p className={`text-xs font-medium ${isLight ? 'text-black/60' : 'text-slate-500'}`}>{ex.sets} séries • {ex.reps} reps {ex.weight && `• ${ex.weight}kg`}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
@@ -493,8 +494,8 @@ const GymManager: React.FC<GymManagerProps> = ({ workouts, setWorkouts, cardClas
                 workouts.filter(w => w.day < selectedDate && w.exercises.length > 0).sort((a, b) => b.day.localeCompare(a.day)).map(w => (
                   <div key={w.day} className="p-4 bg-white/5 rounded-2xl border border-white/5 hover:bg-white/10 transition-all cursor-pointer" onClick={() => setSelectedDate(w.day)}>
                     <p className="text-[10px] text-indigo-400 font-bold uppercase mb-1">{new Date(w.day).toLocaleDateString('pt-BR')}</p>
-                    <p className={`text-sm font-bold ${document.documentElement.classList.contains('dark') ? 'text-black' : 'text-slate-200'}`}>{w.focus}</p>
-                    <p className={`text-[10px] mt-1 ${document.documentElement.classList.contains('dark') ? 'text-black/60' : 'text-slate-500'}`}>{w.exercises.filter(e => e.completed).length}/{w.exercises.length} concluídos</p>
+                    <p className={`text-sm font-bold ${isLight ? 'text-black' : 'text-slate-200'}`}>{w.focus}</p>
+                    <p className={`text-[10px] mt-1 ${isLight ? 'text-black/60' : 'text-slate-500'}`}>{w.exercises.filter(e => e.completed).length}/{w.exercises.length} concluídos</p>
                   </div>
                 ))
               ) : (

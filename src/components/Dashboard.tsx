@@ -147,7 +147,7 @@ const Dashboard: React.FC<DashboardProps> = ({
               <Dumbbell className="w-7 h-7 text-indigo-500" />
             </div>
           </div>
-          <p className={`${isLight ? 'text-black/60' : 'text-slate-400 dark:text-slate-400'} text-xs font-black uppercase tracking-[0.2em] mb-3 relative z-10`}>Treino de Hoje</p>
+          <p className={`${isLight ? 'text-black/60' : 'text-white/60'} text-xs font-black uppercase tracking-[0.2em] mb-3 relative z-10`}>Treino de Hoje</p>
           <p className={`text-2xl font-black ${isLight ? 'text-black' : 'text-white'} line-clamp-1 relative z-10`}>{todayWorkout?.focus || 'Descanso'}</p>
           <button onClick={() => onNavigate('gym')} className={`mt-6 text-xs font-black flex items-center gap-2 hover:translate-x-1 transition-all relative z-10 group ${isLight ? 'text-indigo-600' : 'text-indigo-400'}`}>
             ACESSAR TREINO <ArrowUpRight className="w-4 h-4 group-hover:-translate-y-1 transition-transform" />
@@ -161,7 +161,7 @@ const Dashboard: React.FC<DashboardProps> = ({
               <Droplet className="w-7 h-7 text-sky-500" />
             </div>
           </div>
-          <p className={`${isLight ? 'text-black/60' : 'text-slate-400 dark:text-slate-400'} text-sm font-black uppercase tracking-widest mb-2 relative z-10`}>Hidratação</p>
+          <p className={`${isLight ? 'text-black/60' : 'text-white/60'} text-sm font-black uppercase tracking-widest mb-2 relative z-10`}>Hidratação</p>
           <p className={`text-3xl font-black ${isLight ? 'text-black' : 'text-white'} relative z-10`}>{water.current}ml</p>
           <div className="mt-4 w-full bg-slate-100 dark:bg-white/5 h-3 rounded-full overflow-hidden relative z-10 p-0.5 border border-white/50">
             <div className="bg-gradient-to-r from-sky-300 to-sky-500 h-full rounded-full transition-all duration-1000 shadow-lg shadow-sky-400/50" style={{ width: `${Math.min(waterProgress, 100)}%` }}></div>
@@ -181,7 +181,7 @@ const Dashboard: React.FC<DashboardProps> = ({
               <Trophy className="w-7 h-7 text-amber-500" />
             </div>
           </div>
-          <p className={`${isLight ? 'text-black/60' : 'text-slate-400 dark:text-slate-400'} text-xs font-black uppercase tracking-[0.2em] mb-3 relative z-10`}>Metas Ativas</p>
+          <p className={`${isLight ? 'text-black/60' : 'text-white/60'} text-xs font-black uppercase tracking-[0.2em] mb-3 relative z-10`}>Metas Ativas</p>
           <p className={`text-3xl font-black ${isLight ? 'text-black' : 'text-white'} relative z-10`}>{goals.length}</p>
           <button
             onClick={() => onNavigate('goals')}
@@ -208,7 +208,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                 <div className="w-6 h-6 rounded-full border-2 border-slate-300 dark:border-slate-700 flex items-center justify-center group-hover:border-indigo-500 transition-colors">
                   <div className="w-2 h-2 bg-indigo-500 rounded-full opacity-0 group-hover:opacity-100 scale-0 group-hover:scale-100 transition-all"></div>
                 </div>
-                <span className={`text-base font-black ${isLight ? 'text-slate-700' : 'text-slate-200'} group-hover:text-indigo-600 transition-colors`}>{task.title}</span>
+                <span className={`text-base font-black ${isLight ? 'text-slate-700' : 'text-white'} group-hover:text-indigo-600 transition-colors`}>{task.title}</span>
                 <ChevronRight className="ml-auto w-5 h-5 text-slate-300 group-hover:text-indigo-500 group-hover:translate-x-1 transition-all" />
               </div>
             ))}

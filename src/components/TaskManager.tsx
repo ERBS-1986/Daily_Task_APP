@@ -255,7 +255,7 @@ const TaskManager: React.FC<TaskManagerProps> = ({ tasks, setTasks, cardClass, i
               />
 
               <div className="flex flex-col">
-                <span className={`font-black ${task.completed ? 'line-through text-slate-500' : (isLight ? 'text-slate-900' : 'text-slate-100')}`}>
+                <span className={`font-black ${task.completed ? 'line-through text-slate-500' : (isLight ? 'text-black' : 'text-white')}`}>
                   {task.title}
                 </span>
                 <div className="flex flex-wrap items-center gap-2 mt-1">

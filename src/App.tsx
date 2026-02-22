@@ -264,7 +264,7 @@ const App: React.FC = () => {
       case 'habits': return <HabitTracker {...commonProps} habits={habits} setHabits={setHabits} />;
       case 'goals': return <GoalsManager {...commonProps} goals={goals} setGoals={setGoals} />;
       case 'water': return <WaterManager {...commonProps} water={water} setWater={setWater} />;
-      case 'gym': return <GymManager {...commonProps} workouts={workouts} setWorkouts={setWorkouts} />;
+      case 'gym': return <GymManager {...commonProps} workouts={workouts} setWorkouts={setWorkouts} themeId={currentTheme} />;
       case 'focus': return <FocusMode {...commonProps} tasks={tasks} isGlobalFocusActive={isFocusActive} setIsGlobalFocusActive={setIsFocusActive} />;
       default: return <Dashboard {...commonProps} tasks={tasks} habits={habits} goals={goals} water={water} workouts={workouts} onNavigate={setActiveTab} />;
     }
