@@ -2,40 +2,47 @@
 import React, { useState, useEffect } from 'react';
 import { Droplet, Plus, Minus, Info, Settings2, Save, X, Clock, Bell, CalendarClock, Trash2, Music } from 'lucide-react';
 import { WaterIntake } from '../types';
-
-interface WaterManagerProps {
-  water: WaterIntake;
-  setWater: React.Dispatch<React.SetStateAction<WaterIntake>>;
-}
-
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
-
-// ... (imports)
 
 interface WaterManagerProps {
   water: WaterIntake;
   setWater: React.Dispatch<React.SetStateAction<WaterIntake>>;
   cardClass?: string;
   isLight?: boolean;
+  initialWeight?: number;
+  initialActivity?: number;
+  initialReminders?: { enabled: boolean; type: string; interval: number; scheduledTimes: string[] };
 }
 
-const WaterManager: React.FC<WaterManagerProps> = ({ water, setWater, cardClass, isLight }) => {
+const WaterManager: React.FC<WaterManagerProps> = ({ water, setWater, cardClass, isLight, initialWeight, initialActivity, initialReminders }) => {
   const { user } = useAuth();
   const [isConfiguring, setIsConfiguring] = useState(false);
   const [activeConfigTab, setActiveConfigTab] = useState<'goal' | 'reminders'>('goal');
 
-  // Local state for editing goal
-  const [weight, setWeight] = useState<number>(70);
-  const [activity, setActivity] = useState<number>(35);
+  // Local state for editing goal - initialized from profile data
+  const [weight, setWeight] = useState<number>(initialWeight || 70);
+  const [activity, setActivity] = useState<number>(initialActivity || 35);
 
-  // Local state for editing reminders
-  const [remindersEnabled, setRemindersEnabled] = useState(water.remindersEnabled);
-  const [reminderType, setReminderType] = useState(water.reminderType);
-  const [interval, setInterval] = useState(water.reminderInterval || 60);
-  const [scheduledTimes, setScheduledTimes] = useState<string[]>(water.scheduledTimes || []);
+  // Local state for editing reminders - initialized from profile data
+  const [remindersEnabled, setRemindersEnabled] = useState(initialReminders?.enabled ?? true);
+  const [reminderType, setReminderType] = useState(initialReminders?.type || 'interval');
+  const [interval, setInterval] = useState(initialReminders?.interval || 60);
+  const [scheduledTimes, setScheduledTimes] = useState<string[]>(initialReminders?.scheduledTimes || []);
   const [newTime, setNewTime] = useState('08:00');
   const [notifSound, setNotifSound] = useState(() => localStorage.getItem('ff_water_sound') || 'default');
+
+  // Sync local state when props change (e.g., after data is loaded from Supabase)
+  useEffect(() => {
+    if (initialWeight) setWeight(initialWeight);
+    if (initialActivity) setActivity(initialActivity);
+    if (initialReminders) {
+      setRemindersEnabled(initialReminders.enabled ?? true);
+      setReminderType(initialReminders.type || 'interval');
+      setInterval(initialReminders.interval || 60);
+      setScheduledTimes(initialReminders.scheduledTimes || []);
+    }
+  }, [initialWeight, initialActivity, initialReminders]);
 
   const updateWaterInDb = async (newWaterData: Partial<WaterIntake>) => {
     if (!user) return;
@@ -187,10 +194,10 @@ const WaterManager: React.FC<WaterManagerProps> = ({ water, setWater, cardClass,
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className={`p-8 rounded-[2.5rem] border backdrop-blur-2xl shadow-xl ${cardClass || 'bg-slate-900 border-slate-800'} ${isLight ? 'border-white/50' : 'border-slate-800'}`}>
-              <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-4">Meta AguaLife</label>
+              <label className={`block text-xs font-bold uppercase tracking-wider mb-4 ${isLight ? 'text-black' : 'text-white'}`}>Meta AguaLife</label>
               <div className="space-y-6">
                 <div>
-                  <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Seu Peso (KG)</label>
+                  <label className={`block text-[10px] font-black uppercase tracking-widest mb-2 ${isLight ? 'text-black' : 'text-white'}`}>Seu Peso (KG)</label>
                   <div className="flex items-center gap-4 bg-slate-400/50 border border-white/10 p-4 rounded-2xl">
                     <button onClick={() => setWeight(Math.max(20, weight - 1))} className="p-1 hover:bg-black/10 rounded-lg text-white transition-colors">
                       <Minus className="w-4 h-4" />
@@ -210,7 +217,7 @@ const WaterManager: React.FC<WaterManagerProps> = ({ water, setWater, cardClass,
                   </div>
                 </div>
                 <div>
-                  <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Nível de Atividade</label>
+                  <label className={`block text-[10px] font-black uppercase tracking-widest mb-2 ${isLight ? 'text-black' : 'text-white'}`}>Nível de Atividade</label>
                   <div className="grid grid-cols-2 gap-2">
                     {[
                       { label: 'Sedentário', value: 30 },
@@ -221,7 +228,7 @@ const WaterManager: React.FC<WaterManagerProps> = ({ water, setWater, cardClass,
                       <button
                         key={opt.value}
                         onClick={() => setActivity(opt.value)}
-                        className={`px-3 py-3 rounded-xl text-[10px] font-black uppercase transition-all border ${activity === opt.value ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg' : 'bg-slate-800/30 border-slate-700/50 text-slate-500'}`}
+                        className={`px-3 py-3 rounded-xl text-[10px] font-black uppercase transition-all border ${activity === opt.value ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg' : `bg-slate-800/30 border-slate-700/50 ${isLight ? 'text-black/70' : 'text-white/70'}`}`}
                       >
                         {opt.label}
                       </button>
@@ -229,7 +236,7 @@ const WaterManager: React.FC<WaterManagerProps> = ({ water, setWater, cardClass,
                   </div>
                 </div>
                 <div className="p-4 bg-indigo-600/10 border border-indigo-500/20 rounded-2xl text-center">
-                  <p className="text-[10px] text-indigo-400 font-black uppercase mb-1">Cálculo AguaLife</p>
+                  <p className={`text-[10px] font-black uppercase mb-1 ${isLight ? 'text-black' : 'text-white'}`}>Cálculo AguaLife</p>
                   <p className={`text-3xl font-black ${isLight ? 'text-black' : 'text-white'}`}>{weight * activity}ml <span className="text-xs font-medium text-slate-500">/ dia</span></p>
                 </div>
               </div>
@@ -237,7 +244,7 @@ const WaterManager: React.FC<WaterManagerProps> = ({ water, setWater, cardClass,
 
             <div className={`p-8 rounded-[2.5rem] border backdrop-blur-2xl shadow-xl ${cardClass || 'bg-slate-900 border-slate-800'} ${isLight ? 'border-white/50' : 'border-slate-800'}`}>
               <div className="flex items-center justify-between mb-6">
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider">Notificações</label>
+                <label className={`block text-xs font-bold uppercase tracking-wider ${isLight ? 'text-black' : 'text-white'}`}>Notificações</label>
                 <button
                   onClick={() => setRemindersEnabled(!remindersEnabled)}
                   className={`w-12 h-6 rounded-full transition-colors relative ${remindersEnabled ? 'bg-indigo-600' : 'bg-slate-700'}`}
@@ -265,7 +272,7 @@ const WaterManager: React.FC<WaterManagerProps> = ({ water, setWater, cardClass,
 
                   {reminderType === 'interval' ? (
                     <div className="space-y-3">
-                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest">A cada {interval} min</label>
+                      <label className={`block text-[10px] font-black uppercase tracking-widest ${isLight ? 'text-black' : 'text-white'}`}>A cada {interval} min</label>
                       <input
                         type="range"
                         min="15" max="240" step="15"
@@ -306,7 +313,7 @@ const WaterManager: React.FC<WaterManagerProps> = ({ water, setWater, cardClass,
               ) : (
                 <div className="py-8 text-center bg-slate-800/10 border border-dashed border-slate-700/30 rounded-2xl">
                   <Bell className="w-10 h-10 text-slate-700 mx-auto mb-2 opacity-50" />
-                  <p className="text-[10px] text-slate-600 font-black uppercase tracking-widest">Alertas Desativados</p>
+                  <p className={`text-[10px] font-black uppercase tracking-widest ${isLight ? 'text-black' : 'text-white'}`}>Alertas Desativados</p>
                 </div>
               )}
             </div>

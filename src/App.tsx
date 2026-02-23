@@ -100,6 +100,12 @@ const App: React.FC = () => {
     scheduledTimes: ["09:00", "12:00", "15:00", "18:00", "21:00"]
   });
 
+  const [userWeight, setUserWeight] = useState<number>(70);
+  const [userActivity, setUserActivity] = useState<number>(35);
+  const [userWaterReminders, setUserWaterReminders] = useState<any>({
+    enabled: true, type: 'interval', interval: 60, scheduledTimes: []
+  });
+
   useEffect(() => {
     if (user) {
       fetchData();
@@ -120,12 +126,13 @@ const App: React.FC = () => {
     setIsLoadingData(true);
 
     try {
-      const [tasksResult, habitsResult, goalsResult, waterResult, workoutsResult] = await Promise.all([
+      const [tasksResult, habitsResult, goalsResult, waterResult, workoutsResult, profileResult] = await Promise.all([
         supabase.from('tasks').select('*'),
         supabase.from('habits').select('*'),
         supabase.from('goals').select('*'),
         supabase.from('water_intake').select('*').eq('user_id', user.id).single(),
-        supabase.from('workouts').select('*, exercises(*)').eq('user_id', user.id)
+        supabase.from('workouts').select('*, exercises(*)').eq('user_id', user.id),
+        supabase.from('profiles').select('weight, activity_level, water_reminders').eq('id', user.id).single()
       ]);
 
       if (tasksResult.data) {
@@ -173,6 +180,15 @@ const App: React.FC = () => {
 
       if (workoutsResult.data) {
         setWorkouts(workoutsResult.data);
+      }
+
+      // Load profile data (weight, activity, water reminders)
+      if (profileResult.data) {
+        setUserWeight(profileResult.data.weight || 70);
+        setUserActivity(profileResult.data.activity_level || 35);
+        if (profileResult.data.water_reminders) {
+          setUserWaterReminders(profileResult.data.water_reminders);
+        }
       }
 
     } catch (error) {
@@ -260,7 +276,7 @@ const App: React.FC = () => {
       case 'tasks': return <TaskManager {...commonProps} tasks={tasks} setTasks={setTasks} />;
       case 'habits': return <HabitTracker {...commonProps} habits={habits} setHabits={setHabits} />;
       case 'goals': return <GoalsManager {...commonProps} goals={goals} setGoals={setGoals} />;
-      case 'water': return <WaterManager {...commonProps} water={water} setWater={setWater} />;
+      case 'water': return <WaterManager {...commonProps} water={water} setWater={setWater} initialWeight={userWeight} initialActivity={userActivity} initialReminders={userWaterReminders} />;
       case 'gym': return <GymManager {...commonProps} workouts={workouts} setWorkouts={setWorkouts} themeId={currentTheme} />;
       case 'focus': return <FocusMode {...commonProps} tasks={tasks} isGlobalFocusActive={isFocusActive} setIsGlobalFocusActive={setIsFocusActive} />;
       default: return <Dashboard {...commonProps} tasks={tasks} habits={habits} goals={goals} water={water} workouts={workouts} onNavigate={setActiveTab} />;
@@ -286,7 +302,7 @@ const App: React.FC = () => {
               <div className="absolute inset-0 bg-indigo-900/10 backdrop-blur-[2px]"></div>
             </div>
 
-            <div className="absolute inset-0 flex items-end p-6 z-10 bg-gradient-to-t from-white via-white/40 to-transparent dark:from-slate-900 dark:via-slate-900/40">
+            <div className={`absolute inset-0 flex items-end p-6 z-10 ${currentTheme === 'lavender-light' ? 'bg-gradient-to-t from-[#ddd6f3] via-[#ddd6f3]/90 to-[#ddd6f3]/50' : 'bg-gradient-to-t from-[#0f172a] via-[#0f172a]/90 to-[#0f172a]/50'}`}>
               <div className="flex items-center gap-4">
                 <div className="w-14 h-14 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-xl shadow-indigo-600/20">
                   <CalIcon className="w-8 h-8 text-white" />
