@@ -30,6 +30,7 @@ import WaterManager from './components/WaterManager';
 import CalendarSync from './components/CalendarSync';
 import FocusMode from './components/FocusMode';
 import GymManager from './components/GymManager';
+import NotesManager from './components/NotesManager';
 import Auth from './components/Auth';
 import ProfileModal from './components/ProfileModal';
 import PasswordModal from './components/PasswordModal';
@@ -251,6 +252,68 @@ const App: React.FC = () => {
     setNotifications(prev => prev.map(n => ({ ...n, read: true })));
   };
 
+  const handleConvertToTask = async (title: string) => {
+    const newTask = {
+      user_id: user?.id,
+      title,
+      category: Category.OTHER,
+      priority: TaskPriority.MEDIUM,
+      completed: false,
+      due_date: new Date().toISOString()
+    };
+    const { data, error } = await supabase.from('tasks').insert(newTask).select().single();
+    if (!error && data) {
+      setTasks(prev => [...prev, {
+        id: data.id,
+        title: data.title,
+        category: data.category as Category,
+        priority: data.priority as TaskPriority,
+        completed: data.completed,
+        subTasks: data.subtasks || [],
+        dueDate: data.due_date,
+        reminder: data.reminder
+      }]);
+      showToast('Nota convertida para Tarefa com sucesso!', 'success');
+    } else {
+      showToast('Erro ao converter nota em tarefa', 'error');
+    }
+  };
+
+  const handleConvertToHabit = async (title: string) => {
+    const newHabit = {
+      user_id: user?.id,
+      title,
+      frequency: 'daily',
+      streak: 0,
+      history: []
+    };
+    const { data, error } = await supabase.from('habits').insert(newHabit).select().single();
+    if (!error && data) {
+      setHabits(prev => [...prev, data]);
+      showToast('Nota convertida para Hábito com sucesso!', 'success');
+    } else {
+      showToast('Erro ao converter nota em hábito', 'error');
+    }
+  };
+
+  const handleConvertToGoal = async (title: string) => {
+    const newGoal = {
+      user_id: user?.id,
+      title,
+      target: 1,
+      current: 0,
+      unit: 'unidades',
+      type: 'weekly'
+    };
+    const { data, error } = await supabase.from('goals').insert(newGoal).select().single();
+    if (!error && data) {
+      setGoals(prev => [...prev, data]);
+      showToast('Nota convertida para Meta com sucesso!', 'success');
+    } else {
+      showToast('Erro ao converter nota em meta', 'error');
+    }
+  };
+
   if (isAuthLoading) {
     return (
       <div className="min-h-screen bg-[#020617] flex items-center justify-center">
@@ -278,6 +341,7 @@ const App: React.FC = () => {
       case 'goals': return <GoalsManager {...commonProps} goals={goals} setGoals={setGoals} />;
       case 'water': return <WaterManager {...commonProps} water={water} setWater={setWater} initialWeight={userWeight} initialActivity={userActivity} initialReminders={userWaterReminders} />;
       case 'gym': return <GymManager {...commonProps} workouts={workouts} setWorkouts={setWorkouts} themeId={currentTheme} />;
+      case 'notes': return <NotesManager {...commonProps} themeId={currentTheme} onConvertToTask={handleConvertToTask} onConvertToHabit={handleConvertToHabit} onConvertToGoal={handleConvertToGoal} />;
       case 'focus': return <FocusMode {...commonProps} tasks={tasks} isGlobalFocusActive={isFocusActive} setIsGlobalFocusActive={setIsFocusActive} />;
       default: return <Dashboard {...commonProps} tasks={tasks} habits={habits} goals={goals} water={water} workouts={workouts} onNavigate={setActiveTab} />;
     }

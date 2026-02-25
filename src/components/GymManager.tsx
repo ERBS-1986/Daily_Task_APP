@@ -6,7 +6,7 @@ import {
   Dumbbell, Plus, CheckCircle2, Circle, Calendar,
   Flame, Activity, ChevronRight, Save, Play,
   RotateCcw, Pause, Timer, X, Pencil, Trash2,
-  Sparkles, History, Copy
+  Sparkles, History, Copy, ArrowUp, ArrowDown
 } from 'lucide-react';
 import { useToast } from '../contexts/ToastContext';
 import { supabase } from '../lib/supabase';
@@ -90,9 +90,11 @@ const GymManager: React.FC<GymManagerProps> = ({ workouts, setWorkouts, cardClas
       if (workoutError && workoutError.code !== 'PGRST116') throw workoutError;
 
       if (workoutData) {
+        let sortedExercises = workoutData.exercises || [];
+        sortedExercises.sort((a: any, b: any) => (a.order_index || 0) - (b.order_index || 0));
         setCurrentWorkout({
           ...workoutData,
-          exercises: workoutData.exercises || []
+          exercises: sortedExercises
         });
       } else {
         setCurrentWorkout({
@@ -260,6 +262,39 @@ const GymManager: React.FC<GymManagerProps> = ({ workouts, setWorkouts, cardClas
     }
   };
 
+  const moveExercise = async (index: number, direction: -1 | 1) => {
+    const newExercises = [...currentWorkout.exercises];
+    if (index + direction < 0 || index + direction >= newExercises.length) return;
+
+    const temp = newExercises[index];
+    newExercises[index] = newExercises[index + direction];
+    newExercises[index + direction] = temp;
+
+    setCurrentWorkout({ ...currentWorkout, exercises: newExercises });
+
+    try {
+      let hasError = false;
+      for (let i = 0; i < newExercises.length; i++) {
+        const { error } = await supabase.from('exercises').update({ order_index: i }).eq('id', newExercises[i].id);
+        if (error) {
+          console.error('Error updating order:', error);
+          hasError = true;
+          if (error.code === 'PGRST204' || (error.message && error.message.includes('order_index'))) {
+            showToast("Aviso: Crie a coluna 'order_index' (int4) na tabela 'exercises' no Supabase para salvar a ordem definitiva.", "error");
+          } else {
+            showToast("Erro ao salvar ordem no banco.", "error");
+          }
+          break;
+        }
+      }
+
+      await fetchWorkout(selectedDate);
+    } catch (err) {
+      console.error(err);
+      showToast("Erro ao reordenar exercícios.", "error");
+    }
+  };
+
   const cloneWorkout = async (targetDate: string) => {
     if (currentWorkout.exercises.length === 0 || !user) return;
 
@@ -381,7 +416,7 @@ const GymManager: React.FC<GymManagerProps> = ({ workouts, setWorkouts, cardClas
                   </button>
                 </div>
               ) : (
-                currentWorkout.exercises.map(ex => (
+                currentWorkout.exercises.map((ex, index) => (
                   <div
                     key={ex.id}
                     className={`
@@ -401,11 +436,17 @@ const GymManager: React.FC<GymManagerProps> = ({ workouts, setWorkouts, cardClas
                         <p className={`text-xs font-medium ${isLight ? 'text-slate-800' : 'text-slate-500'}`}>{ex.sets} séries • {ex.reps} reps {ex.weight && `• ${ex.weight}kg`}</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <button onClick={() => openEditModal(ex)} className="p-2 text-slate-600 hover:text-indigo-400 transition-colors">
+                    <div className="flex items-center gap-1">
+                      <button onClick={() => moveExercise(index, -1)} disabled={index === 0} className="p-2 text-slate-600 hover:text-indigo-400 disabled:opacity-30 disabled:hover:text-slate-600 transition-colors" title="Mover para cima">
+                        <ArrowUp className="w-4 h-4" />
+                      </button>
+                      <button onClick={() => moveExercise(index, 1)} disabled={index === currentWorkout.exercises.length - 1} className="p-2 text-slate-600 hover:text-indigo-400 disabled:opacity-30 disabled:hover:text-slate-600 transition-colors" title="Mover para baixo">
+                        <ArrowDown className="w-4 h-4" />
+                      </button>
+                      <button onClick={() => openEditModal(ex)} className="p-2 text-slate-600 hover:text-indigo-400 transition-colors" title="Editar">
                         <Pencil className="w-4 h-4" />
                       </button>
-                      <button onClick={() => deleteExercise(ex.id)} className="p-2 text-slate-600 hover:text-rose-400 transition-colors">
+                      <button onClick={() => deleteExercise(ex.id)} className="p-2 text-slate-600 hover:text-rose-400 transition-colors" title="Excluir">
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>

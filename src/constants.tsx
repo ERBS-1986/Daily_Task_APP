@@ -14,7 +14,8 @@ import {
   Calendar as CalendarIcon,
   Sparkles,
   Timer,
-  Dumbbell
+  Dumbbell,
+  StickyNote
 } from 'lucide-react';
 import { Category } from './types';
 
@@ -32,6 +33,7 @@ export const NAVIGATION = [
   { id: 'tasks', name: 'Tarefas', icon: <CheckSquare className="w-5 h-5" /> },
   { id: 'focus', name: 'Modo Foco', icon: <Timer className="w-5 h-5" /> },
   { id: 'gym', name: 'Treino', icon: <Dumbbell className="w-5 h-5" /> },
+  { id: 'notes', name: 'Notas', icon: <StickyNote className="w-5 h-5" /> },
   { id: 'habits', name: 'Hábitos', icon: <Repeat className="w-5 h-5" /> },
   { id: 'goals', name: 'Metas', icon: <Target className="w-5 h-5" /> },
   { id: 'water', name: 'Hidratação', icon: <Droplets className="w-5 h-5" /> },

@@ -82,6 +82,7 @@ export interface Exercise {
   weight?: string;
   completed: boolean;
   gifUrl?: string; // URL para o GIF do exercício
+  order_index?: number;
 }
 
 export interface DailyWorkout {
@@ -109,3 +110,11 @@ export interface NotificationItem {
 }
 
 export type AppTheme = 'default' | 'red' | 'green' | 'blue' | 'pink' | 'purple' | 'lavender-light';
+
+export interface Note {
+  id: string;
+  user_id: string;
+  title: string;
+  content: string;
+  created_at: string;
+}
