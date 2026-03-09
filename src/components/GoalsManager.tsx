@@ -174,16 +174,18 @@ const GoalsManager: React.FC<GoalsManagerProps> = ({ goals, setGoals, cardClass,
 
           return (
             <div key={goal.id} className={`p-8 rounded-[2.5rem] border space-y-6 relative overflow-hidden group transition-all duration-500 backdrop-blur-2xl shadow-xl ${cardClass || 'bg-slate-900 border-slate-800'} ${isLight ? 'border-white/50 hover:bg-white/60 shadow-amber-100/10' : 'border-slate-800 hover:border-amber-500/30 shadow-black/20'}`}>
-              <div className="absolute top-4 right-4 flex gap-1 opacity-0 group-hover:opacity-100 transition-all z-20">
+              <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-all z-20">
                 <button
                   onClick={() => openEditModal(goal)}
-                  className="p-2 text-slate-600 hover:text-indigo-400"
+                  className={`p-2 rounded-lg border transition-all duration-300 shadow-lg ${isLight ? 'bg-white/80 border-slate-200 text-slate-600 hover:text-indigo-600 hover:border-indigo-400 hover:shadow-indigo-500/20' : 'bg-slate-800/80 border-white/10 text-slate-400 hover:text-indigo-400 hover:border-indigo-500/50 hover:shadow-indigo-500/30 hover:scale-110'}`}
+                  title="Editar Meta"
                 >
                   <Pencil className="w-4 h-4" />
                 </button>
                 <button
                   onClick={() => deleteGoal(goal.id)}
-                  className="p-2 text-slate-600 hover:text-rose-500"
+                  className={`p-2 rounded-lg border transition-all duration-300 shadow-lg ${isLight ? 'bg-white/80 border-slate-200 text-slate-600 hover:text-rose-600 hover:border-rose-400 hover:shadow-rose-500/20' : 'bg-slate-800/80 border-white/10 text-slate-400 hover:text-rose-400 hover:border-rose-500/50 hover:shadow-rose-500/30 hover:scale-110'}`}
+                  title="Excluir Meta"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>

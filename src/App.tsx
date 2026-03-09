@@ -149,7 +149,37 @@ const App: React.FC = () => {
         })));
       }
       if (habitsResult.data) setHabits(habitsResult.data);
-      if (goalsResult.data) setGoals(goalsResult.data);
+      if (goalsResult.data) {
+        const rawGoals = goalsResult.data;
+        const now = new Date();
+        
+        // Calcular início da semana atual (Segunda-feira 00:00:00 local)
+        const startOfWeek = new Date(now);
+        const day = startOfWeek.getDay(); // 0 (Dom) a 6 (Sáb)
+        const diff = startOfWeek.getDate() - day + (day === 0 ? -6 : 1); // Ajustar para Segunda-feira
+        startOfWeek.setDate(diff);
+        startOfWeek.setHours(0, 0, 0, 0);
+
+        const updatedGoals = await Promise.all(rawGoals.map(async (goal: any) => {
+          if (goal.type === 'weekly') {
+            const lastUpdate = new Date(goal.updated_at || goal.created_at);
+            
+            // Se a última atualização foi ANTES desta semana começar, reseta
+            if (lastUpdate < startOfWeek) {
+              console.log(`[App] Resetando meta semanal: ${goal.title}`);
+              const { error } = await supabase
+                .from('goals')
+                .update({ current: 0 })
+                .eq('id', goal.id);
+              
+              if (!error) return { ...goal, current: 0, updated_at: now.toISOString() };
+            }
+          }
+          return goal;
+        }));
+
+        setGoals(updatedGoals);
+      }
       if (waterResult.data) {
         const waterData = waterResult.data;
         const lastUpdate = new Date(waterData.updated_at);
