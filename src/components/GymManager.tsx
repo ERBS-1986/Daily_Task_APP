@@ -436,17 +436,25 @@ const GymManager: React.FC<GymManagerProps> = ({ workouts, setWorkouts, cardClas
                         <p className={`text-xs font-medium ${isLight ? 'text-slate-800' : 'text-slate-500'}`}>{ex.sets} séries • {ex.reps} reps {ex.weight && `• ${ex.weight}kg`}</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-2">
                       <button onClick={() => moveExercise(index, -1)} disabled={index === 0} className="p-2 text-slate-600 hover:text-indigo-400 disabled:opacity-30 disabled:hover:text-slate-600 transition-colors" title="Mover para cima">
                         <ArrowUp className="w-4 h-4" />
                       </button>
                       <button onClick={() => moveExercise(index, 1)} disabled={index === currentWorkout.exercises.length - 1} className="p-2 text-slate-600 hover:text-indigo-400 disabled:opacity-30 disabled:hover:text-slate-600 transition-colors" title="Mover para baixo">
                         <ArrowDown className="w-4 h-4" />
                       </button>
-                      <button onClick={() => openEditModal(ex)} className="p-2 text-slate-600 hover:text-indigo-400 transition-colors" title="Editar">
+                      <button
+                        onClick={() => openEditModal(ex)}
+                        className={`p-2 rounded-lg border transition-all duration-300 shadow-lg ${isLight ? 'bg-white/80 border-slate-200 text-slate-600 hover:text-indigo-600 hover:border-indigo-400 hover:shadow-indigo-500/20' : 'bg-slate-800/80 border-white/10 text-slate-400 hover:text-indigo-400 hover:border-indigo-500/50 hover:shadow-indigo-500/30 hover:scale-110'}`}
+                        title="Editar Exercício"
+                      >
                         <Pencil className="w-4 h-4" />
                       </button>
-                      <button onClick={() => deleteExercise(ex.id)} className="p-2 text-slate-600 hover:text-rose-400 transition-colors" title="Excluir">
+                      <button
+                        onClick={() => deleteExercise(ex.id)}
+                        className={`p-2 rounded-lg border transition-all duration-300 shadow-lg ${isLight ? 'bg-white/80 border-slate-200 text-slate-600 hover:text-rose-600 hover:border-rose-400 hover:shadow-rose-500/20' : 'bg-slate-800/80 border-white/10 text-slate-400 hover:text-rose-400 hover:border-rose-500/50 hover:shadow-rose-500/30 hover:scale-110'}`}
+                        title="Excluir Exercício"
+                      >
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>

@@ -276,18 +276,20 @@ const TaskManager: React.FC<TaskManagerProps> = ({ tasks, setTasks, cardClass, i
               </div>
             </div>
 
-            <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-              <button
-                onClick={() => deleteTask(task.id)}
-                className="p-2 text-slate-500 hover:text-rose-400 transition-colors"
-              >
-                <Trash2 className="w-5 h-5" />
-              </button>
+            <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all">
               <button
                 onClick={() => openEditModal(task)}
-                className="p-2 text-slate-500 hover:text-indigo-400 transition-colors"
+                className={`p-2 rounded-lg border transition-all duration-300 shadow-lg ${isLight ? 'bg-white/80 border-slate-200 text-slate-600 hover:text-indigo-600 hover:border-indigo-400 hover:shadow-indigo-500/20' : 'bg-slate-800/80 border-white/10 text-slate-400 hover:text-indigo-400 hover:border-indigo-500/50 hover:shadow-indigo-500/30 hover:scale-110'}`}
+                title="Editar Tarefa"
               >
                 <Pencil className="w-5 h-5" />
+              </button>
+              <button
+                onClick={() => deleteTask(task.id)}
+                className={`p-2 rounded-lg border transition-all duration-300 shadow-lg ${isLight ? 'bg-white/80 border-slate-200 text-slate-600 hover:text-rose-600 hover:border-rose-400 hover:shadow-rose-500/20' : 'bg-slate-800/80 border-white/10 text-slate-400 hover:text-rose-400 hover:border-rose-500/50 hover:shadow-rose-500/30 hover:scale-110'}`}
+                title="Excluir Tarefa"
+              >
+                <Trash2 className="w-5 h-5" />
               </button>
             </div>
           </div>
